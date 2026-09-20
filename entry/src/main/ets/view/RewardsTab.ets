@@ -1,11 +1,23 @@
+import { promptAction } from '@kit.ArkUI';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
+import { MallService, RedeemResult } from '../model/MallService';
 import { AppColor } from '../common/Constants';
-import { BadgeDef, DailyTask } from '../model/CarbonTypes';
+import { BadgeDef, DailyTask, RedeemItem, RedemptionRecord } from '../model/CarbonTypes';
+import { DateUtil } from '../common/DateUtil';
 
 @Component
 export struct RewardsTab {
   @StorageLink('recordsVersion') version: number = 0;
+
+  onRedeem(item: RedeemItem): void {
+    const res: RedeemResult = MallService.redeem(item);
+    if (res.ok) {
+      promptAction.showToast({ message: '兑换成功，兑换码 ' + res.code });
+    } else {
+      promptAction.showToast({ message: res.message });
+    }
+  }
 
   build() {
     Scroll() {
@@ -17,18 +29,24 @@ export struct RewardsTab {
           .width('100%')
 
         Column() {
-          Text('我的碳积分')
+          Text('可用碳积分')
             .fontSize(13)
             .fontColor(AppColor.TEXT_SUB)
-          Text(CarbonStore.get().totalPoints().toString())
+          Text(CarbonStore.get().pointsBalance().toString())
             .fontSize(40)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppColor.ACCENT)
             .margin({ top: 4 })
-          Text('累计减排 ' + CarbonStore.get().totalSaved().toFixed(2) + ' kg CO₂e')
-            .fontSize(12)
-            .fontColor(AppColor.TEXT_SUB)
-            .margin({ top: 6 })
+          Row() {
+            Text('累计获得 ' + CarbonStore.get().totalPoints().toString())
+              .fontSize(12)
+              .fontColor(AppColor.TEXT_SUB)
+            Text('已兑换 ' + CarbonStore.get().spentPoints().toString())
+              .fontSize(12)
+              .fontColor(AppColor.TEXT_SUB)
+              .margin({ left: 16 })
+          }
+          .margin({ top: 6 })
         }
         .width('100%')
         .padding(20)
@@ -61,6 +79,83 @@ export struct RewardsTab {
         .padding(16)
         .backgroundColor(AppColor.CARD)
         .borderRadius(16)
+
+        Column() {
+          Row() {
+            Text('碳普惠权益商城')
+              .fontSize(15)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(AppColor.TEXT)
+            Blank()
+            Text('模拟城市碳普惠接口')
+              .fontSize(10)
+              .fontColor(AppColor.TEXT_SUB)
+          }
+          .width('100%')
+          ForEach(MallService.ITEMS, (item: RedeemItem) => {
+            Row() {
+              Text(item.icon)
+                .fontSize(26)
+              Column() {
+                Text(item.name)
+                  .fontSize(14)
+                  .fontColor(AppColor.TEXT)
+                Text(item.desc)
+                  .fontSize(11)
+                  .fontColor(AppColor.TEXT_SUB)
+                  .margin({ top: 2 })
+              }
+              .layoutWeight(1)
+              .alignItems(HorizontalAlign.Start)
+              .margin({ left: 10 })
+              Button(CarbonStore.get().pointsBalance() >= item.cost ? '兑换' : item.cost.toString() + '分')
+                .height(32)
+                .fontSize(12)
+                .backgroundColor(CarbonStore.get().pointsBalance() >= item.cost ? AppColor.PRIMARY : AppColor.DIVIDER)
+                .fontColor(Color.White)
+                .onClick(() => {
+                  this.onRedeem(item);
+                })
+            }
+            .width('100%')
+            .padding({ top: 10, bottom: 10 })
+          }, (item: RedeemItem) => item.id)
+        }
+        .width('100%')
+        .padding(16)
+        .backgroundColor(AppColor.CARD)
+        .borderRadius(16)
+
+        if (CarbonStore.get().getRedemptions().length > 0) {
+          Column() {
+            Text('兑换记录')
+              .fontSize(15)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(AppColor.TEXT)
+              .width('100%')
+            ForEach(CarbonStore.get().getRedemptions(), (r: RedemptionRecord) => {
+              Row() {
+                Text(r.itemName)
+                  .fontSize(13)
+                  .fontColor(AppColor.TEXT)
+                  .layoutWeight(1)
+                Text('-' + r.cost.toString())
+                  .fontSize(13)
+                  .fontColor(AppColor.DANGER)
+                Text(DateUtil.formatTime(r.timestamp))
+                  .fontSize(11)
+                  .fontColor(AppColor.TEXT_SUB)
+                  .margin({ left: 10 })
+              }
+              .width('100%')
+              .padding({ top: 8, bottom: 8 })
+            }, (r: RedemptionRecord) => r.id)
+          }
+          .width('100%')
+          .padding(16)
+          .backgroundColor(AppColor.CARD)
+          .borderRadius(16)
+        }
 
         Column() {
           Text('今日任务')

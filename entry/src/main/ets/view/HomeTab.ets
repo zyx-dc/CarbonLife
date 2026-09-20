@@ -4,12 +4,69 @@ import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
 import { AppColor } from '../common/Constants';
 import { DailyTask } from '../model/CarbonTypes';
+import { FamilyService } from '../model/FamilyService';
+import { ReminderService } from '../model/ReminderService';
 
 @Component
 export struct HomeTab {
   controller: TabsController = new TabsController();
   @StorageLink('recordsVersion') version: number = 0;
+  @StorageLink('familyVersion') familyVersion: number = 0;
   @State showShare: boolean = false;
+  @State reminderOn: boolean = false;
+  @State familyName: string = '我';
+  @State familyCode: string = '';
+
+  aboutToAppear(): void {
+    FamilyService.get().pushLocal();
+    this.familyName = FamilyService.get().getNickname();
+    ReminderService.isEnabled().then((v: boolean) => {
+      this.reminderOn = v;
+    });
+  }
+
+  onGenCode(): void {
+    const code = FamilyService.get().genSession();
+    this.familyCode = code;
+    promptAction.showToast({ message: '家庭码：' + code });
+  }
+
+  onJoin(): void {
+    if (this.familyCode === '') {
+      promptAction.showToast({ message: '请先输入或生成家庭码' });
+      return;
+    }
+    FamilyService.get().joinSession(this.familyCode).then(() => {
+      promptAction.showToast({ message: '已加入家庭组' });
+    });
+  }
+
+  onLeave(): void {
+    FamilyService.get().leaveSession().then(() => {
+      promptAction.showToast({ message: '已退出家庭组' });
+    });
+  }
+
+  onSync(): void {
+    FamilyService.get().pushLocal();
+    promptAction.showToast({ message: '已同步我的碳积分' });
+  }
+
+  onReminderChange(isOn: boolean): void {
+    this.reminderOn = isOn;
+    if (isOn) {
+      ReminderService.enable().then(() => {
+        promptAction.showToast({ message: '已开启每日 20:00 提醒' });
+      }).catch(() => {
+        this.reminderOn = false;
+        promptAction.showToast({ message: '开启提醒失败' });
+      });
+    } else {
+      ReminderService.disable().then(() => {
+        promptAction.showToast({ message: '已关闭提醒' });
+      });
+    }
+  }
 
   @Builder
   statBlock(title: string, value: string, unit: string, color: string) {
@@ -185,6 +242,140 @@ export struct HomeTab {
         .width('100%')
 
         Column() {
+          Row() {
+            Text('👨👩👧 家庭碳积分（超级终端）')
+              .fontSize(15)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(AppColor.TEXT)
+            Blank()
+            Text(FamilyService.get().getSessionId() === '' ? '未加入' :
+              (FamilyService.get().isPeerOnline() ? '对方在线' : '等待对方'))
+              .fontSize(11)
+              .fontColor(FamilyService.get().getSessionId() === '' ? AppColor.TEXT_SUB : AppColor.PRIMARY)
+          }
+          .width('100%')
+          Row() {
+            Column() {
+              Text(FamilyService.get().getSaved().toFixed(2))
+                .fontSize(18)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(AppColor.PRIMARY)
+              Text('我的减排(kg)')
+                .fontSize(10)
+                .fontColor(AppColor.TEXT_SUB)
+            }
+            .layoutWeight(1)
+            Column() {
+              Text(FamilyService.get().getPoints().toString())
+                .fontSize(18)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(AppColor.ACCENT)
+              Text('我的积分')
+                .fontSize(10)
+                .fontColor(AppColor.TEXT_SUB)
+            }
+            .layoutWeight(1)
+          }
+          .width('100%')
+          .margin({ top: 10 })
+
+          TextInput({ text: this.familyName, placeholder: '我的昵称' })
+            .height(40)
+            .backgroundColor(AppColor.BG)
+            .margin({ top: 10 })
+            .onChange((v: string) => {
+              this.familyName = v;
+              FamilyService.get().setNickname(v);
+            })
+          TextInput({ text: $$this.familyCode, placeholder: '家庭码（生成或输入）' })
+            .height(40)
+            .backgroundColor(AppColor.BG)
+            .margin({ top: 8 })
+          Row({ space: 8 }) {
+            Button('生成家庭码')
+              .layoutWeight(1)
+              .height(38)
+              .fontSize(12)
+              .backgroundColor(AppColor.PRIMARY)
+              .fontColor(Color.White)
+              .onClick(() => {
+                this.onGenCode();
+              })
+            Button('加入')
+              .layoutWeight(1)
+              .height(38)
+              .fontSize(12)
+              .backgroundColor(AppColor.CHART_BLUE)
+              .fontColor(Color.White)
+              .onClick(() => {
+                this.onJoin();
+              })
+          }
+          .width('100%')
+          .margin({ top: 8 })
+          Row({ space: 8 }) {
+            Button('同步我的数据')
+              .layoutWeight(1)
+              .height(38)
+              .fontSize(12)
+              .backgroundColor(AppColor.CARD)
+              .fontColor(AppColor.PRIMARY)
+              .borderWidth(1)
+              .borderColor(AppColor.PRIMARY)
+              .onClick(() => {
+                this.onSync();
+              })
+            Button('退出家庭组')
+              .layoutWeight(1)
+              .height(38)
+              .fontSize(12)
+              .backgroundColor(AppColor.CARD)
+              .fontColor(AppColor.TEXT_SUB)
+              .borderWidth(1)
+              .borderColor(AppColor.DIVIDER)
+              .onClick(() => {
+                this.onLeave();
+              })
+          }
+          .width('100%')
+          .margin({ top: 8 })
+          Text('在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。')
+            .fontSize(10)
+            .fontColor(AppColor.TEXT_SUB)
+            .margin({ top: 8 })
+            .width('100%')
+        }
+        .width('100%')
+        .padding(16)
+        .backgroundColor(AppColor.CARD)
+        .borderRadius(16)
+
+        Column() {
+          Row() {
+            Column() {
+              Text('每日低碳提醒')
+                .fontSize(14)
+                .fontColor(AppColor.TEXT)
+              Text('每天 20:00 提醒记录低碳行为')
+                .fontSize(11)
+                .fontColor(AppColor.TEXT_SUB)
+                .margin({ top: 2 })
+            }
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start)
+            Toggle({ type: ToggleType.Switch, isOn: this.reminderOn })
+              .onChange((isOn: boolean) => {
+                this.onReminderChange(isOn);
+              })
+          }
+          .width('100%')
+        }
+        .width('100%')
+        .padding(16)
+        .backgroundColor(AppColor.CARD)
+        .borderRadius(16)
+
+        Column() {
           Text('今日任务')
             .fontSize(15)
             .fontWeight(FontWeight.Bold)
@@ -275,6 +466,6 @@ export struct HomeTab {
     }
     .width('100%')
     .height('100%')
-    .id('home_' + this.version.toString())
+    .id('home_' + this.version.toString() + '_' + this.familyVersion.toString())
   }
 }

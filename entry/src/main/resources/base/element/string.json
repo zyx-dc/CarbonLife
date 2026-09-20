@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "碳足迹"
+    },
+    {
+      "name": "perm_distributed_reason",
+      "value": "用于家庭碳积分在多设备间同步"
     }
   ]
 }

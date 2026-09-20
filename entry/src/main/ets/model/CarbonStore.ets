@@ -1,7 +1,7 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint } from './CarbonTypes';
+import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord } from './CarbonTypes';
 import { CarbonFactors } from './CarbonFactors';
 import { AppConst, AppColor } from '../common/Constants';
 import { DateUtil } from '../common/DateUtil';
@@ -10,6 +10,7 @@ export class CarbonStore {
   private static instance: CarbonStore | null = null;
   private prefs: preferences.Preferences | null = null;
   private records: CarbonRecord[] = [];
+  private redemptions: RedemptionRecord[] = [];
   private loaded: boolean = false;
 
   static get(): CarbonStore {
@@ -26,6 +27,8 @@ export class CarbonStore {
     this.prefs = await preferences.getPreferences(context, AppConst.STORE_NAME);
     const raw = await this.prefs.get(AppConst.KEY_RECORDS, '[]') as string;
     this.records = this.parse(raw);
+    const rawRedeem = await this.prefs.get(AppConst.KEY_REDEMPTIONS, '[]') as string;
+    this.redemptions = this.parseRedemptions(rawRedeem);
     this.loaded = true;
     AppStorage.setOrCreate('recordsVersion', 1);
   }
@@ -39,11 +42,36 @@ export class CarbonStore {
     }
   }
 
+  private parseRedemptions(raw: string): RedemptionRecord[] {
+    try {
+      const arr: RedemptionRecord[] = JSON.parse(raw) as RedemptionRecord[];
+      return arr;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async getSetting(key: string, def: string): Promise<string> {
+    if (this.prefs === null) {
+      return def;
+    }
+    return await this.prefs.get(key, def) as string;
+  }
+
+  async setSetting(key: string, value: string): Promise<void> {
+    if (this.prefs === null) {
+      return;
+    }
+    await this.prefs.put(key, value);
+    await this.prefs.flush();
+  }
+
   private async persist(): Promise<void> {
     if (this.prefs === null) {
       return;
     }
     await this.prefs.put(AppConst.KEY_RECORDS, JSON.stringify(this.records));
+    await this.prefs.put(AppConst.KEY_REDEMPTIONS, JSON.stringify(this.redemptions));
     await this.prefs.flush();
   }
 
@@ -108,6 +136,30 @@ export class CarbonStore {
       sum += r.points;
     });
     return sum;
+  }
+
+  spentPoints(): number {
+    let sum = 0;
+    this.redemptions.forEach((r: RedemptionRecord) => {
+      sum += r.cost;
+    });
+    return sum;
+  }
+
+  pointsBalance(): number {
+    return this.totalPoints() - this.spentPoints();
+  }
+
+  getRedemptions(): RedemptionRecord[] {
+    const copy: RedemptionRecord[] = this.redemptions.slice();
+    copy.sort((a: RedemptionRecord, b: RedemptionRecord) => b.timestamp - a.timestamp);
+    return copy;
+  }
+
+  addRedemption(rec: RedemptionRecord): void {
+    this.redemptions.push(rec);
+    this.persist();
+    this.notify();
   }
 
   totalCount(): number {

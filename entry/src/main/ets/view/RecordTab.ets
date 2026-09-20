@@ -4,6 +4,7 @@ import { CarbonFactors } from '../model/CarbonFactors';
 import { AppColor, AppConst } from '../common/Constants';
 import { BehaviorDef, CarbonRecord } from '../model/CarbonTypes';
 import { DateUtil } from '../common/DateUtil';
+import { VisionService, VisionResult } from '../model/VisionService';
 
 @Component
 export struct RecordTab {
@@ -53,6 +54,17 @@ export struct RecordTab {
     this.note = '';
   }
 
+  onAiDetect(): void {
+    VisionService.pickAndDetect().then((res: VisionResult) => {
+      if (res.ok) {
+        const b: BehaviorDef = CarbonFactors.find(res.behaviorKey);
+        this.category = b.category;
+        this.selectedKey = b.key;
+      }
+      promptAction.showToast({ message: res.message });
+    });
+  }
+
   build() {
     Scroll() {
       Column({ space: 14 }) {
@@ -61,6 +73,33 @@ export struct RecordTab {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppColor.TEXT)
           .width('100%')
+
+        Column() {
+          Row() {
+            Text('🤖 AI 识图识别低碳行为')
+              .fontSize(14)
+              .fontColor(AppColor.TEXT)
+              .layoutWeight(1)
+            Button('拍照/选图')
+              .height(34)
+              .fontSize(12)
+              .backgroundColor(AppColor.PRIMARY)
+              .fontColor(Color.White)
+              .onClick(() => {
+                this.onAiDetect();
+              })
+          }
+          .width('100%')
+          Text('选择一张照片，端侧 AI 自动识别场景并推荐低碳行为')
+            .fontSize(11)
+            .fontColor(AppColor.TEXT_SUB)
+            .margin({ top: 6 })
+            .width('100%')
+        }
+        .width('100%')
+        .padding(16)
+        .backgroundColor(AppColor.CARD)
+        .borderRadius(16)
 
         Column() {
           Text('选择类别')

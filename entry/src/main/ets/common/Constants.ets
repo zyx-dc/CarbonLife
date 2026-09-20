@@ -18,6 +18,10 @@ export class AppColor {
 export class AppConst {
   static readonly STORE_NAME: string = 'carbon_life_store';
   static readonly KEY_RECORDS: string = 'records';
+  static readonly KEY_REDEMPTIONS: string = 'redemptions';
+  static readonly KEY_FAMILY_SESSION: string = 'family_session';
+  static readonly KEY_FAMILY_NAME: string = 'family_name';
+  static readonly KEY_REMINDER_ID: string = 'reminder_id';
   static readonly POINTS_PER_KG: number = 100;
   static readonly TREE_PER_KG: number = 10;
 }

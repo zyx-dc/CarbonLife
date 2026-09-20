@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
+import { FamilyService } from '../model/FamilyService';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'CarbonLife';
@@ -19,6 +20,8 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     hilog.info(DOMAIN, TAG, 'Ability onWindowStageCreate');
     CarbonStore.get().init(this.context).then(() => {
+      FamilyService.get().init(this.context);
+      FamilyService.get().pushLocal();
       hilog.info(DOMAIN, TAG, 'store ready');
     });
     windowStage.loadContent('pages/Index', (err: BusinessError) => {

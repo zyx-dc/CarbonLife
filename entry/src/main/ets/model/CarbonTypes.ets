@@ -57,3 +57,29 @@ export interface KnowledgeItem {
   summary: string;
   content: string;
 }
+
+export interface RedeemItem {
+  id: string;
+  name: string;
+  desc: string;
+  cost: number;
+  icon: string;
+  category: string;
+}
+
+export interface RedemptionRecord {
+  id: string;
+  itemId: string;
+  itemName: string;
+  cost: number;
+  timestamp: number;
+}
+
+export interface FamilyMember {
+  deviceName: string;
+  nickname: string;
+  saved: number;
+  points: number;
+  online: boolean;
+  isSelf: boolean;
+}
