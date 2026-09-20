@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Low carbon life assistant"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Carbon footprint entry"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "CarbonLife"
+    }
+  ]
+}

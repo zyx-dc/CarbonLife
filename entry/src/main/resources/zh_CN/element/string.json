@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "低碳生活碳积分与减排指南"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "碳足迹主入口"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "碳足迹"
+    }
+  ]
+}
