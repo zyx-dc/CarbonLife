@@ -12,6 +12,8 @@ export class CarbonStore {
   private records: CarbonRecord[] = [];
   private redemptions: RedemptionRecord[] = [];
   private loaded: boolean = false;
+  private versionCounter: number = 1;
+  private changeListeners: Array<() => void> = [];
 
   static get(): CarbonStore {
     if (CarbonStore.instance === null) {
@@ -24,13 +26,17 @@ export class CarbonStore {
     if (this.loaded) {
       return;
     }
-    this.prefs = await preferences.getPreferences(context, AppConst.STORE_NAME);
-    const raw = await this.prefs.get(AppConst.KEY_RECORDS, '[]') as string;
-    this.records = this.parse(raw);
-    const rawRedeem = await this.prefs.get(AppConst.KEY_REDEMPTIONS, '[]') as string;
-    this.redemptions = this.parseRedemptions(rawRedeem);
-    this.loaded = true;
-    AppStorage.setOrCreate('recordsVersion', 1);
+    try {
+      this.prefs = await preferences.getPreferences(context, AppConst.STORE_NAME);
+      const raw = await this.prefs.get(AppConst.KEY_RECORDS, '[]') as string;
+      this.records = this.parse(raw);
+      const rawRedeem = await this.prefs.get(AppConst.KEY_REDEMPTIONS, '[]') as string;
+      this.redemptions = this.parseRedemptions(rawRedeem);
+      this.loaded = true;
+      this.notify();
+    } catch (e) {
+      console.error('CarbonStore init failed: ' + JSON.stringify(e));
+    }
   }
 
   private parse(raw: string): CarbonRecord[] {
@@ -55,29 +61,50 @@ export class CarbonStore {
     if (this.prefs === null) {
       return def;
     }
-    return await this.prefs.get(key, def) as string;
+    try {
+      return await this.prefs.get(key, def) as string;
+    } catch (e) {
+      return def;
+    }
   }
 
   async setSetting(key: string, value: string): Promise<void> {
     if (this.prefs === null) {
       return;
     }
-    await this.prefs.put(key, value);
-    await this.prefs.flush();
+    try {
+      await this.prefs.put(key, value);
+      await this.prefs.flush();
+    } catch (e) {
+      console.error('CarbonStore setSetting failed: ' + JSON.stringify(e));
+    }
   }
 
   private async persist(): Promise<void> {
     if (this.prefs === null) {
       return;
     }
-    await this.prefs.put(AppConst.KEY_RECORDS, JSON.stringify(this.records));
-    await this.prefs.put(AppConst.KEY_REDEMPTIONS, JSON.stringify(this.redemptions));
-    await this.prefs.flush();
+    try {
+      await this.prefs.put(AppConst.KEY_RECORDS, JSON.stringify(this.records));
+      await this.prefs.put(AppConst.KEY_REDEMPTIONS, JSON.stringify(this.redemptions));
+      await this.prefs.flush();
+    } catch (e) {
+      console.error('CarbonStore persist failed: ' + JSON.stringify(e));
+    }
+  }
+
+  addChangeListener(cb: () => void): void {
+    this.changeListeners.push(cb);
+  }
+
+  removeChangeListener(cb: () => void): void {
+    this.changeListeners = this.changeListeners.filter((l: () => void) => l !== cb);
   }
 
   private notify(): void {
-    const v = AppStorage.get<number>('recordsVersion') ?? 0;
-    AppStorage.setOrCreate('recordsVersion', v + 1);
+    this.versionCounter = this.versionCounter + 1;
+    AppStorage.setOrCreate('recordsVersion', this.versionCounter);
+    this.changeListeners.forEach((l: () => void) => l());
   }
 
   getRecords(): CarbonRecord[] {
@@ -118,6 +145,7 @@ export class CarbonStore {
 
   clearAll(): void {
     this.records = [];
+    this.redemptions = [];
     this.persist();
     this.notify();
   }
@@ -172,6 +200,17 @@ export class CarbonStore {
     this.records.forEach((r: CarbonRecord) => {
       if (r.timestamp >= start) {
         sum += r.saved;
+      }
+    });
+    return sum;
+  }
+
+  todayPoints(): number {
+    const start = DateUtil.startOfDay(Date.now());
+    let sum = 0;
+    this.records.forEach((r: CarbonRecord) => {
+      if (r.timestamp >= start) {
+        sum += r.points;
       }
     });
     return sum;
@@ -311,14 +350,23 @@ export class CarbonStore {
     return this.trendDay();
   }
 
+  private csvField(value: string): string {
+    if (value.indexOf(',') >= 0 || value.indexOf('"') >= 0 ||
+      value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
+      return '"' + value.split('"').join('""') + '"';
+    }
+    return value;
+  }
+
   exportCsv(): string {
     let csv = 'id,日期,类别,行为,数量,单位,减排量kgCO2e,积分,备注\n';
     this.getRecords().forEach((r: CarbonRecord) => {
-      csv += r.id + ',' + r.dateKey + ',' + r.category + ',' + r.name + ',' +
-        r.amount.toString() + ',' + r.unit + ',' + r.saved.toFixed(4) + ',' +
-        r.points.toString() + ',' + (r.note === '' ? '-' : r.note) + '\n';
+      csv += this.csvField(r.id) + ',' + this.csvField(r.dateKey) + ',' + this.csvField(r.category) + ',' +
+        this.csvField(r.name) + ',' + r.amount.toString() + ',' + this.csvField(r.unit) + ',' +
+        r.saved.toFixed(4) + ',' + r.points.toString() + ',' +
+        this.csvField(r.note === '' ? '-' : r.note) + '\n';
     });
-    return csv;
+    return '\uFEFF' + csv;
   }
 
   exportJson(): string {

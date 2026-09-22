@@ -1,16 +1,47 @@
 import { AppColor } from '../common/Constants';
+import { AppMotion } from '../common/Theme';
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
 
 @Component
 export struct BarChartView {
-  @Prop @Watch('onDataChange') data: number[];
-  @Prop labels: string[];
-  @Prop barColor: string;
+  @Prop @Watch('onDataChange') data: number[] = [];
+  @Prop labels: string[] = [];
+  @Prop barColor: string = AppColor.PRIMARY;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private ready: boolean = false;
+  @State displayData: number[] = [];
 
   onDataChange(): void {
-    this.draw();
+    this.animateData();
+  }
+
+  aboutToAppear(): void {
+    this.displayData = this.data.map(() => 0);
+    this.animateData();
+  }
+
+  animateData(): void {
+    if (AppMotion.reduceMotion()) {
+      this.displayData = this.data.slice();
+      this.draw();
+      return;
+    }
+    const target = this.data.slice();
+    const start = Date.now();
+    const duration = 600;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      this.displayData = target.map((v: number, i: number) => lerp(0, v, t));
+      this.draw();
+      if (t < 1) {
+        setTimeout(tick, 16);
+      }
+    };
+    tick();
   }
 
   build() {
@@ -54,12 +85,12 @@ export struct BarChartView {
     this.ctx.textAlign = 'right';
     this.ctx.fillText(max.toFixed(1), left - 4, top + 8);
     this.ctx.fillText('0', left - 4, top + plotH);
-    const n: number = this.data.length;
+    const n: number = this.displayData.length;
     const slot: number = n > 0 ? plotW / n : plotW;
     const barW: number = slot * 0.5;
     this.ctx.textAlign = 'center';
     for (let i = 0; i < n; i++) {
-      const v: number = this.data[i];
+      const v: number = this.displayData[i];
       const barH: number = max > 0 ? (v / max) * plotH : 0;
       const x: number = left + slot * i + (slot - barW) / 2;
       const y: number = top + plotH - barH;
@@ -75,14 +106,40 @@ export struct BarChartView {
 
 @Component
 export struct LineChartView {
-  @Prop @Watch('onDataChange') data: number[];
-  @Prop labels: string[];
+  @Prop @Watch('onDataChange') data: number[] = [];
+  @Prop labels: string[] = [];
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private ready: boolean = false;
+  @State displayData: number[] = [];
 
   onDataChange(): void {
-    this.draw();
+    this.animateData();
+  }
+
+  aboutToAppear(): void {
+    this.displayData = this.data.map(() => 0);
+    this.animateData();
+  }
+
+  animateData(): void {
+    if (AppMotion.reduceMotion()) {
+      this.displayData = this.data.slice();
+      this.draw();
+      return;
+    }
+    const target = this.data.slice();
+    const start = Date.now();
+    const duration = 700;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      this.displayData = target.map((v: number) => lerp(0, v, t));
+      this.draw();
+      if (t < 1) {
+        setTimeout(tick, 16);
+      }
+    };
+    tick();
   }
 
   build() {
@@ -126,7 +183,7 @@ export struct LineChartView {
     this.ctx.textAlign = 'right';
     this.ctx.fillText(max.toFixed(1), left - 4, top + 8);
     this.ctx.fillText('0', left - 4, top + plotH);
-    const n: number = this.data.length;
+    const n: number = this.displayData.length;
     if (n === 0) {
       return;
     }
@@ -136,7 +193,7 @@ export struct LineChartView {
     this.ctx.beginPath();
     for (let i = 0; i < n; i++) {
       const x: number = left + step * i;
-      const y: number = top + plotH - (this.data[i] / max) * plotH;
+      const y: number = top + plotH - (this.displayData[i] / max) * plotH;
       if (i === 0) {
         this.ctx.moveTo(x, y);
       } else {
@@ -147,7 +204,7 @@ export struct LineChartView {
     this.ctx.textAlign = 'center';
     for (let i = 0; i < n; i++) {
       const x: number = left + step * i;
-      const y: number = top + plotH - (this.data[i] / max) * plotH;
+      const y: number = top + plotH - (this.displayData[i] / max) * plotH;
       this.ctx.beginPath();
       this.ctx.arc(x, y, 3, 0, Math.PI * 2);
       this.ctx.fillStyle = AppColor.PRIMARY;
@@ -162,14 +219,38 @@ export struct LineChartView {
 
 @Component
 export struct PieChartView {
-  @Prop @Watch('onDataChange') data: number[];
-  @Prop colors: string[];
+  @Prop @Watch('onDataChange') data: number[] = [];
+  @Prop colors: string[] = [];
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private ready: boolean = false;
+  @State sweep: number = 0;
 
   onDataChange(): void {
-    this.draw();
+    this.animateSweep();
+  }
+
+  aboutToAppear(): void {
+    this.animateSweep();
+  }
+
+  animateSweep(): void {
+    if (AppMotion.reduceMotion()) {
+      this.sweep = 1;
+      this.draw();
+      return;
+    }
+    const start = Date.now();
+    const duration = 700;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      this.sweep = t;
+      this.draw();
+      if (t < 1) {
+        setTimeout(tick, 16);
+      }
+    };
+    tick();
   }
 
   build() {
@@ -208,12 +289,15 @@ export struct PieChartView {
       return;
     }
     let start: number = -Math.PI / 2;
+    const totalAngle: number = Math.PI * 2 * this.sweep;
+    let consumed: number = 0;
     for (let i = 0; i < this.data.length; i++) {
       const v: number = this.data[i];
       if (v <= 0) {
         continue;
       }
-      const angle: number = (v / sum) * Math.PI * 2;
+      const ratio = v / sum;
+      const angle: number = ratio * totalAngle;
       this.ctx.beginPath();
       this.ctx.moveTo(cx, cy);
       this.ctx.arc(cx, cy, r, start, start + angle);
@@ -221,6 +305,7 @@ export struct PieChartView {
       this.ctx.fillStyle = i < this.colors.length ? this.colors[i] : AppColor.PRIMARY;
       this.ctx.fill();
       start += angle;
+      consumed += angle;
     }
     this.ctx.beginPath();
     this.ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);

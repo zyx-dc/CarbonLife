@@ -20,9 +20,15 @@ export class ReminderService {
         abilityName: 'EntryAbility'
       }
     };
-    const id = await reminderAgentManager.publishReminder(req);
-    await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_ID, id.toString());
-    return id;
+    try {
+      const id = await reminderAgentManager.publishReminder(req);
+      await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_ID, id.toString());
+      return id;
+    } catch (e) {
+      const err = e as Error;
+      console.error('ReminderService enable failed: ' + err.message);
+      throw new Error('开启提醒失败');
+    }
   }
 
   static async disable(): Promise<void> {

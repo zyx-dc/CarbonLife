@@ -10,11 +10,15 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "碳足迹"
+      "value": "CarbonLife"
     },
     {
       "name": "perm_distributed_reason",
       "value": "用于家庭碳积分在多设备间同步"
+    },
+    {
+      "name": "perm_reminder_reason",
+      "value": "用于每日定时提醒记录低碳行为"
     }
   ]
 }

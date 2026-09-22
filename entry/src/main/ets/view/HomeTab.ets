@@ -1,471 +1,340 @@
-import { promptAction } from '@kit.ArkUI';
+import { PromptAction, UIContext } from '@kit.ArkUI';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
 import { AppColor } from '../common/Constants';
 import { DailyTask } from '../model/CarbonTypes';
-import { FamilyService } from '../model/FamilyService';
+import { FamilyService, MemberData } from '../model/FamilyService';
 import { ReminderService } from '../model/ReminderService';
+import { AppButton } from '../components/AppButton';
+import { AppCard } from '../components/AppCard';
+import { TaskCard } from '../components/TaskCard';
+import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
 
 @Component
 export struct HomeTab {
   controller: TabsController = new TabsController();
   @StorageLink('recordsVersion') version: number = 0;
   @StorageLink('familyVersion') familyVersion: number = 0;
+  private uiContext: UIContext = this.getUIContext();
+  private promptAction: PromptAction = this.uiContext.getPromptAction();
+  private onChange: () => void = () => { this.refresh(); };
   @State showShare: boolean = false;
   @State reminderOn: boolean = false;
   @State familyName: string = '我';
   @State familyCode: string = '';
+  @State ready: boolean = false;
+
+  @State todaySaved: string = '0.00';
+  @State todayPoints: string = '0';
+  @State totalSaved: string = '0.00';
+  @State totalPoints: string = '0';
+  @State totalCount: string = '0';
+  @State treeCount: string = '0';
+  @State familySaved: string = '0.00';
+  @State familyPoints: string = '0';
+  @State familyStatus: string = '未加入';
+  @State familyJoined: boolean = false;
+  @State members: MemberData[] = [];
+  @State taskStates: boolean[] = [];
+  @State suggestionsList: string[] = [];
 
   aboutToAppear(): void {
+    CarbonStore.get().addChangeListener(this.onChange);
+    FamilyService.get().addChangeListener(this.onChange);
     FamilyService.get().pushLocal();
     this.familyName = FamilyService.get().getNickname();
-    ReminderService.isEnabled().then((v: boolean) => {
-      this.reminderOn = v;
-    });
+    ReminderService.isEnabled().then((v: boolean) => { this.reminderOn = v; });
+    this.refresh();
+    setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
+  }
+
+  aboutToDisappear(): void {
+    CarbonStore.get().removeChangeListener(this.onChange);
+    FamilyService.get().removeChangeListener(this.onChange);
+  }
+
+  refresh(): void {
+    const store = CarbonStore.get();
+    const family = FamilyService.get();
+    this.todaySaved = store.todaySaved().toFixed(2);
+    this.todayPoints = store.todayPoints().toString();
+    this.totalSaved = store.totalSaved().toFixed(2);
+    this.totalPoints = store.totalPoints().toString();
+    this.totalCount = store.totalCount().toString();
+    this.treeCount = Rewards.treeCount(store).toString();
+    this.familySaved = family.getSaved().toFixed(2);
+    this.familyPoints = family.getPoints().toString();
+    this.familyJoined = family.getSessionId() !== '';
+    this.familyStatus = this.familyJoined
+      ? (family.isPeerOnline() ? '对方在线' : '等待对方') : '未加入';
+    this.members = family.getMembers();
+    this.suggestionsList = Rewards.suggestions(store);
+    this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
   }
 
   onGenCode(): void {
     const code = FamilyService.get().genSession();
     this.familyCode = code;
-    promptAction.showToast({ message: '家庭码：' + code });
+    this.refresh();
+    this.promptAction.showToast({ message: '家庭码：' + code });
   }
 
   onJoin(): void {
     if (this.familyCode === '') {
-      promptAction.showToast({ message: '请先输入或生成家庭码' });
+      this.promptAction.showToast({ message: '请先输入或生成家庭码' });
       return;
     }
     FamilyService.get().joinSession(this.familyCode).then(() => {
-      promptAction.showToast({ message: '已加入家庭组' });
+      this.refresh();
+      this.promptAction.showToast({ message: '已加入家庭组' });
     });
   }
 
   onLeave(): void {
     FamilyService.get().leaveSession().then(() => {
-      promptAction.showToast({ message: '已退出家庭组' });
+      this.refresh();
+      this.promptAction.showToast({ message: '已退出家庭组' });
     });
   }
 
   onSync(): void {
     FamilyService.get().pushLocal();
-    promptAction.showToast({ message: '已同步我的碳积分' });
+    this.refresh();
+    this.promptAction.showToast({ message: '已同步我的碳积分' });
   }
 
   onReminderChange(isOn: boolean): void {
     this.reminderOn = isOn;
     if (isOn) {
       ReminderService.enable().then(() => {
-        promptAction.showToast({ message: '已开启每日 20:00 提醒' });
+        this.promptAction.showToast({ message: '已开启每日 20:00 提醒' });
       }).catch(() => {
         this.reminderOn = false;
-        promptAction.showToast({ message: '开启提醒失败' });
+        this.promptAction.showToast({ message: '开启提醒失败' });
       });
     } else {
       ReminderService.disable().then(() => {
-        promptAction.showToast({ message: '已关闭提醒' });
+        this.promptAction.showToast({ message: '已关闭提醒' });
       });
     }
   }
 
-  @Builder
-  statBlock(title: string, value: string, unit: string, color: string) {
-    Column() {
-      Text(value)
-        .fontSize(22)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(color)
-      Text(unit)
-        .fontSize(11)
-        .fontColor(AppColor.TEXT_SUB)
-      Text(title)
-        .fontSize(12)
-        .fontColor(AppColor.TEXT_SUB)
-        .margin({ top: 4 })
-    }
-    .layoutWeight(1)
-    .alignItems(HorizontalAlign.Center)
-  }
-
   shareText(): string {
-    const store = CarbonStore.get();
-    return '我在「碳足迹」App 已累计减排 ' + store.totalSaved().toFixed(2) +
-      ' kg CO₂e，获得 ' + store.totalPoints().toString() + ' 积分，种下 ' +
-      Rewards.treeCount(store).toString() + ' 棵树。一起加入低碳生活吧！';
+    return '我在「CarbonLife」App 已累计减排 ' + this.totalSaved +
+      ' kg CO₂e，获得 ' + this.totalPoints + ' 积分，种下 ' +
+      this.treeCount + ' 棵树。一起加入低碳生活吧！';
   }
 
-  @Builder
-  shareSheet() {
-    Column({ space: 16 }) {
-      Text('我的减排成果')
-        .fontSize(18)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppColor.TEXT)
-      Column({ space: 10 }) {
-        Text('🌍 碳足迹 · 低碳生活')
-          .fontSize(14)
-          .fontColor(AppColor.PRIMARY)
-        Text(CarbonStore.get().totalSaved().toFixed(2) + ' kg')
-          .fontSize(34)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppColor.PRIMARY)
-        Text('累计减排 CO₂e')
-          .fontSize(12)
-          .fontColor(AppColor.TEXT_SUB)
-        Divider().color(AppColor.DIVIDER).margin({ top: 6, bottom: 6 })
-        Row() {
-          Column() {
-            Text(CarbonStore.get().totalPoints().toString())
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppColor.ACCENT)
-            Text('积分')
-              .fontSize(11)
-              .fontColor(AppColor.TEXT_SUB)
-          }
-          .layoutWeight(1)
-          Column() {
-            Text(Rewards.treeCount(CarbonStore.get()).toString())
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppColor.PRIMARY_LIGHT)
-            Text('种树')
-              .fontSize(11)
-              .fontColor(AppColor.TEXT_SUB)
-          }
-          .layoutWeight(1)
-          Column() {
-            Text(CarbonStore.get().totalCount().toString())
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppColor.CHART_BLUE)
-            Text('记录')
-              .fontSize(11)
-              .fontColor(AppColor.TEXT_SUB)
-          }
-          .layoutWeight(1)
-        }
-        .width('100%')
-      }
-      .width('100%')
-      .padding(20)
-      .backgroundColor(AppColor.BG)
-      .borderRadius(16)
-      .alignItems(HorizontalAlign.Center)
+  @Builder shareStat(label: string, value: string, color: string) {
+    Column() {
+      Text(value).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(color);
+      Text(label).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+    }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+  }
 
-      Button('复制分享文案')
-        .width('100%')
-        .height(44)
-        .backgroundColor(AppColor.PRIMARY)
-        .fontColor(Color.White)
-        .onClick(() => {
-          const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
-          pasteboard.getSystemPasteboard().setData(data).then(() => {
-            promptAction.showToast({ message: '分享文案已复制' });
-            this.showShare = false;
-          });
-        })
-      Button('关闭')
-        .width('100%')
-        .height(44)
-        .backgroundColor(AppColor.CARD)
-        .fontColor(AppColor.TEXT_SUB)
-        .borderWidth(1)
-        .borderColor(AppColor.DIVIDER)
-        .onClick(() => {
-          this.showShare = false;
-        })
+  @Builder sectionTitle(title: string, subtitle?: string) {
+    Column({ space: AppSpacing.XXS }) {
+      Text(title).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+      if (subtitle !== undefined) {
+        Text(subtitle).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%');
+      }
+    }.width('100%').alignItems(HorizontalAlign.Start);
+  }
+
+  @Builder memberRow(m: MemberData) {
+    Row({ space: AppSpacing.SM }) {
+      Text(m.nickname).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
+      if (FamilyService.get().isLocal(m.deviceId)) {
+        Text('我').fontSize(AppTypography.SMALL.size).fontColor(AppColor.PRIMARY)
+          .backgroundColor(AppColor.PRIMARY_SOFT)
+          .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
+          .borderRadius(AppRadius.SM);
+      }
+      Text(m.saved.toFixed(2) + ' kg').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.PRIMARY);
+      Text(m.points.toString() + ' 分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT).margin({ left: AppSpacing.SM });
     }
-    .width('100%')
-    .padding(20)
+    .width('100%').padding({ top: AppSpacing.XS, bottom: AppSpacing.XS });
+  }
+
+  @Builder shareSheet() {
+    Column({ space: AppSpacing.MD }) {
+      Text('我的减排成果').fontSize(AppTypography.H3.size).fontWeight(AppTypography.H3.weight).fontColor(AppColor.TEXT);
+      AppCard({ cardPadding: AppSpacing.LG, showShadow: false, showBorder: true, enter: this.ready, enterDelayIndex: 0 }) {
+        Column({ space: AppSpacing.SM }) {
+          Row({ space: AppSpacing.XS }) {
+            Image($r('app.media.ic_leaf'))
+              .width(18)
+              .height(18)
+              .fillColor(AppColor.PRIMARY);
+            Text('CarbonLife · 低碳生活').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
+          }
+          Text(this.totalSaved + ' kg').fontSize(34).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
+          Text('累计减排 CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+          Divider().color(AppColor.DIVIDER).margin({ top: AppSpacing.SM, bottom: AppSpacing.SM });
+          Row() {
+            this.shareStat('积分', this.totalPoints, AppColor.ACCENT);
+            this.shareStat('种树', this.treeCount, AppColor.PRIMARY_LIGHT);
+            this.shareStat('记录', this.totalCount, AppColor.CHART_BLUE);
+          }.width('100%');
+        }.width('100%').alignItems(HorizontalAlign.Center);
+      }
+      AppButton({ text: '复制分享文案', type: 'primary', fullWidth: true }).onClick(() => {
+        const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
+        pasteboard.getSystemPasteboard().setData(data).then(() => {
+          this.promptAction.showToast({ message: '分享文案已复制' });
+          this.showShare = false;
+        });
+      });
+      AppButton({ text: '关闭', type: 'ghost', fullWidth: true }).onClick(() => { this.showShare = false; });
+    }.width('100%').padding(AppSpacing.LG);
   }
 
   build() {
     Stack() {
       Scroll() {
-      Column({ space: 14 }) {
-        Column() {
-          Text('低碳生活 · 从我做起')
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppColor.TEXT)
-          Text('记录每一次低碳行动，积少成多守护地球')
-            .fontSize(12)
-            .fontColor(AppColor.TEXT_SUB)
-            .margin({ top: 6 })
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-
-        Column() {
-          Row() {
-            this.statBlock('今日减排', CarbonStore.get().todaySaved().toFixed(2), 'kg CO₂e', AppColor.PRIMARY)
-            Divider().vertical(true).height(40).color(AppColor.DIVIDER)
-            this.statBlock('今日积分', CarbonStore.get().totalPoints().toString(), '分', AppColor.ACCENT)
+        Column({ space: AppSpacing.MD }) {
+          Column({ space: AppSpacing.XS }) {
+            Text('低碳生活 · 从我做起').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT);
+            Text('记录每一次低碳行动，积少成多守护地球').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           }
-          .width('100%')
+          .width('100%').alignItems(HorizontalAlign.Start)
+          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
-          Divider().color(AppColor.DIVIDER).margin({ top: 14, bottom: 14 })
-
-          Row() {
-            this.statBlock('累计减排', CarbonStore.get().totalSaved().toFixed(2), 'kg CO₂e', AppColor.CHART_BLUE)
-            Divider().vertical(true).height(40).color(AppColor.DIVIDER)
-            this.statBlock('累计种树', Rewards.treeCount(CarbonStore.get()).toString(), '棵', AppColor.PRIMARY_LIGHT)
-          }
-          .width('100%')
-        }
-        .width('100%')
-        .padding(16)
-        .backgroundColor(AppColor.CARD)
-        .borderRadius(16)
-
-        Row({ space: 12 }) {
-          Button('去记录低碳行为')
-            .layoutWeight(1)
-            .height(44)
-            .backgroundColor(AppColor.PRIMARY)
-            .fontColor(Color.White)
-            .onClick(() => {
-              this.controller.changeIndex(1);
-            })
-          Button('生成成果卡片')
-            .layoutWeight(1)
-            .height(44)
-            .backgroundColor(AppColor.CARD)
-            .fontColor(AppColor.PRIMARY)
-            .borderWidth(1)
-            .borderColor(AppColor.PRIMARY)
-            .onClick(() => {
-              this.showShare = true;
-            })
-        }
-        .width('100%')
-
-        Column() {
-          Row() {
-            Text('👨👩👧 家庭碳积分（超级终端）')
-              .fontSize(15)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppColor.TEXT)
-            Blank()
-            Text(FamilyService.get().getSessionId() === '' ? '未加入' :
-              (FamilyService.get().isPeerOnline() ? '对方在线' : '等待对方'))
-              .fontSize(11)
-              .fontColor(FamilyService.get().getSessionId() === '' ? AppColor.TEXT_SUB : AppColor.PRIMARY)
-          }
-          .width('100%')
-          Row() {
-            Column() {
-              Text(FamilyService.get().getSaved().toFixed(2))
-                .fontSize(18)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppColor.PRIMARY)
-              Text('我的减排(kg)')
-                .fontSize(10)
-                .fontColor(AppColor.TEXT_SUB)
+          AppCard({ cardPadding: AppSpacing.LG, enter: this.ready, enterDelayIndex: 1 }) {
+            Column({ space: AppSpacing.MD }) {
+              Row() {
+                Column({ space: AppSpacing.XS }) {
+                  Text(this.todaySaved).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
+                  Text('kg CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text('今日减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+                Divider().vertical(true).height(48).color(AppColor.DIVIDER);
+                Column({ space: AppSpacing.XS }) {
+                  Text(this.todayPoints).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+                  Text('分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text('今日积分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+              }.width('100%');
+              Divider().color(AppColor.DIVIDER);
+              Row() {
+                Column({ space: AppSpacing.XS }) {
+                  Text(this.totalSaved).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.CHART_BLUE);
+                  Text('kg CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text('累计减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+                Divider().vertical(true).height(48).color(AppColor.DIVIDER);
+                Column({ space: AppSpacing.XS }) {
+                  Text(this.treeCount).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY_LIGHT);
+                  Text('棵').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text('累计种树').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+              }.width('100%');
             }
-            .layoutWeight(1)
-            Column() {
-              Text(FamilyService.get().getPoints().toString())
-                .fontSize(18)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppColor.ACCENT)
-              Text('我的积分')
-                .fontSize(10)
-                .fontColor(AppColor.TEXT_SUB)
-            }
-            .layoutWeight(1)
           }
-          .width('100%')
-          .margin({ top: 10 })
 
-          TextInput({ text: this.familyName, placeholder: '我的昵称' })
-            .height(40)
-            .backgroundColor(AppColor.BG)
-            .margin({ top: 10 })
-            .onChange((v: string) => {
-              this.familyName = v;
-              FamilyService.get().setNickname(v);
-            })
-          TextInput({ text: $$this.familyCode, placeholder: '家庭码（生成或输入）' })
-            .height(40)
-            .backgroundColor(AppColor.BG)
-            .margin({ top: 8 })
-          Row({ space: 8 }) {
-            Button('生成家庭码')
-              .layoutWeight(1)
-              .height(38)
-              .fontSize(12)
-              .backgroundColor(AppColor.PRIMARY)
-              .fontColor(Color.White)
-              .onClick(() => {
-                this.onGenCode();
-              })
-            Button('加入')
-              .layoutWeight(1)
-              .height(38)
-              .fontSize(12)
-              .backgroundColor(AppColor.CHART_BLUE)
-              .fontColor(Color.White)
-              .onClick(() => {
-                this.onJoin();
-              })
+          Row({ space: AppSpacing.SM }) {
+            AppButton({ text: '去记录低碳行为', type: 'primary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(1));
+            AppButton({ text: '生成成果卡片', type: 'secondary' }).layoutWeight(1).onClick(() => this.showShare = true);
           }
           .width('100%')
-          .margin({ top: 8 })
-          Row({ space: 8 }) {
-            Button('同步我的数据')
-              .layoutWeight(1)
-              .height(38)
-              .fontSize(12)
-              .backgroundColor(AppColor.CARD)
-              .fontColor(AppColor.PRIMARY)
-              .borderWidth(1)
-              .borderColor(AppColor.PRIMARY)
-              .onClick(() => {
-                this.onSync();
-              })
-            Button('退出家庭组')
-              .layoutWeight(1)
-              .height(38)
-              .fontSize(12)
-              .backgroundColor(AppColor.CARD)
-              .fontColor(AppColor.TEXT_SUB)
-              .borderWidth(1)
-              .borderColor(AppColor.DIVIDER)
-              .onClick(() => {
-                this.onLeave();
-              })
-          }
-          .width('100%')
-          .margin({ top: 8 })
-          Text('在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。')
-            .fontSize(10)
-            .fontColor(AppColor.TEXT_SUB)
-            .margin({ top: 8 })
-            .width('100%')
-        }
-        .width('100%')
-        .padding(16)
-        .backgroundColor(AppColor.CARD)
-        .borderRadius(16)
+          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 })
+          .animation({ duration: AppMotion.reduceMotion() ? 0 : 500, curve: AppMotion.EASE, delay: AppMotion.staggerDelay(2) });
 
-        Column() {
-          Row() {
-            Column() {
-              Text('每日低碳提醒')
-                .fontSize(14)
-                .fontColor(AppColor.TEXT)
-              Text('每天 20:00 提醒记录低碳行为')
-                .fontSize(11)
-                .fontColor(AppColor.TEXT_SUB)
-                .margin({ top: 2 })
-            }
-            .layoutWeight(1)
-            .alignItems(HorizontalAlign.Start)
-            Toggle({ type: ToggleType.Switch, isOn: this.reminderOn })
-              .onChange((isOn: boolean) => {
-                this.onReminderChange(isOn);
-              })
-          }
-          .width('100%')
-        }
-        .width('100%')
-        .padding(16)
-        .backgroundColor(AppColor.CARD)
-        .borderRadius(16)
-
-        Column() {
-          Text('今日任务')
-            .fontSize(15)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppColor.TEXT)
-            .width('100%')
-          ForEach(Rewards.TASKS, (task: DailyTask) => {
-            Row() {
-              Text(Rewards.taskDone(task.key, CarbonStore.get()) ? '✅' : '⬜')
-                .fontSize(16)
-              Column() {
-                Text(task.name)
-                  .fontSize(14)
-                  .fontColor(AppColor.TEXT)
-                Text(task.desc)
-                  .fontSize(11)
-                  .fontColor(AppColor.TEXT_SUB)
-                  .margin({ top: 2 })
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
+            Column({ space: AppSpacing.SM }) {
+              Row() {
+                this.sectionTitle('家庭碳积分', '超级终端多设备同步');
+                Blank();
+                Text(this.familyStatus)
+                  .fontSize(AppTypography.CAPTION.size)
+                  .fontColor(this.familyJoined ? AppColor.PRIMARY : AppColor.TEXT_SUB);
+              }.width('100%');
+              Row() {
+                Column() {
+                  Text(this.familySaved).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
+                  Text('家庭减排(kg)').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1);
+                Column() {
+                  Text(this.familyPoints).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+                  Text('家庭积分').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1);
+              }.width('100%').margin({ top: AppSpacing.SM });
+              if (this.familyJoined && this.members.length > 0) {
+                Column({ space: AppSpacing.XS }) {
+                  this.sectionTitle('家庭成员', this.members.length.toString() + ' 人');
+                  ForEach(this.members, (m: MemberData) => {
+                    this.memberRow(m);
+                  }, (m: MemberData) => m.deviceId);
+                }.width('100%').margin({ top: AppSpacing.SM });
               }
-              .layoutWeight(1)
-              .alignItems(HorizontalAlign.Start)
-              .margin({ left: 8 })
-              Text('+' + task.points.toString())
-                .fontSize(13)
-                .fontColor(AppColor.ACCENT)
+              TextInput({ text: this.familyName, placeholder: '我的昵称' }).height(42).backgroundColor(AppColor.BG).margin({ top: AppSpacing.SM })
+                .onChange((v: string) => { this.familyName = v; FamilyService.get().setNickname(v); });
+              TextInput({ text: $$this.familyCode, placeholder: '家庭码（生成或输入）' }).height(42).backgroundColor(AppColor.BG).margin({ top: AppSpacing.XS });
+              Row({ space: AppSpacing.XS }) {
+                AppButton({ text: '生成家庭码', type: 'primary', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onGenCode());
+                AppButton({ text: '加入', type: 'secondary', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onJoin());
+              }.width('100%').margin({ top: AppSpacing.XS });
+              Row({ space: AppSpacing.XS }) {
+                AppButton({ text: '同步我的数据', type: 'ghost', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onSync());
+                AppButton({ text: '退出家庭组', type: 'ghost', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onLeave());
+              }.width('100%').margin({ top: AppSpacing.XS });
+              Text('在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。')
+                .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
             }
-            .width('100%')
-            .padding({ top: 10, bottom: 10 })
-          }, (task: DailyTask) => task.key)
-        }
-        .width('100%')
-        .padding(16)
-        .backgroundColor(AppColor.CARD)
-        .borderRadius(16)
+          }
 
-        Column() {
-          Text('智能低碳建议')
-            .fontSize(15)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppColor.TEXT)
-            .width('100%')
-          ForEach(Rewards.suggestions(CarbonStore.get()), (tip: string, index: number) => {
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
             Row() {
-              Text('💡')
-                .fontSize(14)
-              Text(tip)
-                .fontSize(13)
-                .fontColor(AppColor.TEXT_SUB)
-                .layoutWeight(1)
-                .margin({ left: 6 })
+              Column() {
+                Text('每日低碳提醒').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                Text('每天 20:00 提醒记录低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+              Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
+            }.width('100%');
+          }
+
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 5 }) {
+            Column({ space: AppSpacing.SM }) {
+              this.sectionTitle('今日任务');
+              ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
+                TaskCard({ task: task, done: this.taskStates[index] ?? false, index: index })
+                  .onClick(() => { if (!this.taskStates[index]) { this.controller.changeIndex(1); } });
+              }, (task: DailyTask) => task.key);
             }
-            .width('100%')
-            .padding({ top: 8, bottom: 8 })
-          }, (tip: string, index: number) => index.toString())
+          }
+
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 6, marginBottom: AppSpacing.LG }) {
+            Column({ space: AppSpacing.SM }) {
+              this.sectionTitle('智能低碳建议');
+              ForEach(this.suggestionsList, (tip: string, index: number) => {
+                Row({ space: AppSpacing.SM }) {
+                  Image($r('app.media.ic_power'))
+                    .width(18)
+                    .height(18)
+                    .fillColor(AppColor.PRIMARY);
+                  Text(tip).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).layoutWeight(1);
+                }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
+              }, (tip: string, index: number) => index.toString());
+            }
+          }
         }
-        .width('100%')
-        .padding(16)
-        .backgroundColor(AppColor.CARD)
-        .borderRadius(16)
-        .margin({ bottom: 16 })
+        .width('100%').padding(AppSpacing.MD)
       }
-      .width('100%')
-      .padding(16)
-    }
-      .width('100%')
-      .height('100%')
-      .backgroundColor(AppColor.BG)
-      .scrollBar(BarState.Off)
+      .width('100%').height('100%').backgroundColor(AppColor.BG).scrollBar(BarState.Off);
 
       if (this.showShare) {
         Column() {
           Column() {
-            this.shareSheet()
+            this.shareSheet();
           }
-          .width('88%')
-          .backgroundColor(AppColor.CARD)
-          .borderRadius(20)
-          .onClick(() => {
-          })
+          .width('88%').backgroundColor(AppColor.CARD).borderRadius(AppRadius.LG)
+          .onClick(() => {});
         }
-        .width('100%')
-        .height('100%')
-        .backgroundColor('rgba(0,0,0,0.45)')
-        .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-          this.showShare = false;
-        })
+        .width('100%').height('100%').backgroundColor(AppColor.OVERLAY).justifyContent(FlexAlign.Center)
+        .onClick(() => this.showShare = false);
       }
     }
-    .width('100%')
-    .height('100%')
-    .id('home_' + this.version.toString() + '_' + this.familyVersion.toString())
+    .width('100%').height('100%');
   }
 }

@@ -23,7 +23,14 @@
         }
       },
       {
-        "name": "ohos.permission.PUBLISH_AGENT_REMINDER"
+        "name": "ohos.permission.PUBLISH_AGENT_REMINDER",
+        "reason": "$string:perm_reminder_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       }
     ],
     "abilities": [

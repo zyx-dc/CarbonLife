@@ -41,3 +41,15 @@ export class MallService {
     return 'CP' + item.id.toUpperCase() + rand.toString();
   }
 }
+
+export function redeemIcon(id: string): Resource {
+  switch (id) {
+    case 'm1': return $r('app.media.ic_medal');
+    case 'm2': return $r('app.media.ic_bike');
+    case 'm3': return $r('app.media.ic_subway');
+    case 'm4': return $r('app.media.ic_bag');
+    case 'm5': return $r('app.media.ic_tree');
+    case 'm6': return $r('app.media.ic_certificate');
+    default: return $r('app.media.ic_leaf');
+  }
+}

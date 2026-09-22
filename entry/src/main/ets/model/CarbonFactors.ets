@@ -157,3 +157,22 @@ export class CarbonFactors {
     return list.length > 0 ? list[0] : CarbonFactors.BEHAVIORS[0];
   }
 }
+
+export function behaviorIcon(key: string): Resource {
+  switch (key) {
+    case 'walk': return $r('app.media.ic_walk');
+    case 'bike': return $r('app.media.ic_bike');
+    case 'bus': return $r('app.media.ic_bus');
+    case 'subway': return $r('app.media.ic_subway');
+    case 'save_power': return $r('app.media.ic_power');
+    case 'save_water': return $r('app.media.ic_water');
+    case 'recycle_paper': return $r('app.media.ic_paper');
+    case 'recycle_plastic': return $r('app.media.ic_recycle');
+    case 'recycle_metal': return $r('app.media.ic_metal');
+    case 'recycle_clothes': return $r('app.media.ic_clothes');
+    case 'clean_plate': return $r('app.media.ic_clean_plate');
+    case 'no_disposable': return $r('app.media.ic_chopsticks');
+    case 'veg_meal': return $r('app.media.ic_veg');
+    default: return $r('app.media.ic_leaf');
+  }
+}
