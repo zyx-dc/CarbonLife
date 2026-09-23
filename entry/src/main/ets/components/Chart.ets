@@ -48,7 +48,7 @@ function withAlpha(color: string, alpha: number): string {
 export struct BarChartView {
   @Prop @Watch('onDataChange') data: number[] = [];
   @Prop labels: string[] = [];
-  @Prop barColor: string = AppColor.PRIMARY;
+  @Prop barColor: string = AppColor.CHART_LINE;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private ready: boolean = false;
@@ -81,9 +81,9 @@ export struct BarChartView {
       this.draw();
       return;
     }
-    const target = this.data.slice();
+    const target: number[] = this.data.slice();
     const start = Date.now();
-    const duration = 700;
+    const duration = 600;
     const tick = () => {
       const t = Math.min(1, (Date.now() - start) / duration);
       const e = easeOut(t);
@@ -116,7 +116,7 @@ export struct BarChartView {
     const h: number = this.ctx.height;
     this.ctx.clearRect(0, 0, w, h);
     const left: number = 36;
-    const right: number = 20;
+    const right: number = 12;
     const top: number = 12;
     const bottom: number = 24;
     const plotW: number = w - left - right;
@@ -128,54 +128,33 @@ export struct BarChartView {
       }
     });
     const max: number = niceCeil(dataMax);
+    // 3 条水平网格线 + 刻度
     this.ctx.strokeStyle = AppColor.DIVIDER;
     this.ctx.lineWidth = 1;
-    for (let g = 1; g <= 3; g++) {
-      const gy: number = top + plotH - (plotH * g / 4);
+    this.ctx.textAlign = 'right';
+    this.ctx.font = FONT_AXIS;
+    this.ctx.fillStyle = AppColor.TEXT_SUB;
+    for (let g = 0; g <= 2; g++) {
+      const gy: number = top + (plotH / 2) * g;
       this.ctx.beginPath();
       this.ctx.moveTo(left, gy);
       this.ctx.lineTo(left + plotW, gy);
       this.ctx.stroke();
+      this.ctx.fillText((max * (1 - g / 2)).toFixed(1), left - 4, gy + 4);
     }
-    this.ctx.beginPath();
-    this.ctx.moveTo(left, top);
-    this.ctx.lineTo(left, top + plotH);
-    this.ctx.lineTo(left + plotW, top + plotH);
-    this.ctx.stroke();
-    this.ctx.fillStyle = AppColor.TEXT_SUB;
-    this.ctx.font = FONT_AXIS;
-    this.ctx.textAlign = 'right';
-    this.ctx.fillText(max.toFixed(1), left - 4, top + 8);
-    this.ctx.fillText('0', left - 4, top + plotH);
-    this.ctx.textAlign = 'left';
-    this.ctx.fillText('kg', left + 6, top + 8);
     const n: number = this.displayData.length;
     const slot: number = n > 0 ? plotW / n : plotW;
     const barW: number = slot * 0.5;
     this.ctx.textAlign = 'center';
+    this.ctx.font = FONT_TICK;
     for (let i = 0; i < n; i++) {
       const v: number = this.displayData[i];
       const barH: number = max > 0 ? (v / max) * plotH : 0;
       const x: number = left + slot * i + (slot - barW) / 2;
       const y: number = top + plotH - barH;
-      if (barH > 0.5) {
-        const grad = this.ctx.createLinearGradient(0, y, 0, top + plotH);
-        grad.addColorStop(0, this.barColor);
-        grad.addColorStop(1, withAlpha(this.barColor, 0.6));
-        this.ctx.fillStyle = grad;
-        const r: number = Math.min(barW / 2, 6, barH);
-        this.ctx.beginPath();
-        this.ctx.moveTo(x, y + barH);
-        this.ctx.lineTo(x, y + r);
-        this.ctx.arcTo(x, y, x + r, y, r);
-        this.ctx.lineTo(x + barW - r, y);
-        this.ctx.arcTo(x + barW, y, x + barW, y + r, r);
-        this.ctx.lineTo(x + barW, y + barH);
-        this.ctx.closePath();
-        this.ctx.fill();
-      }
+      this.ctx.fillStyle = this.barColor;
+      this.ctx.fillRect(x, y, barW, barH);
       this.ctx.fillStyle = AppColor.TEXT_SUB;
-      this.ctx.font = FONT_TICK;
       if (i < this.labels.length) {
         this.ctx.fillText(this.labels[i], left + slot * i + slot / 2, top + plotH + 14);
       }

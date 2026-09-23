@@ -1,5 +1,5 @@
 import { PromptAction, UIContext } from '@kit.ArkUI';
-import { fileIo as fs } from '@kit.CoreFileKit';
+import { fileIo as fs, picker } from '@kit.CoreFileKit';
 import { common } from '@kit.AbilityKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { CarbonFactors } from '../model/CarbonFactors';
@@ -74,16 +74,23 @@ export struct DashboardTab {
     this.recentList = store.recentRecords(10);
   }
 
-  exportFile(kind: string): void {
+  async exportFile(kind: string): Promise<void> {
     let file: fs.File | null = null;
     try {
       const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
       const ext = kind === 'csv' ? '.csv' : '.json';
-      const path = ctx.filesDir + '/carbon_export_' + Date.now().toString() + ext;
       const content = kind === 'csv' ? CarbonStore.get().exportCsv() : CarbonStore.get().exportJson();
-      file = fs.openSync(path, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+      // 用系统文档选择器保存到用户可访问的位置（而非沙箱 filesDir）
+      const docPicker = new picker.DocumentViewPicker(ctx);
+      const opt = new picker.DocumentSaveOptions();
+      opt.newFileNames = ['carbon_export_' + Date.now().toString() + ext];
+      const uris = await docPicker.save(opt);
+      if (uris.length === 0) {
+        return;
+      }
+      file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
       fs.writeSync(file.fd, content);
-      this.promptAction.showToast({ message: '已导出到：' + path });
+      this.promptAction.showToast({ message: '已导出' });
     } catch (e) {
       this.promptAction.showToast({ message: '导出失败' });
     } finally {

@@ -12,6 +12,9 @@ export interface VisionResult {
 }
 
 export class VisionService {
+  // 物体检测最低置信度阈值
+  static readonly MIN_SCORE: number = 0.5;
+
   static async pickAndDetect(): Promise<VisionResult> {
     let file: fs.File | null = null;
     let source: image.ImageSource | null = null;
@@ -66,6 +69,10 @@ export class VisionService {
   }
 
   static mapLabel(label: number, score: number): VisionResult {
+    // 置信度过低直接放弃，避免把噪声当成场景推荐
+    if (score < VisionService.MIN_SCORE) {
+      return { ok: false, label: '', behaviorKey: '', score: score, message: '未识别到匹配场景，请手动选择行为' };
+    }
     if (label === 11 || label === 6) {
       return { ok: true, label: '食物 / 餐桌', behaviorKey: 'clean_plate', score: score, message: '识别到食物，建议记录「光盘行动」' };
     }

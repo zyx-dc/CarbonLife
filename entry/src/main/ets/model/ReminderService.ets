@@ -7,6 +7,14 @@ export class ReminderService {
   static readonly MINUTE: number = 0;
 
   static async enable(): Promise<number> {
+    // 先取消已存在的提醒，避免重复发布导致多条告警
+    const prev = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_ID, '');
+    if (prev !== '') {
+      try {
+        await reminderAgentManager.cancelReminder(parseInt(prev));
+      } catch (e) {
+      }
+    }
     const req: reminderAgentManager.ReminderRequestAlarm = {
       reminderType: reminderAgentManager.ReminderType.REMINDER_TYPE_ALARM,
       hour: ReminderService.HOUR,
@@ -33,13 +41,16 @@ export class ReminderService {
 
   static async disable(): Promise<void> {
     const s = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_ID, '');
-    if (s !== '') {
-      try {
-        await reminderAgentManager.cancelReminder(parseInt(s));
-      } catch (e) {
-      }
+    if (s === '') {
+      return;
     }
-    await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_ID, '');
+    try {
+      await reminderAgentManager.cancelReminder(parseInt(s));
+      await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_ID, '');
+    } catch (e) {
+      // 取消失败则保留 id，便于下次重试，避免留下无法追踪的孤儿提醒
+      console.error('ReminderService disable failed: ' + JSON.stringify(e));
+    }
   }
 
   static async isEnabled(): Promise<boolean> {

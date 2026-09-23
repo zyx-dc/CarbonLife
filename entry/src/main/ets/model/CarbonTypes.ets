@@ -89,12 +89,3 @@ export interface RedemptionRecord {
   cost: number;
   timestamp: number;
 }
-
-export interface FamilyMember {
-  deviceName: string;
-  nickname: string;
-  saved: number;
-  points: number;
-  online: boolean;
-  isSelf: boolean;
-}
