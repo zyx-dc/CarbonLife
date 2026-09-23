@@ -22,6 +22,7 @@ export struct BadgeItem {
   @Prop index: number = 0;
   @State scaleVal: number = 0.8;
   @State opacityVal: number = 0;
+  private timerId: number = -1;
 
   aboutToAppear(): void {
     const delay = AppMotion.staggerDelay(this.index);
@@ -29,10 +30,17 @@ export struct BadgeItem {
       this.scaleVal = 1;
       this.opacityVal = 1;
     } else {
-      setTimeout(() => {
+      this.timerId = setTimeout(() => {
         this.scaleVal = 1;
         this.opacityVal = 1;
       }, delay);
+    }
+  }
+
+  aboutToDisappear(): void {
+    if (this.timerId >= 0) {
+      clearTimeout(this.timerId);
+      this.timerId = -1;
     }
   }
 

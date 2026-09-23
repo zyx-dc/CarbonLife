@@ -9,15 +9,23 @@ export struct TaskCard {
   @Prop index: number = 0;
   @State pressed: boolean = false;
   @State visible: boolean = false;
+  private timerId: number = -1;
 
   aboutToAppear(): void {
     const delay = AppMotion.staggerDelay(this.index);
     if (delay === 0) {
       this.visible = true;
     } else {
-      setTimeout(() => {
+      this.timerId = setTimeout(() => {
         this.visible = true;
       }, delay);
+    }
+  }
+
+  aboutToDisappear(): void {
+    if (this.timerId >= 0) {
+      clearTimeout(this.timerId);
+      this.timerId = -1;
     }
   }
 
