@@ -56,6 +56,21 @@ export interface KnowledgeItem {
   tag: string;
   summary: string;
   content: string;
+  points: string[];
+  factLabel: string;
+  fact: string;
+  readMin: number;
+}
+
+export interface QuizOption {
+  label: string;
+  score: number;
+}
+
+export interface QuizQuestion {
+  id: string;
+  q: string;
+  options: QuizOption[];
 }
 
 export interface RedeemItem {

@@ -10,6 +10,8 @@ struct Splash {
   @State logoOpacity: number = 0;
   @State taglineOpacity: number = 0;
   @State shimmerX: number = -160;
+  @State pulse: boolean = false;
+  @State orbit: number = 0;
 
   private uiContext: UIContext = this.getUIContext();
 
@@ -33,6 +35,14 @@ struct Splash {
 
     this.uiContext.animateTo({ duration: 1500, curve: Curve.Linear, iterations: -1 }, () => {
       this.shimmerX = 500;
+    });
+
+    // 光晕呼吸 + 卫星环轨：让启动页有「活着」的细节
+    this.uiContext.animateTo({ duration: 1600, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate }, () => {
+      this.pulse = true;
+    });
+    this.uiContext.animateTo({ duration: 4200, curve: Curve.Linear, iterations: -1 }, () => {
+      this.orbit = 360;
     });
 
     setTimeout(() => this.goHome(), 1800);
@@ -66,6 +76,32 @@ struct Splash {
           .translate({ x: this.shimmerX })
           .opacity(0.6)
           .animation({ duration: 1500, curve: Curve.Linear, iterations: -1 })
+
+        // 呼吸光晕
+        Column()
+          .width(220)
+          .height(220)
+          .borderRadius(110)
+          .radialGradient({ center: ['50%', '50%'], radius: 110, colors: [['rgba(182,255,46,0.34)', 0.0], ['rgba(182,255,46,0.0)', 1.0]] })
+          .scale({ x: this.pulse ? 1.16 : 0.86, y: this.pulse ? 1.16 : 0.86 })
+          .opacity(this.pulse ? 0.55 : 1)
+          .animation({ duration: 1600, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate })
+
+        // 环轨卫星
+        Column() {
+          Column()
+            .width(7)
+            .height(7)
+            .borderRadius(4)
+            .backgroundColor(AppColor.SIGNAL)
+            .shadow({ radius: 8, color: 'rgba(182,255,46,0.9)', offsetX: 0, offsetY: 0 })
+        }
+        .width(170)
+        .height(170)
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Center)
+        .rotate({ angle: this.orbit })
+        .animation({ duration: 4200, curve: Curve.Linear, iterations: -1 })
       }
 
       Column({ space: AppSpacing.MD }) {

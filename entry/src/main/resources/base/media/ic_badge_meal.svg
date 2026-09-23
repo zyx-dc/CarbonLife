@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill="#0F3D2E" fill-rule="evenodd" d="M12 2.1a9.9 9.9 0 1 0 0 19.8 9.9 9.9 0 0 0 0-19.8ZM12 4.5a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Z"/>
-<path fill="#0F3D2E" d="M4.3 12.6h15.4a7.7 7.7 0 0 1-15.4 0Z"/>
-<rect x="13.9" y="5.4" width="1.7" height="6.6" rx=".85" fill="#0F3D2E"/>
-<rect x="16.3" y="5.4" width="1.7" height="6.6" rx=".85" fill="#0F3D2E"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill="#0F3D2E" fill-rule="evenodd" d="M12 2.6a9.4 9.4 0 1 1 0 18.8 9.4 9.4 0 0 1 0-18.8Zm0 1.8a7.6 7.6 0 1 0 0 15.2 7.6 7.6 0 0 0 0-15.2Z"/><path fill="#0F3D2E" d="M9.2 6.4a.9.9 0 0 1 .9.9v1.4a.9.9 0 1 1-1.8 0V7.3a.9.9 0 0 1 .9-.9Zm3-1.4a.9.9 0 0 1 .9.9v2.8a.9.9 0 1 1-1.8 0V5.9a.9.9 0 0 1 .9-.9Zm3 1.4a.9.9 0 0 1 .9.9v1.4a.9.9 0 1 1-1.8 0V7.3a.9.9 0 0 1 .9-.9Z"/><path fill="#0F3D2E" d="M5.6 11.6h12.8a.9.9 0 0 1 .9.98A6.9 6.9 0 0 1 12.6 19h-1.2a6.9 6.9 0 0 1-6.7-6.42.9.9 0 0 1 .9-.98Z"/></svg>

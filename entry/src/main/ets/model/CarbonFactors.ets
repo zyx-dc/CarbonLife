@@ -1,18 +1,20 @@
 import { BehaviorDef } from './CarbonTypes';
 import { AppColor } from '../common/Constants';
+import { ThemeTokens } from '../common/Theme';
 
 export class CarbonFactors {
   static readonly CATEGORIES: string[] = ['出行', '节能', '回收', '餐饮'];
 
+  // 类别数据色：全部落在「夜行荧光」绿系（青柠→电青→次级青柠→苔绿），四类可区分且不跑色
   static categoryColor(category: string): string {
     if (category === '出行') {
-      return AppColor.CHART_BLUE;
+      return AppColor.SIGNAL;
     } else if (category === '节能') {
-      return AppColor.CHART_ORANGE;
+      return AppColor.ACCENT;
     } else if (category === '回收') {
-      return AppColor.CHART_PURPLE;
+      return AppColor.PRIMARY_LIGHT;
     }
-    return AppColor.CHART_TEAL;
+    return ThemeTokens.SEA;
   }
 
   static readonly BEHAVIORS: BehaviorDef[] = [

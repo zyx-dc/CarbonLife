@@ -1,5 +1,5 @@
 import { AppColor } from '../common/Constants';
-import { AppMotion, AppRadius, AppSpacing, AppTypography, Theme } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, Theme } from '../common/Theme';
 
 export type ButtonType = 'primary' | 'secondary' | 'ghost';
 
@@ -18,12 +18,12 @@ export struct AppButton {
       return AppColor.DIVIDER;
     }
     if (this.type === 'primary') {
-      return AppColor.PRIMARY;
+      return AppColor.SIGNAL;
     }
     if (this.type === 'ghost') {
       return 'transparent';
     }
-    return AppColor.PRIMARY_SOFT;
+    return AppColor.GLASS;
   }
 
   private textColor(): string {
@@ -31,13 +31,20 @@ export struct AppButton {
       return AppColor.TEXT_SUB;
     }
     if (this.type === 'primary') {
-      return Theme.current().textInverse;
+      return AppColor.ON_SIGNAL;
     }
-    return AppColor.PRIMARY;
+    if (this.type === 'ghost') {
+      return AppColor.PRIMARY;
+    }
+    return AppColor.TEXT;
   }
 
   private borderWidthValue(): number {
-    return this.type === 'ghost' ? 1 : 0;
+    return this.type === 'primary' || this.disabled ? 0 : 1;
+  }
+
+  private borderColorValue(): string {
+    return this.type === 'ghost' ? AppColor.PRIMARY : AppColor.BORDER;
   }
 
   build() {
@@ -49,16 +56,23 @@ export struct AppButton {
       }
       Text(this.text)
         .fontSize(AppTypography.BODY_MEDIUM.size)
-        .fontWeight(AppTypography.BODY_MEDIUM.weight)
+        .fontWeight(FontWeight.Medium)
         .fontColor(this.textColor());
     }
     .width(this.fullWidth ? '100%' : 'auto')
     .height(this.btnHeight)
     .padding({ left: AppSpacing.LG, right: AppSpacing.LG })
     .backgroundColor(this.bgColor())
+    .linearGradient({
+      angle: 135,
+      colors: (this.type === 'primary' && !this.disabled)
+        ? [[AppColor.SIGNAL, 0.0], [AppColor.SIGNAL_DEEP, 1.0]]
+        : [[this.bgColor(), 0.0], [this.bgColor(), 1.0]]
+    })
     .borderRadius(AppRadius.MD)
     .borderWidth(this.borderWidthValue())
-    .borderColor(AppColor.PRIMARY)
+    .borderColor(this.borderColorValue())
+    .shadow((this.type === 'primary' && !this.disabled) ? AppShadow.glow() : { radius: 0, color: '#00000000' })
     .justifyContent(FlexAlign.Center)
     .scale({ x: this.pressed ? 0.97 : 1, y: this.pressed ? 0.97 : 1 })
     .opacity(this.disabled ? 0.6 : 1)

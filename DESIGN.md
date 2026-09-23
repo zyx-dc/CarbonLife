@@ -3,10 +3,10 @@ version: alpha
 name: CarbonLife-design-system
 description: >-
   CarbonLife（碳足迹）是一款面向 HarmonyOS / ArkTS 原生（ArkUI 声明式 UI）的
-  低碳生活记录与激励 App。视觉语言为「深林绿 + 暖白」的温暖可信体系：以深绿承载品牌与
-  关键数据，以琥珀金承载积分与成就，卡片圆角柔和、阴影克制，动效轻量。系统内置浅色/深色
-  双主题，并为无障碍提供「减弱动效」开关。目标是让任何 AI Agent 在改动 ArkUI 代码前，
-  能读到一套真实存在、与 `common/Theme.ets` 一一对应的设计 token。
+  低碳生活记录与激励 App。视觉语言为「夜行荧光」：近黑深色玻璃底，电光青柠作为
+  稀缺信号色，电青承载积分与成就；深浅模式跟随系统（冷启动读取系统 Configuration.colorMode，
+  运行中实时跟随），浅色为「墨绿 + 纸感」并同样注入青柠信号。目标是让任何 AI Agent 在改动
+  ArkUI 代码前，能读到一套真实存在、与 `common/Theme.ets` 一一对应的设计 token。
 
 platform: HarmonyOS ArkUI (ArkTS, stage model)
 targets:
@@ -15,34 +15,63 @@ targets:
 sourceOfTruth: entry/src/main/ets/common/Theme.ets
 fontStack: "HarmonyOS Sans SC, Noto Sans SC, system default"
 
-# 浅色主题（默认）——与 Theme.light() 对应
+# ============ 深色主题（默认气质：夜行荧光）——与 Theme.dark() 对应 ============
 colors:
-  primary: "#0F3D2E"           # 深林绿：主按钮、关键数据、选中态
-  primary-light: "#1B5E20"     # 次级强调、次要数据
-  primary-soft: "#ECF0EE"      # 标签底色、选中项背景（代码中 = rgba(15,61,46,0.08)）
-  accent: "#FFB300"            # 琥珀金：积分、成就、高亮
-  background: "#F5F7F5"        # 页面背景
-  surface: "#FFFFFF"           # 浮层/弹窗背景
-  card: "#FFFFFF"              # 卡片背景
-  elevated: "#FFFFFF"          # 提升层级卡片
-  on-surface: "#1C1C1E"        # 主文字
-  on-surface-muted: "#6E6E73"  # 次级/说明文字
-  on-primary: "#FFFFFF"        # 主色按钮上的文字
-  divider: "rgba(28,28,30,0.08)"  # 分割线
-  border: "rgba(28,28,30,0.10)"   # 卡片/输入框边框
-  shadow: "#E6ECE8"            # 卡片阴影色
-  error: "#FF453A"             # 删除、错误
-  success: "#34C759"           # 成功、完成
-  chart-blue: "#0A84FF"
-  chart-orange: "#FF9F0A"
-  chart-purple: "#BF5AF2"
-  chart-teal: "#40C8E0"
+  background: "#0A0A0A"          # 页面底色（保持原样，不参与荧光升级）
+  surface: "#121712"             # 弹窗/浮层
+  card: "#101510"                # 卡片基准（实际卡片多用 glass）
+  elevated: "#1A211A"            # 输入框底、提升层级
+  primary: "#B6FF2E"             # 电光青柠：品牌 = 信号色
+  primary-light: "#7FCB00"       # 次级青柠（渐变末端、muted 强调）
+  primary-soft: "rgba(182,255,46,0.14)"   # 青柠低透明底（标签/选中底）
+  signal: "#B6FF2E"              # 信号色：填充/描边/辉光（与 primary 同值，语义分离）
+  signal-deep: "#7FCB00"
+  on-signal: "#0A0F07"           # 青柠填充上的近黑字
+  accent: "#3DE0C8"              # 电青：仅积分与成就语义
+  magenta: "#FF3D9A"             # 稀有高光：仅作极少量点缀，制造「不和谐的秩序」
+  sea: "#2E8B57"                 # 数据可视化补充色：苔绿（类别「餐饮」，与绿系同族）
+  on-surface: "#E9F7E0"          # 主文字（带绿调暖白）
+  on-surface-muted: "#82917B"    # 次级/说明文字
+  text-inverse: "#0A0F07"
+  text-inverse-sub: "rgba(10,15,7,0.62)"
+  divider: "rgba(255,255,255,0.10)"     # 分隔/网格（中性——避免青柠到处描边「廉价化」）
+  border: "rgba(255,255,255,0.16)"      # 控件描边（中性）
+  glass: "rgba(18,24,18,0.55)"          # 玻璃卡底
+  glass-strong: "rgba(18,24,18,0.82)"   # 高不透明玻璃（hero/选项/输入）
+  glass-border: "rgba(255,255,255,0.14)" # 玻璃卡描边（中性）
+  scrim: "rgba(6,10,7,0.55)"            # 图片底部压暗
+  scrim-fade: "rgba(6,10,7,0.00)"
+  shadow: "rgba(0,0,0,0.60)"
+  primary-glow: "rgba(182,255,46,0.30)"
+  overlay: "rgba(0,0,0,0.72)"
+  error: "#FF5C5C"               # 删除/错误
+  success: "#B6FF2E"             # 成功/完成（跟随信号色）
+  chart-blue: "#4DD0FF"
+  chart-orange: "#FFB020"
+  chart-purple: "#C77DFF"
+  chart-teal: "#3DE0C8"
+  chart-line: "#B6FF2E"           # 图表主线：深色=青柠，浅色=#3E8E1E（AppColor.CHART_LINE）
 
-# 深色主题色板见正文「Color Palette & Roles → 深色主题」。
-# （`colors-dark` 不是合法的 token 键，放这里会被 lint 忽略，故仅存于正文。）
+# 背景渐变/光斑（保持原样，非本轮设计变量）：
+#   bg-wash-top #0A1410 · bg-wash-bottom #100F0A
+#   blobA #6B34C759 · blobB #5C1F5C3A · blobC #4AF2B24C
+
+# ============ 浅色主题（日光纸感）——与 Theme.light() 对应 ============
+# colors-light 不是合法 token 键，故仅存于正文「Color Palette & Roles → 浅色主题」。
+# 关键：浅色下 primary 为墨绿（保证白底可读），青柠改走 signal 仍作填充/描边。
 
 # 字体层级——与 AppTypography 对应（size / weight / lineHeight）
 typography:
+  display-lg:
+    fontFamily: system
+    fontSize: "56px"
+    fontWeight: 700
+    lineHeight: "64px"
+  display:
+    fontFamily: system
+    fontSize: "46px"
+    fontWeight: 700
+    lineHeight: "52px"
   h1:
     fontFamily: system
     fontSize: "32px"
@@ -89,12 +118,13 @@ typography:
     fontWeight: 400
     lineHeight: "16px"
 
-# 圆角——与 AppRadius 对应
+# 圆角——与 AppRadius 对应（阶梯：卡 28 / 内图 28 顶部 / 按钮 16 / 小件 8 / pill 全圆）
 rounded:
   none: "0px"
   sm: "8px"
   md: "16px"
   lg: "24px"
+  xxl: "28px"
   xl: "32px"
   full: "9999px"
 
@@ -108,187 +138,155 @@ spacing:
   xl: "32px"
   xxl: "48px"
 
-# 阴影与动效：非 token 键，规范见正文「Depth & Elevation」与「Component Stylings」。
-# 阴影 soft radius12/offsetY12，medium radius20/offsetY20；动效 enter 500ms / press 120ms / stagger 60ms。
-
 components:
   card:
-    backgroundColor: "{colors.card}"
+    backgroundColor: "{colors.glass}"
     textColor: "{colors.on-surface}"
     typography: "{typography.body}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.xxl}"
     padding: "{spacing.md}"
   button-primary:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.on-primary}"
+    backgroundColor: "{colors.signal}"
+    textColor: "{colors.on-signal}"
     typography: "{typography.body-medium}"
     rounded: "{rounded.md}"
     height: "48px"
-    padding: "0 {spacing.lg}"
   button-secondary:
-    backgroundColor: "{colors.primary-soft}"
-    textColor: "{colors.primary}"
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.on-surface}"
     typography: "{typography.body-medium}"
     rounded: "{rounded.md}"
     height: "48px"
-    padding: "0 {spacing.lg}"
   button-ghost:
-    backgroundColor: "{colors.background}"
+    backgroundColor: "transparent"
     textColor: "{colors.primary}"
     typography: "{typography.body-medium}"
     rounded: "{rounded.md}"
     height: "48px"
-    padding: "0 {spacing.lg}"
-  stat-value-primary:
-    textColor: "{colors.primary}"
-    typography: "{typography.h2}"
-  stat-value-secondary:
-    textColor: "{colors.primary-light}"
+  hero-panel:
+    backgroundColor: "{colors.glass-strong}"
+    textColor: "{colors.on-surface}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.lg}"
+  eyebrow:
+    textColor: "{colors.on-surface-muted}"
+    typography: "{typography.small}"
+  stat-value-signal:
+    textColor: "{colors.signal}"
     typography: "{typography.h2}"
   stat-value-points:
     textColor: "{colors.accent}"
     typography: "{typography.h2}"
-  stats-strip:
-    backgroundColor: "{colors.elevated}"
-    textColor: "{colors.on-surface-muted}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.md}"
+  stat-value-neutral:
+    textColor: "{colors.on-surface}"
+    typography: "{typography.h2}"
   pill-tab:
-    backgroundColor: "{colors.background}"
+    backgroundColor: "{colors.glass-strong}"
     textColor: "{colors.on-surface}"
     typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.xs} {spacing.md}"
+    rounded: "{rounded.full}"
   pill-tab-active:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.on-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-  tab-bar:
-    backgroundColor: "{colors.card}"
-    textColor: "{colors.on-surface-muted}"
-    height: "64px"
-  badge:
-    backgroundColor: "{colors.primary-soft}"
-    textColor: "{colors.primary}"
-    typography: "{typography.caption-medium}"
-    rounded: "{rounded.sm}"
-    padding: "{spacing.xs} {spacing.sm}"
+    backgroundColor: "{colors.signal}"
+    textColor: "{colors.on-signal}"
+    rounded: "{rounded.full}"
   input:
-    backgroundColor: "{colors.background}"
+    backgroundColor: "{colors.elevated}"
     textColor: "{colors.on-surface}"
-    typography: "{typography.body}"
     rounded: "{rounded.sm}"
     height: "44px"
-  task-card:
-    backgroundColor: "{colors.card}"
-    textColor: "{colors.on-surface}"
-    typography: "{typography.body}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.md}"
-  task-check-done:
-    backgroundColor: "{colors.success}"
+  q-index:
+    backgroundColor: "{colors.elevated}"
+    textColor: "{colors.signal}"
     rounded: "{rounded.full}"
     size: "22px"
-    height: "22px"
-    width: "22px"
+  progress-seg:
+    backgroundColor: "{colors.border}"
+    rounded: "{rounded.full}"
+    height: "6px"
+  progress-seg-done:
+    backgroundColor: "{colors.signal}"
+  chart-grid:
+    backgroundColor: "{colors.divider}"
+  chart-series-line:
+    backgroundColor: "{colors.chart-line}"
+  scrim-image:
+    backgroundColor: "{colors.scrim}"
   danger-action:
     textColor: "{colors.error}"
-  divider-line:
-    backgroundColor: "{colors.divider}"
-    height: "1px"
-  share-sheet:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.on-surface}"
-    typography: "{typography.body}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.lg}"
-  chart-series-travel:
-    backgroundColor: "{colors.chart-blue}"
-  chart-series-energy:
-    backgroundColor: "{colors.chart-orange}"
-  chart-series-recycle:
-    backgroundColor: "{colors.chart-purple}"
-  chart-series-food:
-    backgroundColor: "{colors.chart-teal}"
 ---
 
 ## Visual Theme & Atmosphere
 
-CarbonLife 的视觉隐喻是「清晨的森林」：深林绿（`{colors.primary}`）像树冠，暖白画布（`{colors.background}`）像透进来的光，琥珀金（`{colors.accent}`）像积分与成就的奖章。整体气质**温暖、可信、克制**，不喧哗、不炫技——它是一款每天都要打开的记录工具，而不是需要被「惊艳」的营销页。
+隐喻是「夜间的低碳仪表盘」：世界是近黑的（`{colors.background}` #0A0A0A），玻璃卡片像暗处的面板（`{colors.glass}`），而**电光青柠 `{colors.signal}` 是唯一的发光信号**——它只出现在真正需要被看见的地方：主操作、当前选中、以及单个关键读数。积分与成就则用**电青 `{colors.accent}`**，像另一种仪表。
 
-系统刻意做了三件事来区别于通用默认 UI：
+系统刻意做了四件事来区别通用默认 UI：
 
-1. **克制的用色**：除主色与强调色外，界面以中性灰阶为主；深色模式下主色换成更亮的薄荷绿（`#34C759`），保证暗底对比度。
-2. **柔和的几何**：卡片 16vp 圆角、按钮 16vp 圆角、浮层 24vp 圆角，没有任何直角，呼应「绿色/自然」的品牌温度。
-3. **轻量的动效**：进入淡入上滑 500ms、按压缩放 0.97 / 120ms、列表 stagger 60ms。所有动效都遵循无障碍「减弱动效」开关。
+1. **深浅模式跟随系统**：冷启动读取系统 `Configuration.colorMode`（`EntryAbility.onCreate`），运行中切换系统主题由 `onConfigurationUpdate` 实时跟随；`Index` 绑定 `colorMode` 并在其变化时重建 Tabs 子树，确保全部 `AppColor.*` 重新求值。深色为「夜行荧光」气质，浅色为「日光纸感」，两套均完整可用。
+2. **青柠是稀缺信号，不是底漆**：一屏内青柠只用于「1 个主 CTA + 1 个关键数字 + 选中态」。其余描边、次级按钮、眉标一律走中性灰绿（`{colors.on-surface-muted}`）或 `{colors.border}`。
+3. **玻璃 + 描边代替重投影**：卡片用 `backgroundBlur(24)` + `{colors.glass}` + `1px {colors.glass-border}`；辉光只给主 CTA 与 hero（`AppShadow.glow()`，radius 14 / opacity 0.30）。
+4. **眉标（eyebrow）统一**：每页顶部为「英文小字眉标（大写 + `letterSpacing 2.5` + `{colors.on-surface-muted}`）+ 中文大标题」，五个 Tab 共用同一骨架。
 
 **关键特征：**
-- 深林绿主色 + 暖白画布构成「清新自然」基调，与「低碳」主题强关联
-- 琥珀金专属于积分/成就语义，从不作通用装饰色
-- 大字号数据 + 中性灰说明文字，信息层级靠**字号+颜色**而非粗体堆叠
-- 全部图标为**单色 SVG 剪影**，运行时通过 `fillColor` 上主题色
-- 卡片阴影是「极淡的一层」，多数卡片靠留白与圆角而非阴影区分层级
-- 明亮的浅色主题与 OLED 友好的深色主题并行，同一套 token 角色
+- 青柠 `{colors.signal}` 与 `{colors.primary}` 同值但**语义分离**：primary 用于文字强调（浅色下为墨绿），signal 专用于填充/描边/辉光。
+- 电青 `{colors.accent}` 专属于积分/成就，从不作通用强调色。
+- 品红 `{colors.magenta}` 是**「不和谐的秩序」**：一屏至多一处极小的活点（如首页眉标旁的呼吸圆点），制造一个刻意跳出青柠/电青秩序的异质信号，不得用于文字或大面积填充。
+- 大数值 + 中性说明文字，层级靠**字号 + 颜色**而非粗体堆叠。
+- 图标为**单色双色调 SVG**：形状用 `fill`，层次靠 `fill-opacity`，运行时 `fillColor` 统一染色（见「Icon System」）。
+- 页面背景的渐变与光斑、启动页 `Splash` 保持既有设计，不在本系统变量内。
 
 ## Color Palette & Roles
 
-### 品牌 & 强调
-- **深林绿**（`{colors.primary}` #0F3D2E）：主按钮背景、关键数据（累计减排）、选中态、Tab 激活色。品牌的「单一电压」。
-- **再生绿**（`{colors.primary-light}` #1B5E20）：次级强调、次要数据、正向后动词。
-- **柔绿底**（`{colors.primary-soft}` rgba(15,61,46,0.08)）：标签背景、选中项底色、二级按钮底。注意它是低透明度描边色，**不是**独立品牌色。
-- **琥珀金**（`{colors.accent}` #FFB300）：**仅供积分与成就语义**（今日积分、徽章、兑换按钮文字）。不得当作通用强调色随意使用。
+### 信号 & 品牌（深色）
+- **电光青柠**（`{colors.signal}` #B6FF2E）：主按钮底、选中态、关键读数、描边辉光。**每屏限 1 主 CTA + 1 关键数字。**
+- **次级青柠**（`{colors.primary-light}` #7FCB00）：渐变末端、低强度强调。
+- **青柠低透底**（`{colors.primary-soft}`）：标签/次级按钮底。
+- **近黑字**（`{colors.on-signal}` #0A0F07）：青柠填充上的文字。
 
-### 表面 & 背景
-- **页面背景**（`{colors.background}` #F5F7F5）：带一丝绿调的暖白，是整个 App 的「呼吸」。
-- **卡片**（`{colors.card}` #FFFFFF）：内容卡片与列表项表面。
-- **浮层**（`{colors.surface}` #FFFFFF）：弹窗、分享面板。
-- **提升层**（`{colors.elevated}` #FFFFFF）：需要再上一级的浮层（深色模式下为 #2C2C2E）。
+### 强调（深色）
+- **电青**（`{colors.accent}` #3DE0C8）：**仅积分与成就**（积分数字、任务积分、徽章）。不得当通用强调色。
 
-### 文字
-- **主文字**（`{colors.on-surface}` #1C1C1E）：标题与正文。**从不用纯黑**。
-- **次文字**（`{colors.on-surface-muted}` #6E6E73）：说明、单位、时间戳。
-- **反色文字**（`{colors.on-primary}`）：主色按钮/标签上的文字。
+### 表面 & 背景（深色）
+- 页面底 `{colors.background}` #0A0A0A（保持原样）。
+- 玻璃卡 `{colors.glass}`；高不透明玻璃 `{colors.glass-strong}`；描边 `{colors.glass-border}`。
+- 输入底 `{colors.elevated}`；浮层 `{colors.surface}`。
+
+### 文字（深色）
+- 主文字 `{colors.on-surface}` #E9F7E0（带绿调暖白，**不用纯白**）。
+- 次文字 `{colors.on-surface-muted}` #82917B（说明、单位、眉标、时间戳）。
+- 反色文字 `{colors.on-signal}` / `{colors.text-inverse}`。
 
 ### 语义
-- **成功**（`{colors.success}` #34C759）：任务完成勾选、正向状态。
-- **危险**（`{colors.error}` #FF453A）：删除、清空、错误提示。
+- 成功/完成 `{colors.success}`（= 信号色）；危险/删除 `{colors.error}` #FF5C5C（**唯一允许的裸红**）。
 
-### 图表（数据看板专用）
-- **chart-blue** `{colors.chart-blue}` · **chart-orange** `{colors.chart-orange}` · **chart-purple** `{colors.chart-purple}` · **chart-teal** `{colors.chart-teal}`
-- 类别映射：出行=蓝、节能=橙、回收=紫、餐饮=青（见 `CarbonFactors.categoryColor`）。
+### 图表
+- 折线/柱：`{colors.signal}`、`{colors.primary-light}`；网格 `{colors.divider}`；**类别数据色全部落在绿系** `CarbonFactors.categoryColor`（出行=`signal` 青柠、节能=`accent` 电青、回收=`primary-light` 次级青柠、餐饮=苔绿 `#2E8B57`）——四类可区分，且与「夜行荧光」同色系，不引入蓝/橙等跑色。
 
-### 深色主题
-切换由 `EntryAbility` 写入 `AppStorage 'colorMode'`，`Theme.current()` 据此返回对应色板。**主色在深色下变为薄荷绿以提高可读性，而非继续使用深绿。**
+### 浅色主题（日光纸感）
+浅色下**青柠在白底不可读**，故 `primary` 让位给墨绿，青柠退回 `signal`（只作填充/描边/辉光，其上近黑字）。
 
-| Role | 浅色 | 深色 |
-|---|---|---|
-| primary | `#0F3D2E` | `#34C759` |
-| primary-light | `#1B5E20` | `#66BB6A` |
-| primary-soft | rgba(15,61,46,0.08) | rgba(52,199,89,0.15) |
-| accent | `#FFB300` | `#FFB300` |
-| background | `#F5F7F5` | `#0A0A0A` |
-| surface | `#FFFFFF` | `#1C1C1E` |
-| card | `#FFFFFF` | `#121212` |
-| elevated | `#FFFFFF` | `#2C2C2E` |
-| on-surface | `#1C1C1E` | `#F5F5F7` |
-| on-surface-muted | `#6E6E73` | `#8E8E93` |
-| on-primary | `#FFFFFF` | `#1C1C1E` |
-| divider | rgba(28,28,30,0.08) | rgba(245,245,247,0.10) |
-| border | rgba(28,28,30,0.10) | rgba(245,245,247,0.15) |
-| shadow | `#E6ECE8` | rgba(0,0,0,0.50) |
-| error | `#FF453A` | `#FF6961` |
-| success | `#34C759` | `#34C759` |
-| chart-blue | `#0A84FF` | `#64D2FF` |
-| chart-orange | `#FF9F0A` | `#FFB340` |
-| chart-purple | `#BF5AF2` | `#DAA5FF` |
-| chart-teal | `#40C8E0` | `#6EE1FF` |
+| Role | 浅色 |
+|---|---|
+| primary（文字强调） | `#16210F` 墨绿 |
+| primary-light | `#2F4A1D` |
+| primary-soft | rgba(22,33,15,0.10) |
+| signal / signal-deep | `#B6FF2E` / `#7FCB00` |
+| on-signal | `#0A0F07` |
+| accent（积分） | `#0E8F79` 深青 |
+| background | `#F5F7F5`（保持原样） |
+| card / surface / elevated | `#FFFFFF` |
+| on-surface | `#12180D` |
+| on-surface-muted | `#6A7562` |
+| divider | rgba(18,24,13,0.10) |
+| border | rgba(18,24,13,0.16) |
+| glass / glass-strong | rgba(255,255,255,0.62) / 0.85 |
+| scrim | rgba(10,15,7,0.45) |
+| error / success | `#E5484D` / `#3E8E1E` |
+| chart-* | `#0A84FF` / `#E08600` / `#9B4DFF` / `#0FB5A0` |
 
 ## Typography Rules
 
 ### 字体
-全站使用系统默认字体（HarmonyOS Sans / 系统中文字体）。不引入自定义字库，通过**字号 + 字重**建立层级。
+全站系统默认字体（HarmonyOS Sans / 系统中文字体），不引入自定义字库，靠**字号 + 字重**建立层级。
 
 ### 层级
 
@@ -296,174 +294,178 @@ CarbonLife 的视觉隐喻是「清晨的森林」：深林绿（`{colors.primar
 |---|---|---|---|---|
 | `{typography.h1}` | 32 | 700 | 40 | 启动页大标题 |
 | `{typography.h2}` | 24 | 700 | 32 | 页面标题 |
-| `{typography.h3}` | 20 | 500 | 28 | 弹窗/卡片标题 |
+| `{typography.h3}` | 20 | 500 | 28 | 弹窗/文章标题、统计数值 |
 | `{typography.h4}` | 17 | 500 | 24 | 小标题、数据标签 |
 | `{typography.body}` | 15 | 400 | 22 | 正文 |
 | `{typography.body-medium}` | 15 | 500 | 22 | 列表主文案、按钮文字 |
 | `{typography.caption}` | 13 | 400 | 18 | 说明、单位 |
-| `{typography.caption-medium}` | 13 | 500 | 18 | 分类标签、小标题 |
-| `{typography.small}` | 11 | 400 | 16 | 辅助提示 |
+| `{typography.caption-medium}` | 13 | 500 | 18 | 分类标签 |
+| `{typography.small}` | 11 | 400 | 16 | 辅助提示、眉标 |
 
 ### 原则
-- **数据优先**：大数值用 24/32 加粗 + 品牌色或强调色，单位紧随其下用 `caption` + `on-surface-muted`。
-- **层级靠字号与颜色**：h4 与 body-medium 同为 15/17 级，靠字重与颜色区分。
-- **短文案克制**：说明类文字最多 2 行（`maxLines(2)`），避免卡片高度抖动。
+- **眉标**：`small` + 全大写 + `letterSpacing 2.5` + `{colors.on-surface-muted}`，每页一条。
+- **数据优先**：大数值加粗 + `signal`/`accent`，单位紧随其下用 `caption` + `on-surface-muted`。
+- **短文案克制**：说明类最多 2 行（`maxLines(2)`）。
+
+## Icon System
+
+- **网格**：24×24 viewBox，光学边距 2px；几何圆角、无尖角。
+- **双色调**：主形 `fill-opacity="1"`；辅助形/暗部 `fill-opacity="0.30"`。因为 `fillColor` 只改颜色不改透明度，**同一份 SVG 在深浅两主题下都保留明暗层次**。
+- **实现要点**：暗部必须是「洞」或独立于主形的元素（同一颜色叠加在同一填充上不可见）。带内腔的图标用 `fill-rule="evenodd"` 挖洞，再以 30% 形状填洞。
+- **染色**：运行时 `.fillColor(AppColor.PRIMARY)` / `AppColor.SIGNAL` / `AppColor.TEXT_SUB`；选中行用 `signal`，未选中用 `on-surface-muted`。
+- **语义**：低碳行为图标（步行/骑行/公交/地铁/节能/回收/餐饮…）语义保留，禁止无意义换形。
 
 ## Component Stylings
 
-> 所有组件均为 ArkUI 自定义组件（`components/` 目录）。此处仅定义视觉规则，交互逻辑见对应 `.ets`。
-
 ### 卡片 `AppCard`
-- 背景 `{colors.card}`、圆角 `{rounded.md}`(16)、内边距默认 `{spacing.md}`(16)。
-- 阴影 `AppShadow.soft()`（radius 12 / offsetY 12 / 阴影色 `{colors.shadow}`）；`showBorder` 时叠加 `0.5px {colors.border}`。
-- 进入动画：淡入 + 上移 20vp，500ms，支持 `enterDelayIndex × 60ms` 错峰。
+- 底 `{colors.glass}` + `backdropBlur(24)` + `1px {colors.glass-border}` + `{rounded.xxl}`(28)。
+- 阴影 `AppShadow.soft()`（radius 24 / offsetY 8）；进入动画淡入 + 上移 20vp，500ms，`enterDelayIndex × 60ms` 错峰。
 
 ### 按钮 `AppButton`
-三种类型，均 48vp 高、`{rounded.md}` 圆角、`{typography.body-medium}`：
-- **primary**：底 `{colors.primary}`，字 `{colors.on-primary}`。
-- **secondary**：底 `{colors.primary-soft}`，字 `{colors.primary}`。
-- **ghost**：透明底 + `1px {colors.primary}` 边框，字 `{colors.primary}`。
-- 禁用：底 `{colors.divider}`，字 `{colors.on-surface-muted}`，整体 0.6 透明度。
-- 按压：`scale(0.97)`，120ms。
+均 `{rounded.md}`(16)、`{typography.body-medium}`：
+- **primary**：底 `{colors.signal}`（渐变到 `{colors.signal-deep}`），字 `{colors.on-signal}`，辉光 `AppShadow.glow()`。**每屏最多一个。**
+- **secondary**：底 `{colors.glass}`，字 `{colors.on-surface}`，`1px {colors.border}`——**中性**，不再用青柠描边。
+- **ghost**：透明底 + `1px {colors.primary}`，字 `{colors.primary}`。
+- 按压 `scale(0.97)` / 120ms。
 
-### 分段选择器 / 类别 Pill
-- 未选：底 `{colors.background}`、字 `{colors.on-surface}`、圆角 `{rounded.md}`。
-- 选中：底 `{colors.primary}`、字 `{colors.on-primary}`。
+### 眉标头 `Header`（约定）
+`Column`：眉标（`{typography.small}` 大写 + 字距 2.5 + `on-surface-muted`）+ 标题（`{typography.h2}` + `on-surface`）。五 Tab 统一。
+
+### 选项 Pill / 分段
+- 未选：底 `{colors.glass-strong}`，字 `{colors.on-surface}`，`1px {colors.border}`。
+- 选中：底 `{colors.signal}`，字 `{colors.on-signal}`。
 
 ### 底部导航 `Tabs`
-- 背景 `{colors.card}`，高 64vp，5 个入口，图标 24×24 单色 SVG。
-- 激活：图标与文字 `{colors.primary}`，图标 `scale(1.08)`；未激活 `{colors.on-surface-muted}` + 0.7 透明度。
-
-### 徽章 `BadgeItem`
-- 宽 30%，`{rounded.md}`，内边距 `{spacing.md}`。
-- 已解锁：图标 `{colors.primary}`、底 `{colors.primary-soft}`；
-- 未解锁：图标 `{colors.on-surface-muted}` + 0.45 透明度、底 `{colors.card}`。
-
-### 任务卡 `TaskCard`
-- 未完成：底 `{colors.card}`；完成：底 `{colors.background}`、文字 `{colors.on-surface-muted}`。
-- 勾选圆圈 22×22，完成时填充 `{colors.success}`。
-- `0.5px {colors.border}` 描边，`{rounded.md}`。
+- 高 64vp，5 入口，图标 24×24。激活：`{colors.signal}` + `scale(1.1)`；未激活：`{colors.on-surface-muted}` + 0.65。
 
 ### 输入框
-- 底 `{colors.background}`、圆角 `{rounded.sm}`(8)、高 44vp，占位符 `{colors.on-surface-muted}`。
+- 底 `{colors.elevated}`、`1px {colors.border}`、`{rounded.sm}`(8)、高 44vp、值 `{colors.on-surface}`、占位符 `{colors.on-surface-muted}`。
 
 ### 图表（Canvas）
-- 折线：`{colors.primary}` 2px + 3px 圆点；柱状：`barColor` 默认 `{colors.primary}`。
-- 坐标轴 `{colors.divider}` 1px，刻度文字 `{colors.on-surface-muted}` 10px，画布高 180vp。
-- 饼图：类别色环，中心挖空为 `{colors.card}`；无数据时画 `{colors.divider}` 圆 + 「暂无数据」。
+- **线色**：统一 `AppColor.CHART_LINE`（深色=信号青柠、浅色=品牌绿 `#3E8E1E`）；折线 2vp 实线 + 3–4vp 同色圆点，面积用同色 32%→0 竖向渐变。点/填充/线同色系，不再用深灰黑。
+- **Y 轴**：**动态上限** `niceCeil(dataMax)`（1/1.5/2/2.5/3/4/5/6/8/10 × 10ⁿ），不再固定 0–1.0；轴顶标单位 `kg`。
+- **网格**：3 条 `{colors.divider}` 水平横线（25%/50%/75%），坐标轴 `{colors.divider}` 1px，画布高 180vp。
+- **刻度文字**：字体单位用 **vp**（`px` 为物理像素会渲染过小）；轴数值 `caption`、横轴刻度 `small`，密集序列隔点显示、末端右对齐；右留白 20vp 防端点被裁。
+- **稀疏数据**：本周期 0 条 → 空状态；仅 1 个非零桶 → 柱状（并提示「数据点较少」）；≥2 个非零桶 → 折线。
+- 饼图：类别色环，中心挖空 `{colors.card}` + 合计；无数据画 `{colors.divider}` 圆 + 「暂无数据」。
 
-### 分享面板
-- 底 `{colors.card}`、`{rounded.lg}`(24)、内边距 `{spacing.lg}`；遮罩 `rgba(0,0,0,0.45)`。
+### 看板口径
+- 顶部三张汇总卡与「减排趋势」**同口径**：随「日/周/月/年」聚合（本日/本周/本月/本年），文案随之变化（如「kg 本周减排」）。
+
+### 图像卡（科普）
+- 封面满幅贴卡（负边距），顶部圆角与卡一致（`{rounded.xxl}`）。
+- 底部叠 `{colors.scrim}`→`{colors.scrim-fade}` 压暗统一调性。
+- 标签 chip：底 `{colors.overlay}` + 字 `AppColor.ON_OVERLAY`（恒浅色，图片上任何主题都可读；**不抢青柠**）。
+- 封面右下角**不加**水印标识；仅保留底部 `{colors.scrim}` 压暗。
+
+### 徽章 `BadgeItem` / 任务卡 `TaskCard`
+- 徽章：宽 30%，`{rounded.md}`；解锁图标 `{colors.primary}`；未解锁 `{on-surface-muted}` + 0.45。
+- 任务卡：完成时勾选圆填充 `{colors.success}`；`0.5px {colors.border}` 描边。
 
 ## Layout Principles
 
 ### 间距系统
-基于 8 的倍数（含 4 与 2 的微调步进）：
+8 的倍数（含 4/2 微调）：`{spacing.xs}` 4 · `{spacing.sm}` 8 · `{spacing.md}` 16 · `{spacing.lg}` 24 · `{spacing.xl}` 32 · `{spacing.xxl}` 48。
+- 页面左右留白 `{spacing.md}`(16)，卡片纵向间距 `{spacing.md}`。
+- 徽章网格 3 列（每项 30%）。
 
-| Token | 值(vp) | 用途 |
-|---|---|---|
-| `{spacing.xs}` | 4 | 图标与文字间距 |
-| `{spacing.sm}` | 8 | 行内元素、小内边距 |
-| `{spacing.md}` | 16 | 卡片内边距、模块间距、页面左右边距 |
-| `{spacing.lg}` | 24 | 弹窗内边距、大模块间距 |
-| `{spacing.xl}` | 32 | 分区间距 |
-| `{spacing.xxl}` | 48 | 启动页元素间距 |
-
-### 网格与容器
-- 页面内容左右留白固定 `{spacing.md}`(16)，卡片纵向间距 `{spacing.md}`。
-- 首页数据卡为 **2×2 网格**（今日减排/积分；累计减排/种树），用竖向 `Divider` 分隔。
-- 徽章网格为 **3 列**（每项宽 30%，`SpaceBetween`）。
-- 手机为主目标；平板（`deviceTypes: tablet`）暂用同一单列布局，后续再补多列。
+### 圆角阶梯
+卡/图 `{rounded.xxl}`(28) → 按钮/内块 `{rounded.md}`(16) → 小件 `{rounded.sm}`(8) → pill `{rounded.full}`。**同层不混用。**
 
 ### 留白哲学
-内容优先：用大字号数据与充足留白强调核心信息，**不要用分割线填满页面**。卡片之间靠间距而非边框区分；仅卡片内部或列表行之间用 `{colors.divider}`。
+内容优先：大数值 + 充足留白强调核心；不靠分割线填满页面；组间靠间距而非边框。
 
 ## Depth & Elevation
 
 | 层级 | 处理 | 用途 |
 |---|---|---|
-| 0 平坦 | 无阴影，仅 `{colors.border}` 描边 | 列表项、行、科普折叠卡 |
-| 1 卡片 | `AppShadow.soft()`（radius 12 / offsetY 12 / `{colors.shadow}`） | 普通内容卡片 |
-| 2 浮层 | `AppShadow.medium()`（radius 20 / offsetY 20） | 分享面板、弹出层 |
+| 0 平坦 | 无阴影，仅 `{colors.border}` 描边 | 列表行、折叠卡 |
+| 1 卡片 | `AppShadow.soft()` | 普通内容卡 |
+| 2 辉光 | `AppShadow.glow()`（radius 14 / `{colors.primary-glow}` 0.30） | 仅主 CTA 与 hero |
 
-**阴影哲学**：极淡、单层、暖灰调（浅色为 #E6ECE8，深色为 40% 黑）。App 从不使用沉重投影；深色模式下阴影更依赖 `{colors.elevated}` 的色阶而非阴影本身。
+深色下阴影几乎不可见，层次主要靠 `{colors.glass-strong}` 与 `{colors.border}` 的色阶。
 
 ## Do's and Don'ts
 
 ### Do
-- 用 `{colors.primary}` 承载品牌与关键数据，用 `{colors.accent}` 专门承载积分/成就
-- 页面背景用 `{colors.background}`（暖白），卡片用 `{colors.card}`（纯白），形成微妙的表面分离
-- 所有按钮保持 `{rounded.md}`(16) 圆角与 `scale(0.97)` 按压反馈，全局一致
-- 图标一律用单色 SVG，运行时 `.fillColor(AppColor.PRIMARY)`，使其自动适配主题
-- 大数值用品牌色/强调色 + 大字号，单位用 `caption` + `on-surface-muted` 紧贴其下
-- 动效统一走 `AppMotion`，并遵守 `reduceMotion`（开启时 duration 置 0）
-- 深色主题用 `Theme.dark()` 的对应角色，主色切换为薄荷绿
+- 青柠 `{colors.signal}` 只用于「1 主 CTA + 1 关键数字 + 选中态」，其余降级为 `on-surface-muted` / `border`。
+- 积分/成就一律 `{colors.accent}`；删除一律 `{colors.error}`。
+- 每页用统一的「眉标 + 大标题」头。
+- 图标用 `fillColor` + `fill-opacity` 双色调，选中 `signal` / 未选 `on-surface-muted`。
+- 卡片用玻璃 + 描边；辉光只给主 CTA / hero。
+- 浅色下 primary 用墨绿，青柠只作 signal 填充。
 
 ### Don't
-- 不要把琥珀金 `{colors.accent}` 当作通用强调色到处使用——它只属于积分与成就
-- 不要用纯黑 `#000000` 作正文色——浅色主题正文用 `{colors.on-surface}` #1C1C1E
-- 不要给卡片堆叠多层或深色重投影——本系统只有一层极淡阴影
-- 不要用直角卡片/按钮——圆角是品牌温度的一部分
-- 不要在列表里塞满分割线——用间距和留白分组
-- 不要在 `build()` 中直接硬编码十六进制色值——一律走 `AppColor.*` 动态 token
-- 不要在 AI 识图/识别的标签映射里写死模型索引而不加兜底——识别失败必须回退到手动选择
+- 不要把青柠当大面积底漆或到处描边（会立刻「廉价化」）。
+- 不要用纯黑作正文、不要用纯白当深色主文字。
+- 不要给卡片堆叠多层阴影或深色重投影。
+- 不要把电青当通用强调色——它只属于积分/成就。
+- 不要在 `build()` 硬编码 hex/数值——一律走 `AppColor.*` / `AppSpacing.*` / `AppRadius.*`。
+- 不要改页面背景渐变/光斑的**配色**与 `Splash` 的**品牌色板**（既有设计）；允许在其上叠加缓慢动效（光斑漂移、启动页光晕呼吸/环轨卫星），但必须受 `reduceMotion` 控制。
 
 ## Responsive Behavior
 
 ### 断点（vp）
 | 名称 | 宽度 | 变化 |
 |---|---|---|
-| 手机 | < 600 | 单列，卡片左右 16vp 边距，2×2 数据网格，5 Tab |
-| 平板 | ≥ 600 | 目前沿用单列；建议后续把看板/卡片改为 2 列，图表高度提升至 240vp |
+| 手机 | < 600 | 单列，左右 16vp 边距，5 Tab |
+| 平板 | ≥ 600 | 目前沿用单列；建议后续看板/卡片改 2 列，图表高 240vp |
 
 ### 触控目标
-- 主按钮 48vp 高、Tab 项 52vp 高、步进器按钮 44×44vp，均达到 44×44 的最小触控目标。
-- 任务/列表行整行可点击，不依赖小图标命中。
+主按钮 48vp、Tab 52vp、步进器 44×44vp，均 ≥ 44×44。
 
-### 折叠策略
-- 分屏/窄屏下 `Tabs` 设为 `scrollable(false)` + `BarMode.Fixed`，保持 5 项等宽。
-- 长文本（科普正文、建议）最多 2 行预览，点击展开。
-- 图表用 `width('100%')` 自适应，不做横向滚动。
+### 动效语言（Motion）
+- **关键读数滚动**：`AnimatedNumber` 以 easeOutCubic 从当前值滚到目标值（首页今日减排、积分余额、看板汇总等），700ms。
+- **图表入场**：折线图从左向右揭示 + 面积渐变 + 末端辉光（900ms）；柱图自底向上生长 + 顶部圆角 + 竖向渐变（700ms）；饼图扇形扫入 + 中心合计（800ms）。曲线统一 easeOutCubic。
+- **背景呼吸**：首页背景三枚光斑以 9–13s 周期缓慢漂移/缩放（`playMode: Alternate`）。
+- **启动页**：光晕呼吸 + 环轨卫星 + 掠光。
+- **页面切换**：`Tabs.animationDuration 280ms`。
 
 ### 动效降级
-- `AppStorage 'reduceMotion' === true` 时：进入动画 duration=0、按压动画 duration=0、stagger=0、Canvas 数值动画直接落到终值。
+`AppStorage 'reduceMotion' === true` 时：进入/按压动画 duration=0、stagger=0、光斑漂移与光晕/环轨不启动、数字滚动直接落终值、Canvas 数值直接落终值。
 
 ## Agent Prompt Guide
 
 ### 快速取色
-- 主按钮：`{colors.primary}` / 文字 `{colors.on-primary}`
-- 关键数据：`{colors.primary}`；积分/成就：`{colors.accent}`
-- 页面底：`{colors.background}`；卡片：`{colors.card}`
-- 主文字 `{colors.on-surface}`；次文字 `{colors.on-surface-muted}`
-- 删除/错误：`{colors.error}`；成功/完成：`{colors.success}`
+- 主 CTA：底 `{colors.signal}` / 字 `{colors.on-signal}`；每屏仅一个。
+- 关键数字：`{colors.signal}`；积分/成就：`{colors.accent}`；普通数值：`{colors.on-surface}`。
+- 卡片：底 `{colors.glass}` + `1px {colors.glass-border}`；页面底 `{colors.background}`。
+- 主文字 `{colors.on-surface}`；次文字/眉标 `{colors.on-surface-muted}`。
+- 删除 `{colors.error}`；成功 `{colors.success}`。
 
 ### 示例 Prompt（ArkTS）
-1. 「在 CarbonLife 里新建一个内容卡片：背景用 `AppColor.CARD`，圆角 `AppRadius.MD`，内边距 `AppSpacing.MD`，阴影用 `AppShadow.soft()`，进入时用 `AppCard` 的 `enter/enterDelayIndex`。」
-2. 「做一个主按钮：高 48，圆角 `AppRadius.MD`，底色 `AppColor.PRIMARY`，文字 `AppColor.TEXT_INVERSE`，字号 15/500，按压缩放到 0.97、时长 120ms。」
-3. 「把今日/累计数据做成 2×2 网格：数值 24 加粗，今日用 `AppColor.PRIMARY`、积分用 `AppColor.ACCENT`、累计用 `AppColor.CHART_BLUE`，单位用 13/`AppColor.TEXT_SUB`。」
-4. 「给看板加一个折线图：用 `LineChartView`，线色 `AppColor.PRIMARY`，轴色 `AppColor.DIVIDER`，刻度 10px `AppColor.TEXT_SUB`，高度 180。」
+1. 「做一个页面头：眉标 `KNOWLEDGE`（`AppTypography.SMALL` 大写 + letterSpacing 2.5 + `AppColor.TEXT_SUB`）+ 标题（`AppTypography.H2` + `AppColor.TEXT`）。」
+2. 「做一个主 CTA：高 48、圆角 `AppRadius.MD`、底 `AppColor.SIGNAL`、字 `AppColor.ON_SIGNAL`、按压 0.97/120ms。」
+3. 「做一个中性次级按钮：底 `AppColor.GLASS`、字 `AppColor.TEXT`、`1px AppColor.BORDER`——不要用青柠描边。」
+4. 「输入框：底 `AppColor.ELEVATED`、`1px AppColor.BORDER`、值 `AppColor.TEXT`、占位符 `AppColor.TEXT_SUB`。」
+5. 「折线图：线色 `AppColor.SIGNAL`，3 条 `AppColor.DIVIDER` 网格线，轴色 `AppColor.DIVIDER`，刻度 10px `AppColor.TEXT_SUB`，高 180。」
 
 ### 迭代规则
 1. 一次只改一个组件。
-2. 颜色/字号/间距一律引用 token（`AppColor` / `AppTypography` / `AppSpacing` / `AppRadius`），禁止硬编码。
-3. 新增组件样式，优先在 YAML `components:` 中补一条 token。
-4. 修改前先确认上表「Known Gaps」是否涉及该组件，避免把「文档已定义」误当成「代码已生效」。
-5. 改完 UI 后运行 `hvigorw assembleHap` 确认可构建。
+2. 颜色/字号/间距/圆角一律引用 token，禁止硬编码。
+3. 新增组件样式，先在 YAML `components:` 补一条 token。
+4. 改动前先读「Known Gaps」，避免把「文档已定义」误当「代码已生效」。
+5. 改完运行 `scripts\run.ps1 -BuildOnly` 确认可构建。
 
 ## Known Gaps & Implementation Notes
 
-> 本文件是**设计规范**。以下状态已对照当前代码（`entry/src/main/ets`）核实，改代码前请先阅读，避免文档与实现漂移。
+> 本文件是**设计规范**。以下状态已对照当前代码核实，改代码前请阅读。
 
-**已修复（2026-09 复核）：**
-- ✅ **深色模式已生效**：`EntryAbility.applyConfiguration` 已改为 `config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK` 并存入 `'dark' | 'light'` 字符串，`Theme.isDark()` 判定正确。
-- ✅ **分布式权限已在运行时申请**：`EntryAbility.requestDistributedPermission()` 调用 `requestPermissionsFromUser(['ohos.permission.DISTRIBUTED_DATASYNC'])`。
-- ✅ **家庭碳积分已支持聚合**：`FamilyService` 改为 `members: MemberData[]`，按 `deviceId` 区分成员，`getSaved()/getPoints()` 对全部成员求和。
-- ✅ **图表重绘已修正**：`Chart.ets` 在动画回调与 `reduceMotion` 分支中显式调用 `this.draw()`，并移除了 `DashboardTab` 的 `.id('dashboard_' + version)` 强制重建 hack。
-- ✅ **`clearAll()` 连带清空兑换记录**：`records` 与 `redemptions` 一起清空，积分余额不再可能为负。
-- ✅ **CSV 导出已转义并加 BOM**：含逗号/引号/换行的字段按 RFC 4180 转义，输出以 `\uFEFF` 开头（Excel 中文不再乱码）。
-- ✅ **家庭成员列表已展示**：`HomeTab` 家庭卡片新增成员列表（昵称 + 「我」标记 + 各自减排/积分），按 `deviceId` 区分，`sessionId` 非空时显示；`FamilyService` 已导出 `MemberData` 并提供 `isLocal()`。
+**已实现（2026-09 复核）：**
+- ✅ **夜行荧光色板 + 信号色**：`Theme.ets` 深/浅两套色板，新增 `signal/signalDeep/onSignal/scrim/scrimFade/textInverseSub`。
+- ✅ **深浅模式跟随系统**：`EntryAbility.onCreate` 读取 `this.context.config.colorMode` 初始化；运行中 `onConfigurationUpdate` 实时跟随；`Index` 绑定 `colorMode`，变化时重建 Tabs 子树以重算全部 `AppColor.*`。
+- ✅ **动效升级**：`AnimatedNumber` 数字滚动、图表绘制入场（折线揭示/柱图生长/饼图扫入）、背景光斑呼吸、启动页光晕与环轨、Tab 切换动画——均受 `reduceMotion` 控制。
+- ✅ **品红「不和谐的秩序」**：`AppColor.MAGENTA` 上线，首页眉标旁一处分红活点（呼吸），全站仅此一处。
+- ✅ **科普专栏升级**：眉标、编号题号、分段进度、满幅封面 + 压暗、青柠信号条。
+- ✅ **行为图标双色调**：13 个 SVG 用 `fill-opacity 0.30` 分层；修复 `ic_paper` 文字线不可见。
+- ✅ **看板图表**：折线/柱图补 3 条网格线；指标卡主次（减排=signal / 积分=accent / 条数=中性）。
+- ✅ **深色模式跟随系统**（浅色亦完整可用）。
+- ✅ **家庭聚合 / 清空数据 / CSV BOM / 图表重绘**：见历史修复记录。
 
-**仍待完成：**
-- **减弱动效是死代码**：`reduceMotion` 仍被硬编码为 `false`，且没有 UI 开关；`AppMotion` 的降级分支不会执行。
-- **平板未做多列布局**：`deviceTypes` 已声明 tablet，但布局仍是单列。
-- **UI 层文档**：旧版 `DESIGN_SYSTEM.md` 已由本文件取代（保留作历史参考）。
+**仍待完成 / 已知限制：**
+- **分布式权限弹窗**：`12100009` 已消除（改为先查授权态再申请、失败仅降级打日志）。但模拟器/部分环境对该权限不弹动态申请框，系统直接返回 denied（`It does not need to request permission`）→ 属**环境受限**，需真机复测。
+- **减弱动效**：已在「首页 → 减弱动效」提供开关（写入 `AppStorage 'reduceMotion'`，`AppMotion.loopOptions` 等统一读取）；尚未接入系统无障碍设置。
+- **平板未做多列布局**：仍单列。
+- **青柠锚点审计（已收敛）**：关键读数浅色改走墨绿（`AppColor.READING`）、家庭卡片数值降为中性、看板类别数据改走 `chart-*` 数据色板；首页/看板现为「1 主 CTA + 1 关键读数 + 选中态」。
+- **图像调性**：文章封面来自 Unsplash，风格不统一；已用底部压暗缓解，后续建议统一叠 duotone 或换冷调低饱和图。
+- `DESIGN_SYSTEM.md` 已归档（DEPRECATED），仅历史参考。

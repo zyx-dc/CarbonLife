@@ -14,6 +14,9 @@ export interface VisionResult {
 export class VisionService {
   static async pickAndDetect(): Promise<VisionResult> {
     let file: fs.File | null = null;
+    let source: image.ImageSource | null = null;
+    let pixelMap: image.PixelMap | null = null;
+    let detector: objectDetection.ObjectDetector | null = null;
     try {
       const picker = new photoAccessHelper.PhotoViewPicker();
       const options = new photoAccessHelper.PhotoSelectOptions();
@@ -25,12 +28,10 @@ export class VisionService {
       }
       const uri = picked.photoUris[0];
       file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
-      const source = image.createImageSource(file.fd);
-      const pixelMap = await source.createPixelMap();
-      fs.closeSync(file);
-      file = null;
+      source = image.createImageSource(file.fd);
+      pixelMap = await source.createPixelMap();
 
-      const detector = await objectDetection.ObjectDetector.create();
+      detector = await objectDetection.ObjectDetector.create();
       const req = new visionBase.Request();
       const imgData: visionBase.ImageData = { pixelMap: pixelMap };
       req.inputData = imgData;
@@ -46,13 +47,21 @@ export class VisionService {
       });
       return VisionService.mapLabel(bestLabel, bestScore);
     } catch (e) {
-      if (file !== null) {
-        try {
-          fs.closeSync(file);
-        } catch (err) {
-        }
-      }
       return { ok: false, label: '', behaviorKey: '', score: 0, message: '识别失败，请手动选择行为' };
+    } finally {
+      // 释放原生资源，避免每次识图泄漏
+      if (detector !== null) {
+        try { detector.destroy(); } catch (err) { }
+      }
+      if (pixelMap !== null) {
+        try { pixelMap.release(); } catch (err) { }
+      }
+      if (source !== null) {
+        try { source.release(); } catch (err) { }
+      }
+      if (file !== null) {
+        try { fs.closeSync(file); } catch (err) { }
+      }
     }
   }
 

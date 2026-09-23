@@ -55,6 +55,12 @@ export class FamilyService {
     }
     const name = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_NAME, '我');
     this.setNickname(name);
+    // 恢复上次的家庭会话，避免重启后掉出家庭组
+    const savedSession = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_SESSION, '');
+    if (savedSession !== '') {
+      this.sessionId = savedSession;
+      await this.applySession(savedSession);
+    }
   }
 
   private async ensureDeviceId(): Promise<string> {
@@ -84,36 +90,32 @@ export class FamilyService {
     return member;
   }
 
-  genSession(): string {
+  async genSession(): Promise<string> {
     this.sessionId = distributedDataObject.genSessionId();
-    this.notify();
+    await this.applySession(this.sessionId);
     return this.sessionId;
   }
 
   async joinSession(sessionId: string): Promise<void> {
-    if (this.obj === null) {
-      return;
-    }
-    try {
-      this.sessionId = sessionId;
-      await this.obj.setSessionId(sessionId);
-      this.notify();
-    } catch (e) {
-      console.error('FamilyService joinSession failed: ' + JSON.stringify(e));
-    }
+    this.sessionId = sessionId;
+    await this.applySession(sessionId);
   }
 
   async leaveSession(): Promise<void> {
-    if (this.obj === null) {
-      return;
+    this.sessionId = '';
+    await this.applySession('');
+  }
+
+  private async applySession(sessionId: string): Promise<void> {
+    if (this.obj !== null) {
+      try {
+        await this.obj.setSessionId(sessionId);
+      } catch (e) {
+        console.error('FamilyService setSessionId failed: ' + JSON.stringify(e));
+      }
     }
-    try {
-      this.sessionId = '';
-      await this.obj.setSessionId('');
-      this.notify();
-    } catch (e) {
-      console.error('FamilyService leaveSession failed: ' + JSON.stringify(e));
-    }
+    await CarbonStore.get().setSetting(AppConst.KEY_FAMILY_SESSION, sessionId);
+    this.notify();
   }
 
   pushLocal(): void {
@@ -126,7 +128,7 @@ export class FamilyService {
       member.nickname = '我';
     }
     member.saved = store.totalSaved();
-    member.points = store.totalPoints();
+    member.points = store.pointsBalance();
     member.updatedAt = Date.now();
     this.notify();
   }

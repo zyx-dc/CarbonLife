@@ -93,20 +93,24 @@ export struct RecordTab {
   build() {
     Scroll() {
       Column({ space: AppSpacing.MD }) {
-        Text('记录低碳行为').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%')
-          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
+        Column({ space: AppSpacing.XS }) {
+          Text('RECORD').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
+          Text('记录低碳行为').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
+        }
+        .width('100%').alignItems(HorizontalAlign.Start)
+        .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 1}) {
           Row({ space: AppSpacing.SM }) {
             Image($r('app.media.ic_ai_scan'))
               .width(40)
               .height(40)
-              .fillColor(AppColor.PRIMARY);
+              .fillColor(AppColor.TEXT_SUB);
             Column() {
               Text('AI 识图识别低碳行为').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-              Text('选择一张照片，端侧 AI 自动识别场景并推荐低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%');
+              Text('选择一张照片，端侧 AI 自动识别场景并推荐低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis });
             }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-            AppButton({ text: '拍照/选图', type: 'primary', btnHeight: 34 }).onClick(() => this.onAiDetect());
+            AppButton({ text: '拍照/选图', type: 'secondary', btnHeight: 44, fullWidth: false }).onClick(() => this.onAiDetect());
           }.width('100%');
         }
 
@@ -117,10 +121,14 @@ export struct RecordTab {
               ForEach(CarbonFactors.CATEGORIES, (cat: string) => {
                 Text(cat)
                   .fontSize(AppTypography.BODY.size)
-                  .fontColor(this.category === cat ? AppColor.TEXT_INVERSE : AppColor.TEXT)
-                  .backgroundColor(this.category === cat ? AppColor.PRIMARY : AppColor.BG)
-                  .padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.XS, bottom: AppSpacing.XS })
-                  .borderRadius(AppRadius.MD)
+                  .fontColor(this.category === cat ? AppColor.ON_SIGNAL : AppColor.TEXT)
+                  .backgroundColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_STRONG)
+                  .borderWidth(1)
+                  .borderColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_BORDER)
+                  .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
+                  .height(44)
+                  .textAlign(TextAlign.Center)
+                  .borderRadius(AppRadius.FULL)
                   .onClick(() => {
                     this.category = cat;
                     const list = CarbonFactors.getByCategory(cat);
@@ -139,13 +147,20 @@ export struct RecordTab {
                 Image(behaviorIcon(b.key))
                   .width(24)
                   .height(24)
-                  .fillColor(AppColor.PRIMARY);
+                  .fillColor(this.selectedKey === b.key ? AppColor.SIGNAL : AppColor.TEXT_SUB);
                 Column({ space: 2 }) {
                   Text(b.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text('单位：' + b.unit + ' · 因子 ' + b.factor.toString() + ' kg/' + b.unit).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text('每 ' + b.unit + ' 约减排 ' + b.factor.toString() + ' kg CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                Radio({ value: b.key, group: 'behavior' }).checked(this.selectedKey === b.key)
-                  .onChange((checked: boolean) => { if (checked) this.selectedKey = b.key; });
+                Stack() {
+                  Circle({ width: 22, height: 22 })
+                    .fill(Color.Transparent)
+                    .stroke(this.selectedKey === b.key ? AppColor.SIGNAL : AppColor.BORDER)
+                    .strokeWidth(1.5);
+                  if (this.selectedKey === b.key) {
+                    Circle({ width: 11, height: 11 }).fill(AppColor.SIGNAL);
+                  }
+                }.width(22).height(22);
               }
               .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
               .onClick(() => this.selectedKey = b.key);
@@ -157,15 +172,19 @@ export struct RecordTab {
           Column({ space: AppSpacing.SM }) {
             Text('数量（' + this.currentBehavior().unit + '）').fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
             Row({ space: AppSpacing.SM }) {
-              Button('−').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.PRIMARY).fontSize(AppTypography.H3.size)
+              Button('−').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size)
                 .onClick(() => this.stepAmount(-1));
-              TextInput({ text: $$this.amountText }).type(InputType.Number).layoutWeight(1).height(44).textAlign(TextAlign.Center).backgroundColor(AppColor.BG);
-              Button('+').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.PRIMARY).fontSize(AppTypography.H3.size)
+              TextInput({ text: $$this.amountText }).type(InputType.Number).layoutWeight(1).height(44).textAlign(TextAlign.Center)
+                .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+                .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM);
+              Button('+').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size)
                 .onClick(() => this.stepAmount(1));
             }.width('100%').margin({ top: AppSpacing.XS });
-            TextInput({ text: $$this.note, placeholder: '备注（可选）' }).height(44).backgroundColor(AppColor.BG).margin({ top: AppSpacing.SM });
+            TextInput({ text: $$this.note, placeholder: '备注（可选）' }).height(44)
+              .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+              .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM });
             Row() {
-              Text('预计减排 ' + this.savedValue().toFixed(2) + ' kg CO₂e').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
+              Text('预计减排 ' + this.savedValue().toFixed(2) + ' kg CO₂e').fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
               Blank();
               Text('+' + this.pointsValue().toString() + ' 积分').fontSize(AppTypography.BODY.size).fontColor(AppColor.ACCENT);
             }.width('100%').margin({ top: AppSpacing.SM });
@@ -185,7 +204,7 @@ export struct RecordTab {
                     Text(r.name + '  ' + r.amount.toString() + r.unit).fontSize(AppTypography.BODY_MEDIUM.size).fontColor(AppColor.TEXT);
                     Text(DateUtil.formatTime(r.timestamp) + (r.note === '' ? '' : ' · ' + r.note)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                  Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
+                  Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
                   Text('删除').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER).margin({ left: AppSpacing.MD }).onClick(() => this.confirmDelete(r.id, r.name));
                 }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
               }, (r: CarbonRecord) => r.id);
@@ -193,8 +212,8 @@ export struct RecordTab {
           }
         }
       }
-      .width('100%').padding(AppSpacing.MD)
+      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
     }
-    .width('100%').height('100%').backgroundColor(AppColor.BG).scrollBar(BarState.Off);
+    .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
   }
 }

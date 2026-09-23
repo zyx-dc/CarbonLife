@@ -7,8 +7,10 @@ import { BadgeDef, DailyTask, RedeemItem, RedemptionRecord } from '../model/Carb
 import { DateUtil } from '../common/DateUtil';
 import { AppCard } from '../components/AppCard';
 import { BadgeItem } from '../components/Badge';
+import { AnimatedNumber } from '../components/AnimatedNumber';
+import { TaskCard } from '../components/TaskCard';
 import { AppButton } from '../components/AppButton';
-import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
 
 @Component
 export struct RewardsTab {
@@ -64,25 +66,38 @@ export struct RewardsTab {
   build() {
     Scroll() {
       Column({ space: AppSpacing.MD }) {
-        Text('积分与荣誉').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%')
-          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
-
-        AppCard({ cardPadding: AppSpacing.LG, enter: this.ready, enterDelayIndex: 1 }) {
-          Column({ space: AppSpacing.XS }) {
-            Text('可用碳积分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-            Text(this.balance.toString()).fontSize(48).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
-            Row() {
-              Text('累计获得 ' + this.totalPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-              Text('已兑换 ' + this.spentPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ left: AppSpacing.MD });
-            }.margin({ top: AppSpacing.XS });
-          }.width('100%').alignItems(HorizontalAlign.Center);
+        Column({ space: AppSpacing.XS }) {
+          Text('REWARDS').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
+          Text('积分与荣誉').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
         }
+        .width('100%').alignItems(HorizontalAlign.Start)
+        .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
+
+        Column({ space: AppSpacing.SM }) {
+          Text('可用碳积分').fontSize(AppTypography.CAPTION.size).letterSpacing(1.5).fontColor(AppColor.TEXT_SUB);
+          AnimatedNumber({ value: this.balance, textSize: AppTypography.DISPLAY_LG.size, textColor: AppColor.ACCENT });
+          Row({ space: AppSpacing.LG }) {
+            Text('累计获得 ' + this.totalPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text('已兑换 ' + this.spentPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+          }.margin({ top: AppSpacing.XS });
+        }
+        .width('100%')
+        .padding(AppSpacing.LG)
+        .borderRadius(AppRadius.LG)
+        .backgroundColor(AppColor.GLASS_STRONG)
+        .backdropBlur(24)
+        .borderWidth(1)
+        .borderColor(AppColor.GLASS_BORDER)
+        .shadow(AppShadow.soft())
+        .alignItems(HorizontalAlign.Center)
+        .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 })
+        .animation(AppMotion.enterOptions());
 
         AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 2 }) {
           Row() {
             Column() {
               Row({ space: AppSpacing.XS }) {
-                Image($r('app.media.ic_tree')).width(22).height(22).fillColor(AppColor.PRIMARY);
+                Image($r('app.media.ic_tree')).width(22).height(22).fillColor(AppColor.TEXT_SUB);
                 Text('我的植树证书').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               }.width('100%');
               Text(this.treeCount > 0
@@ -90,9 +105,8 @@ export struct RewardsTab {
                 : '每减排 10 kg CO₂e 即可种下 1 棵树，继续加油！')
                 .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%');
             }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-            Blank();
-            Text(this.treeCount.toString() + ' 棵').fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
-          }.width('100%');
+            Text(this.treeCount.toString() + ' 棵').fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+          }.width('100%').alignItems(VerticalAlign.Top);
         }
 
         AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
@@ -100,22 +114,26 @@ export struct RewardsTab {
             Row() {
               Text('碳普惠权益商城').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
-              Text('模拟城市碳普惠接口').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
             }.width('100%');
             ForEach(MallService.ITEMS, (item: RedeemItem, index: number) => {
               Row({ space: AppSpacing.SM }) {
                 Image(redeemIcon(item.id))
                   .width(28)
                   .height(28)
-                  .fillColor(AppColor.PRIMARY);
+                  .fillColor(AppColor.TEXT_SUB);
                 Column({ space: AppSpacing.XXS }) {
                   Text(item.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
                   Text(item.desc).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                Button(this.balance >= item.cost ? '兑换' : item.cost.toString() + '分')
-                  .height(32).fontSize(AppTypography.CAPTION.size)
-                  .backgroundColor(this.balance >= item.cost ? AppColor.PRIMARY : AppColor.DIVIDER)
-                  .fontColor(AppColor.TEXT_INVERSE)
+                Text(this.balance >= item.cost ? '兑换' : '差 ' + (item.cost - this.balance).toString() + ' 分')
+                  .height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
+                  .textAlign(TextAlign.Center)
+                  .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
+                  .backgroundColor(this.balance >= item.cost ? AppColor.SIGNAL : AppColor.ELEVATED)
+                  .borderWidth(this.balance >= item.cost ? 0 : 1)
+                  .borderColor(AppColor.BORDER)
+                  .fontColor(this.balance >= item.cost ? AppColor.ON_SIGNAL : AppColor.TEXT_SUB)
+                  .borderRadius(AppRadius.SM)
                   .onClick(() => this.onRedeem(item));
               }
               .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
@@ -147,19 +165,7 @@ export struct RewardsTab {
               Blank();
             }.width('100%');
             ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
-              Row({ space: AppSpacing.SM }) {
-                Text(this.taskStates[index] ?? false ? '✓' : '').width(22).height(22).fontSize(14).fontColor(AppColor.TEXT_INVERSE)
-                  .textAlign(TextAlign.Center).backgroundColor((this.taskStates[index] ?? false) ? AppColor.SUCCESS : 'transparent')
-                  .borderRadius(AppRadius.FULL).borderWidth((this.taskStates[index] ?? false) ? 0 : 1).borderColor(AppColor.BORDER);
-                Column({ space: AppSpacing.XXS }) {
-                  Text(task.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor((this.taskStates[index] ?? false) ? AppColor.TEXT_SUB : AppColor.TEXT);
-                  Text(task.desc).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                Text('+' + task.points.toString()).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(FontWeight.Bold).fontColor((this.taskStates[index] ?? false) ? AppColor.TEXT_SUB : AppColor.ACCENT);
-              }
-              .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
-              .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 16 })
-              .animation({ duration: AppMotion.reduceMotion() ? 0 : 400, curve: AppMotion.EASE, delay: AppMotion.staggerDelay(index) });
+              TaskCard({ task: task, done: this.taskStates[index] ?? false, index: index });
             }, (task: DailyTask) => task.key);
           }
         }
@@ -179,8 +185,8 @@ export struct RewardsTab {
           }
         }
       }
-      .width('100%').padding(AppSpacing.MD)
+      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
     }
-    .width('100%').height('100%').backgroundColor(AppColor.BG).scrollBar(BarState.Off);
+    .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
   }
 }

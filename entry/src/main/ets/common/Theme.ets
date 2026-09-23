@@ -15,47 +15,72 @@ export interface ThemeColor {
   primaryLight: string;
   primarySoft: string;
   accent: string;
+  magenta: string;
+  signal: string;
+  signalDeep: string;
+  onSignal: string;
   text: string;
   textSub: string;
   textInverse: string;
+  textInverseSub: string;
   divider: string;
   border: string;
   shadow: string;
+  primaryGlow: string;
   overlay: string;
+  scrim: string;
+  scrimFade: string;
+  glass: string;
+  glassStrong: string;
+  glassBorder: string;
+  bgWashTop: string;
+  bgWashBottom: string;
+  bgWashFade: string;
+  blobA: string;
+  blobAFade: string;
+  blobB: string;
+  blobBFade: string;
+  blobC: string;
+  blobCFade: string;
   danger: string;
   success: string;
   chartBlue: string;
   chartOrange: string;
   chartPurple: string;
   chartTeal: string;
+  chartLine: string;
 }
 
 export class ThemeTokens {
-  // 主色：深林绿系
+  // 夜行荧光：主色为「电光青柠」——低照度下的高能见信号
+  static readonly LIME: string = '#B6FF2E';
+  static readonly LIME_DEEP: string = '#7FCB00';
+
+  // 强调：电青，只属于积分与成就
+  static readonly CYAN: string = '#3DE0C8';
+  static readonly CYAN_DEEP: string = '#0E8F79';
+
+  // 稀有高光：品红。仅作极少量点缀，制造「不和谐的秩序」
+  static readonly MAGENTA: string = '#FF3D9A';
+
+  // 数据可视化补充色：苔绿。与青柠/电青同属绿系，但足够区分
+  static readonly SEA: string = '#2E8B57';
+
+  // 图片压暗层上的文字：恒为浅色（图片底始终是暗 scrim，不随主题翻转）
+  static readonly ON_DARK: string = '#F2FBE8';
+
+  // 日光主题的墨绿（浅底上青柠不可读，改用墨作主色）
+  static readonly INK: string = '#16210F';
+  static readonly INK_DEEP: string = '#2F4A1D';
+
+  static readonly DANGER_DARK: string = '#FF5C5C';
+  static readonly DANGER_LIGHT: string = '#E5484D';
+  static readonly SUCCESS_LIGHT: string = '#3E8E1E';
+
+  // 启动页专用（保持原样，不参与夜行荧光升级）
   static readonly FOREST: string = '#0F3D2E';
   static readonly FOREST_LIGHT: string = '#1B5E20';
-  static readonly MINT: string = '#34C759';
-  static readonly MINT_SOFT: string = '#66BB6A';
-
-  // 强调：琥珀金
-  static readonly AMBER: string = '#FFB300';
-
-  // 背景与表面
   static readonly BG_LIGHT: string = '#F5F7F5';
-  static readonly BG_DARK: string = '#0A0A0A';
-  static readonly CARD_LIGHT: string = '#FFFFFF';
-  static readonly CARD_DARK: string = '#121212';
-  static readonly SURFACE_DARK: string = '#1C1C1E';
-
-  // 文字
-  static readonly TEXT_PRIMARY_LIGHT: string = '#1C1C1E';
-  static readonly TEXT_SECONDARY_LIGHT: string = '#6E6E73';
-  static readonly TEXT_PRIMARY_DARK: string = '#F5F5F7';
-  static readonly TEXT_SECONDARY_DARK: string = '#8E8E93';
-
-  // 辅助
-  static readonly DANGER: string = '#FF453A';
-  static readonly SUCCESS: string = '#34C759';
 }
 
 export class Theme {
@@ -67,55 +92,99 @@ export class Theme {
     return Theme.isDark() ? Theme.dark() : Theme.light();
   }
 
+  // 日光纸感：同源 DNA 的白天版——墨绿主色 + 青柠轨迹
   static light(): ThemeColor {
     return {
-      bg: ThemeTokens.BG_LIGHT,
+      bg: '#F5F7F5',
       surface: '#FFFFFF',
-      card: ThemeTokens.CARD_LIGHT,
+      card: '#FFFFFF',
       elevated: '#FFFFFF',
-      primary: ThemeTokens.FOREST,
-      primaryLight: ThemeTokens.FOREST_LIGHT,
-      primarySoft: 'rgba(15,61,46,0.08)',
-      accent: ThemeTokens.AMBER,
-      text: ThemeTokens.TEXT_PRIMARY_LIGHT,
-      textSub: ThemeTokens.TEXT_SECONDARY_LIGHT,
-      textInverse: '#FFFFFF',
-      divider: 'rgba(28,28,30,0.08)',
-      border: 'rgba(28,28,30,0.10)',
-      shadow: '#E6ECE8',
+      primary: ThemeTokens.INK,
+      primaryLight: ThemeTokens.INK_DEEP,
+      primarySoft: 'rgba(22,33,15,0.10)',
+      accent: ThemeTokens.CYAN_DEEP,
+      magenta: '#D6006E',
+      signal: ThemeTokens.LIME,
+      signalDeep: ThemeTokens.LIME_DEEP,
+      onSignal: '#0A0F07',
+      text: '#12180D',
+      textSub: '#5C6754',
+      textInverse: '#F4FFE4',
+      textInverseSub: 'rgba(244,255,228,0.72)',
+      divider: 'rgba(18,24,13,0.10)',
+      border: 'rgba(18,24,13,0.16)',
+      shadow: 'rgba(20,30,16,0.14)',
+      primaryGlow: 'rgba(22,33,15,0.22)',
       overlay: 'rgba(0,0,0,0.45)',
-      danger: ThemeTokens.DANGER,
-      success: ThemeTokens.SUCCESS,
+      scrim: 'rgba(10,15,7,0.45)',
+      scrimFade: 'rgba(10,15,7,0.00)',
+      glass: 'rgba(255,255,255,0.62)',
+      glassStrong: 'rgba(255,255,255,0.85)',
+      glassBorder: 'rgba(22,33,15,0.12)',
+      bgWashTop: '#E4F2E7',
+      bgWashBottom: '#F7EFE1',
+      bgWashFade: '#00F7EFE1',
+      blobA: '#8C5ED6A8',
+      blobAFade: '#005ED6A8',
+      blobB: '#4A14532D',
+      blobBFade: '#0014532D',
+      blobC: '#52F5BA60',
+      blobCFade: '#00F5BA60',
+      danger: ThemeTokens.DANGER_LIGHT,
+      success: ThemeTokens.SUCCESS_LIGHT,
       chartBlue: '#0A84FF',
-      chartOrange: '#FF9F0A',
-      chartPurple: '#BF5AF2',
-      chartTeal: '#40C8E0'
+      chartOrange: '#E08600',
+      chartPurple: '#9B4DFF',
+      chartTeal: '#0FB5A0',
+      chartLine: ThemeTokens.SUCCESS_LIGHT
     };
   }
 
+  // 夜行荧光（默认气质）：OLED 近黑底 + 电光青柠读数 + 极少量品红高光
   static dark(): ThemeColor {
     return {
-      bg: ThemeTokens.BG_DARK,
-      surface: ThemeTokens.SURFACE_DARK,
-      card: ThemeTokens.CARD_DARK,
-      elevated: '#2C2C2E',
-      primary: ThemeTokens.MINT,
-      primaryLight: ThemeTokens.MINT_SOFT,
-      primarySoft: 'rgba(52,199,89,0.15)',
-      accent: ThemeTokens.AMBER,
-      text: ThemeTokens.TEXT_PRIMARY_DARK,
-      textSub: ThemeTokens.TEXT_SECONDARY_DARK,
-      textInverse: '#1C1C1E',
-      divider: 'rgba(245,245,247,0.10)',
-      border: 'rgba(245,245,247,0.15)',
-      shadow: 'rgba(0,0,0,0.50)',
-      overlay: 'rgba(0,0,0,0.60)',
-      danger: '#FF6961',
-      success: ThemeTokens.MINT,
-      chartBlue: '#64D2FF',
-      chartOrange: '#FFB340',
-      chartPurple: '#DAA5FF',
-      chartTeal: '#6EE1FF'
+      bg: '#0A0A0A',
+      surface: '#121712',
+      card: '#101510',
+      elevated: '#1A211A',
+      primary: ThemeTokens.LIME,
+      primaryLight: ThemeTokens.LIME_DEEP,
+      primarySoft: 'rgba(182,255,46,0.14)',
+      accent: ThemeTokens.CYAN,
+      magenta: ThemeTokens.MAGENTA,
+      signal: ThemeTokens.LIME,
+      signalDeep: ThemeTokens.LIME_DEEP,
+      onSignal: '#0A0F07',
+      text: '#E9F7E0',
+      textSub: '#82917B',
+      textInverse: '#0A0F07',
+      textInverseSub: 'rgba(10,15,7,0.62)',
+      divider: 'rgba(255,255,255,0.10)',
+      border: 'rgba(255,255,255,0.16)',
+      shadow: 'rgba(0,0,0,0.60)',
+      primaryGlow: 'rgba(182,255,46,0.30)',
+      overlay: 'rgba(0,0,0,0.72)',
+      scrim: 'rgba(6,10,7,0.55)',
+      scrimFade: 'rgba(6,10,7,0.00)',
+      glass: 'rgba(18,24,18,0.55)',
+      glassStrong: 'rgba(18,24,18,0.82)',
+      glassBorder: 'rgba(255,255,255,0.14)',
+      bgWashTop: '#0A1410',
+      bgWashBottom: '#100F0A',
+      bgWashFade: '#00100F0A',
+      blobA: '#6B34C759',
+      blobAFade: '#0034C759',
+      blobB: '#5C1F5C3A',
+      blobBFade: '#001F5C3A',
+      blobC: '#4AF2B24C',
+      blobCFade: '#00F2B24C',
+      danger: ThemeTokens.DANGER_DARK,
+      success: ThemeTokens.LIME,
+      chartBlue: '#4DD0FF',
+      chartOrange: '#FFB020',
+      chartPurple: '#C77DFF',
+      chartTeal: '#3DE0C8',
+      chartLine: ThemeTokens.LIME
     };
   }
 }
@@ -127,6 +196,9 @@ export interface TextStyle {
 }
 
 export class AppTypography {
+  // 展示级大数（Hero 读数）
+  static readonly DISPLAY_LG: TextStyle = { size: 56, weight: FontWeight.Bold, lineHeight: 64 };
+  static readonly DISPLAY: TextStyle = { size: 46, weight: FontWeight.Bold, lineHeight: 52 };
   static readonly H1: TextStyle = { size: 32, weight: FontWeight.Bold, lineHeight: 40 };
   static readonly H2: TextStyle = { size: 24, weight: FontWeight.Bold, lineHeight: 32 };
   static readonly H3: TextStyle = { size: 20, weight: FontWeight.Medium, lineHeight: 28 };
@@ -152,6 +224,7 @@ export class AppRadius {
   static readonly SM = 8;
   static readonly MD = 16;
   static readonly LG = 24;
+  static readonly XXL = 28;
   static readonly XL = 32;
   static readonly FULL = 9999;
 }
@@ -159,12 +232,16 @@ export class AppRadius {
 export class AppShadow {
   static soft(): ShadowOptions {
     const c = Theme.current().shadow;
-    return { radius: 12, color: c, offsetX: 0, offsetY: 12 };
+    return { radius: 24, color: c, offsetX: 0, offsetY: 8 };
   }
 
   static medium(): ShadowOptions {
     const c = Theme.current().shadow;
-    return { radius: 20, color: c, offsetX: 0, offsetY: 20 };
+    return { radius: 28, color: c, offsetX: 0, offsetY: 16 };
+  }
+
+  static glow(): ShadowOptions {
+    return { radius: 14, color: Theme.current().primaryGlow, offsetX: 0, offsetY: 6 };
   }
 }
 
@@ -198,6 +275,17 @@ export class AppMotion {
       return 0;
     }
     return index * AppMotion.STAGGER;
+  }
+
+  // 无限循环动效（背景漂移/呼吸/环轨）统一入口：减弱动效时退化为静止
+  static loopOptions(duration: number, alternate: boolean): AnimateParam {
+    if (AppMotion.reduceMotion()) {
+      return { duration: 0 };
+    }
+    if (alternate) {
+      return { duration, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate };
+    }
+    return { duration, curve: Curve.Linear, iterations: -1 };
   }
 }
 

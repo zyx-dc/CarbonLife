@@ -14,6 +14,7 @@ export class CarbonStore {
   private loaded: boolean = false;
   private versionCounter: number = 1;
   private changeListeners: Array<() => void> = [];
+  private writeQueue: Promise<void> = Promise.resolve();
 
   static get(): CarbonStore {
     if (CarbonStore.instance === null) {
@@ -80,13 +81,20 @@ export class CarbonStore {
     }
   }
 
-  private async persist(): Promise<void> {
+  private persist(): void {
+    const recordsJson = JSON.stringify(this.records);
+    const redeemJson = JSON.stringify(this.redemptions);
+    // 串行化写入，避免并发 put/flush 交错导致旧快照覆盖新状态
+    this.writeQueue = this.writeQueue.then(() => this.writeSnapshot(recordsJson, redeemJson));
+  }
+
+  private async writeSnapshot(recordsJson: string, redeemJson: string): Promise<void> {
     if (this.prefs === null) {
       return;
     }
     try {
-      await this.prefs.put(AppConst.KEY_RECORDS, JSON.stringify(this.records));
-      await this.prefs.put(AppConst.KEY_REDEMPTIONS, JSON.stringify(this.redemptions));
+      await this.prefs.put(AppConst.KEY_RECORDS, recordsJson);
+      await this.prefs.put(AppConst.KEY_REDEMPTIONS, redeemJson);
       await this.prefs.flush();
     } catch (e) {
       console.error('CarbonStore persist failed: ' + JSON.stringify(e));
@@ -175,7 +183,8 @@ export class CarbonStore {
   }
 
   pointsBalance(): number {
-    return this.totalPoints() - this.spentPoints();
+    // 删除记录可能使已兑换的积分无法覆盖，兜底不低于 0
+    return Math.max(0, this.totalPoints() - this.spentPoints());
   }
 
   getRedemptions(): RedemptionRecord[] {
@@ -325,7 +334,7 @@ export class CarbonStore {
   trendYear(): TrendPoint[] {
     const points: TrendPoint[] = [];
     const year = new Date().getFullYear();
-    for (let i = 2; i >= 0; i--) {
+    for (let i = 4; i >= 0; i--) {
       const start = new Date(year - i, 0, 1).getTime();
       const end = new Date(year - i + 1, 0, 1).getTime();
       let sum = 0;
@@ -351,11 +360,18 @@ export class CarbonStore {
   }
 
   private csvField(value: string): string {
-    if (value.indexOf(',') >= 0 || value.indexOf('"') >= 0 ||
-      value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
-      return '"' + value.split('"').join('""') + '"';
+    let v = value;
+    const first = v.length > 0 ? v.charAt(0) : '';
+    // 防 CSV 公式注入：以 = + - @ 或制表/回车开头时前置单引号
+    if (first === '=' || first === '+' || first === '-' || first === '@' ||
+      first === '\t' || first === '\r') {
+      v = "'" + v;
     }
-    return value;
+    if (v.indexOf(',') >= 0 || v.indexOf('"') >= 0 ||
+      v.indexOf('\n') >= 0 || v.indexOf('\r') >= 0) {
+      return '"' + v.split('"').join('""') + '"';
+    }
+    return v;
   }
 
   exportCsv(): string {

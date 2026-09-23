@@ -8,8 +8,9 @@ import { FamilyService, MemberData } from '../model/FamilyService';
 import { ReminderService } from '../model/ReminderService';
 import { AppButton } from '../components/AppButton';
 import { AppCard } from '../components/AppCard';
+import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
-import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
 
 @Component
 export struct HomeTab {
@@ -19,8 +20,11 @@ export struct HomeTab {
   private uiContext: UIContext = this.getUIContext();
   private promptAction: PromptAction = this.uiContext.getPromptAction();
   private onChange: () => void = () => { this.refresh(); };
+  private onStoreChange: () => void = () => { FamilyService.get().pushLocal(); this.refresh(); };
   @State showShare: boolean = false;
   @State reminderOn: boolean = false;
+  @StorageLink('reduceMotion') reduceMotion: boolean = false;
+  @State familyExpanded: boolean = false;
   @State familyName: string = '我';
   @State familyCode: string = '';
   @State ready: boolean = false;
@@ -38,19 +42,22 @@ export struct HomeTab {
   @State members: MemberData[] = [];
   @State taskStates: boolean[] = [];
   @State suggestionsList: string[] = [];
+  // 「不和谐的秩序」：品红活点，一屏仅此一处
+  @State live: boolean = false;
 
   aboutToAppear(): void {
-    CarbonStore.get().addChangeListener(this.onChange);
+    CarbonStore.get().addChangeListener(this.onStoreChange);
     FamilyService.get().addChangeListener(this.onChange);
     FamilyService.get().pushLocal();
     this.familyName = FamilyService.get().getNickname();
     ReminderService.isEnabled().then((v: boolean) => { this.reminderOn = v; });
     this.refresh();
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
+    setTimeout(() => this.live = true, AppMotion.reduceMotion() ? 0 : 200);
   }
 
   aboutToDisappear(): void {
-    CarbonStore.get().removeChangeListener(this.onChange);
+    CarbonStore.get().removeChangeListener(this.onStoreChange);
     FamilyService.get().removeChangeListener(this.onChange);
   }
 
@@ -74,10 +81,11 @@ export struct HomeTab {
   }
 
   onGenCode(): void {
-    const code = FamilyService.get().genSession();
-    this.familyCode = code;
-    this.refresh();
-    this.promptAction.showToast({ message: '家庭码：' + code });
+    FamilyService.get().genSession().then((code: string) => {
+      this.familyCode = code;
+      this.refresh();
+      this.promptAction.showToast({ message: '家庭码：' + code });
+    });
   }
 
   onJoin(): void {
@@ -134,12 +142,19 @@ export struct HomeTab {
   }
 
   @Builder sectionTitle(title: string, subtitle?: string) {
-    Column({ space: AppSpacing.XXS }) {
-      Text(title).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-      if (subtitle !== undefined) {
-        Text(subtitle).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%');
-      }
-    }.width('100%').alignItems(HorizontalAlign.Start);
+    Row({ space: AppSpacing.SM }) {
+      Column()
+        .width(3)
+        .height(16)
+        .borderRadius(2)
+        .backgroundColor(AppColor.TEXT_SUB);
+      Column({ space: AppSpacing.XXS }) {
+        Text(title).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT).letterSpacing(0.3);
+        if (subtitle !== undefined) {
+          Text(subtitle).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+        }
+      }.alignItems(HorizontalAlign.Start);
+    }.alignItems(VerticalAlign.Center);
   }
 
   @Builder memberRow(m: MemberData) {
@@ -194,44 +209,54 @@ export struct HomeTab {
     Stack() {
       Scroll() {
         Column({ space: AppSpacing.MD }) {
-          Column({ space: AppSpacing.XS }) {
-            Text('低碳生活 · 从我做起').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT);
-            Text('记录每一次低碳行动，积少成多守护地球').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-          }
-          .width('100%').alignItems(HorizontalAlign.Start)
-          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
+          Column({ space: AppSpacing.LG }) {
+            Row() {
+              Column({ space: AppSpacing.XXS }) {
+                Row({ space: AppSpacing.SM }) {
+                  Column()
+                    .width(7)
+                    .height(7)
+                    .borderRadius(4)
+                    .backgroundColor(AppColor.MAGENTA)
+                    .shadow({ radius: this.live ? 10 : 2, color: AppColor.MAGENTA, offsetX: 0, offsetY: 0 })
+                    .scale({ x: this.live ? 1.15 : 0.8, y: this.live ? 1.15 : 0.8 })
+                    .animation(AppMotion.loopOptions(1400, true));
+                  Text('CARBONLIFE').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
+                }.alignItems(VerticalAlign.Center);
+                Text('低碳生活 · 从我做起').fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+              Image($r('app.media.ic_leaf')).width(38).height(38).fillColor(AppColor.TEXT_SUB);
+            }.width('100%');
 
-          AppCard({ cardPadding: AppSpacing.LG, enter: this.ready, enterDelayIndex: 1 }) {
-            Column({ space: AppSpacing.MD }) {
-              Row() {
-                Column({ space: AppSpacing.XS }) {
-                  Text(this.todaySaved).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
-                  Text('kg CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                  Text('今日减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
-                Divider().vertical(true).height(48).color(AppColor.DIVIDER);
-                Column({ space: AppSpacing.XS }) {
-                  Text(this.todayPoints).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
-                  Text('分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                  Text('今日积分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
-              }.width('100%');
-              Divider().color(AppColor.DIVIDER);
-              Row() {
-                Column({ space: AppSpacing.XS }) {
-                  Text(this.totalSaved).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.CHART_BLUE);
-                  Text('kg CO₂e').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                  Text('累计减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
-                Divider().vertical(true).height(48).color(AppColor.DIVIDER);
-                Column({ space: AppSpacing.XS }) {
-                  Text(this.treeCount).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY_LIGHT);
-                  Text('棵').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                  Text('累计种树').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Center);
-              }.width('100%');
-            }
+            Column({ space: AppSpacing.XXS }) {
+              AnimatedNumber({ value: parseFloat(this.todaySaved), decimals: 2, textSize: AppTypography.DISPLAY.size, textColor: AppColor.READING });
+              Text('kg CO₂e · 今日减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            }.width('100%').alignItems(HorizontalAlign.Start);
+
+            Row() {
+              Column({ space: AppSpacing.XXS }) {
+                AnimatedNumber({ value: parseFloat(this.todayPoints), textSize: AppTypography.H3.size, textColor: AppColor.ACCENT });
+                Text('今日积分').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+              Column({ space: AppSpacing.XXS }) {
+                AnimatedNumber({ value: parseFloat(this.totalSaved), decimals: 2, textSize: AppTypography.H3.size, textColor: AppColor.TEXT });
+                Text('累计减排 kg').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+              Column({ space: AppSpacing.XXS }) {
+                AnimatedNumber({ value: parseFloat(this.treeCount), textSize: AppTypography.H3.size, textColor: AppColor.TEXT });
+                Text('累计种树').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+            }.width('100%');
           }
+          .width('100%')
+          .padding(AppSpacing.LG)
+          .borderRadius(AppRadius.LG)
+          .backgroundColor(AppColor.GLASS_STRONG)
+          .backdropBlur(24)
+          .borderWidth(1)
+          .borderColor(AppColor.GLASS_BORDER)
+          .shadow(AppShadow.soft())
+          .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
           Row({ space: AppSpacing.SM }) {
             AppButton({ text: '去记录低碳行为', type: 'primary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(1));
@@ -248,15 +273,15 @@ export struct HomeTab {
                 Blank();
                 Text(this.familyStatus)
                   .fontSize(AppTypography.CAPTION.size)
-                  .fontColor(this.familyJoined ? AppColor.PRIMARY : AppColor.TEXT_SUB);
+                  .fontColor(AppColor.TEXT_SUB);
               }.width('100%');
               Row() {
                 Column() {
-                  Text(this.familySaved).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
+                  AnimatedNumber({ value: parseFloat(this.familySaved), decimals: 2, textSize: AppTypography.H4.size, textColor: AppColor.TEXT });
                   Text('家庭减排(kg)').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1);
                 Column() {
-                  Text(this.familyPoints).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+                  AnimatedNumber({ value: parseFloat(this.familyPoints), textSize: AppTypography.H4.size, textColor: AppColor.ACCENT });
                   Text('家庭积分').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1);
               }.width('100%').margin({ top: AppSpacing.SM });
@@ -265,33 +290,64 @@ export struct HomeTab {
                   this.sectionTitle('家庭成员', this.members.length.toString() + ' 人');
                   ForEach(this.members, (m: MemberData) => {
                     this.memberRow(m);
-                  }, (m: MemberData) => m.deviceId);
+                  }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
                 }.width('100%').margin({ top: AppSpacing.SM });
               }
-              TextInput({ text: this.familyName, placeholder: '我的昵称' }).height(42).backgroundColor(AppColor.BG).margin({ top: AppSpacing.SM })
-                .onChange((v: string) => { this.familyName = v; FamilyService.get().setNickname(v); });
-              TextInput({ text: $$this.familyCode, placeholder: '家庭码（生成或输入）' }).height(42).backgroundColor(AppColor.BG).margin({ top: AppSpacing.XS });
-              Row({ space: AppSpacing.XS }) {
-                AppButton({ text: '生成家庭码', type: 'primary', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onGenCode());
-                AppButton({ text: '加入', type: 'secondary', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onJoin());
-              }.width('100%').margin({ top: AppSpacing.XS });
-              Row({ space: AppSpacing.XS }) {
-                AppButton({ text: '同步我的数据', type: 'ghost', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onSync());
-                AppButton({ text: '退出家庭组', type: 'ghost', btnHeight: 38 }).layoutWeight(1).onClick(() => this.onLeave());
-              }.width('100%').margin({ top: AppSpacing.XS });
-              Text('在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。')
-                .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
+              if (this.familyExpanded) {
+                TextInput({ text: this.familyName, placeholder: '我的昵称' }).height(42)
+                  .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+                  .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM })
+                  .onChange((v: string) => { this.familyName = v; FamilyService.get().setNickname(v); });
+                TextInput({ text: $$this.familyCode, placeholder: '家庭码（生成或输入）' }).height(42)
+                  .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+                  .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.XS });
+                Row({ space: AppSpacing.XS }) {
+                  AppButton({ text: '生成家庭码', type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onGenCode());
+                  AppButton({ text: '加入', type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onJoin());
+                }.width('100%').margin({ top: AppSpacing.XS });
+                Row({ space: AppSpacing.XS }) {
+                  Text('同步我的数据')
+                    .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                    .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                    .onClick(() => this.onSync());
+                  Text('退出家庭组')
+                    .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                    .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                    .onClick(() => this.onLeave());
+                }.width('100%').margin({ top: AppSpacing.XS });
+                Text('在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。')
+                  .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
+                Text('收起')
+                  .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                  .width('100%').textAlign(TextAlign.Center).padding({ top: AppSpacing.SM })
+                  .onClick(() => this.familyExpanded = false);
+              } else {
+                AppButton({ text: '加入 / 管理家庭组', type: 'secondary', btnHeight: 44, fullWidth: true })
+                  .margin({ top: AppSpacing.SM })
+                  .onClick(() => this.familyExpanded = true);
+              }
             }
           }
 
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
-            Row() {
-              Column() {
-                Text('每日低碳提醒').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                Text('每天 20:00 提醒记录低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-              Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
-            }.width('100%');
+            Column({ space: AppSpacing.SM }) {
+              Row() {
+                Column() {
+                  Text('每日低碳提醒').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                  Text('每天 20:00 提醒记录低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+                Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
+              }.width('100%');
+              Divider().color(AppColor.DIVIDER);
+              Row() {
+                Column() {
+                  Text('减弱动效').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                  Text('关闭入场/图表/背景动效').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+                Toggle({ type: ToggleType.Switch, isOn: this.reduceMotion })
+                  .onChange((isOn: boolean) => { this.reduceMotion = isOn; });
+              }.width('100%');
+            }
           }
 
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 5 }) {
@@ -319,9 +375,9 @@ export struct HomeTab {
             }
           }
         }
-        .width('100%').padding(AppSpacing.MD)
+        .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
       }
-      .width('100%').height('100%').backgroundColor(AppColor.BG).scrollBar(BarState.Off);
+      .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
 
       if (this.showShare) {
         Column() {
