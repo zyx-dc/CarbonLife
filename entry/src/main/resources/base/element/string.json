@@ -1,24 +1,65 @@
 {
   "string": [
-    {
-      "name": "module_desc",
-      "value": "低碳生活碳积分与减排指南"
-    },
-    {
-      "name": "EntryAbility_desc",
-      "value": "碳足迹主入口"
-    },
-    {
-      "name": "EntryAbility_label",
-      "value": "CarbonLife"
-    },
-    {
-      "name": "perm_distributed_reason",
-      "value": "用于家庭碳积分在多设备间同步"
-    },
-    {
-      "name": "perm_reminder_reason",
-      "value": "用于每日定时提醒记录低碳行为"
-    }
+    { "name": "module_desc", "value": "低碳生活碳积分与减排指南" },
+    { "name": "EntryAbility_desc", "value": "碳足迹主入口" },
+    { "name": "EntryAbility_label", "value": "CarbonLife" },
+    { "name": "perm_distributed_reason", "value": "用于家庭碳积分在多设备间同步" },
+    { "name": "perm_reminder_reason", "value": "用于每日定时提醒记录低碳行为" },
+
+    { "name": "home_slogan", "value": "低碳生活 · 从我做起" },
+    { "name": "home_today_unit", "value": "kg CO₂e · 今日减排" },
+    { "name": "home_today_points", "value": "今日积分" },
+    { "name": "home_total_saved", "value": "累计减排 kg" },
+    { "name": "home_total_trees", "value": "累计种树" },
+    { "name": "home_go_record", "value": "去记录低碳行为" },
+    { "name": "home_share_card", "value": "生成成果卡片" },
+    { "name": "home_family_title", "value": "家庭碳积分" },
+    { "name": "home_family_subtitle", "value": "超级终端多设备同步" },
+    { "name": "home_family_saved", "value": "家庭减排(kg)" },
+    { "name": "home_family_points", "value": "家庭积分" },
+    { "name": "home_family_members", "value": "家庭成员" },
+    { "name": "home_tasks", "value": "今日任务" },
+    { "name": "home_suggestions", "value": "智能低碳建议" },
+
+    { "name": "common_me", "value": "我" },
+    { "name": "common_close", "value": "关闭" },
+
+    { "name": "family_status_none", "value": "未加入" },
+    { "name": "family_status_online", "value": "对方在线" },
+    { "name": "family_status_waiting", "value": "等待对方" },
+    { "name": "family_nickname_hint", "value": "我的昵称" },
+    { "name": "family_code_hint", "value": "家庭码（生成或输入）" },
+    { "name": "family_gen_code", "value": "生成家庭码" },
+    { "name": "family_join", "value": "加入" },
+    { "name": "family_sync", "value": "同步我的数据" },
+    { "name": "family_leave", "value": "退出家庭组" },
+    { "name": "family_tip", "value": "在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。" },
+    { "name": "family_collapse", "value": "收起" },
+    { "name": "family_manage", "value": "加入 / 管理家庭组" },
+    { "name": "family_need_code", "value": "请先输入或生成家庭码" },
+    { "name": "family_joined", "value": "已加入家庭组" },
+    { "name": "family_left", "value": "已退出家庭组" },
+    { "name": "family_synced", "value": "已同步我的碳积分" },
+    { "name": "family_code_toast", "value": "家庭码：%s" },
+
+    { "name": "reminder_title", "value": "每日低碳提醒" },
+    { "name": "reminder_subtitle", "value": "每天 %s 提醒记录低碳行为 · 点击修改时间" },
+    { "name": "reminder_on", "value": "已开启每日 %s 提醒" },
+    { "name": "reminder_off", "value": "已关闭提醒" },
+    { "name": "reminder_enable_failed", "value": "开启提醒失败" },
+    { "name": "reminder_time_set", "value": "提醒时间已设置为 %s" },
+    { "name": "reminder_time_updated", "value": "提醒时间已更新为 %s" },
+
+    { "name": "a11y_reduce_motion", "value": "减弱动效" },
+    { "name": "a11y_reduce_motion_desc", "value": "关闭入场/图表/背景动效" },
+
+    { "name": "share_title", "value": "我的减排成果" },
+    { "name": "share_brand", "value": "CarbonLife · 低碳生活" },
+    { "name": "share_total_saved", "value": "累计减排 CO₂e" },
+    { "name": "share_points", "value": "积分" },
+    { "name": "share_trees", "value": "种树" },
+    { "name": "share_records", "value": "记录" },
+    { "name": "share_copy", "value": "复制分享文案" },
+    { "name": "share_copied", "value": "分享文案已复制" }
   ]
 }

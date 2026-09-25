@@ -1,24 +1,65 @@
 {
   "string": [
-    {
-      "name": "module_desc",
-      "value": "Low carbon life assistant"
-    },
-    {
-      "name": "EntryAbility_desc",
-      "value": "Carbon footprint entry"
-    },
-    {
-      "name": "EntryAbility_label",
-      "value": "CarbonLife"
-    },
-    {
-      "name": "perm_distributed_reason",
-      "value": "Used to sync family carbon points across devices"
-    },
-    {
-      "name": "perm_reminder_reason",
-      "value": "Used for a daily reminder to log low-carbon actions"
-    }
+    { "name": "module_desc", "value": "Low carbon life assistant" },
+    { "name": "EntryAbility_desc", "value": "Carbon footprint entry" },
+    { "name": "EntryAbility_label", "value": "CarbonLife" },
+    { "name": "perm_distributed_reason", "value": "Used to sync family carbon points across devices" },
+    { "name": "perm_reminder_reason", "value": "Used for a daily reminder to log low-carbon actions" },
+
+    { "name": "home_slogan", "value": "Low-carbon living starts with me" },
+    { "name": "home_today_unit", "value": "kg CO₂e · saved today" },
+    { "name": "home_today_points", "value": "Points today" },
+    { "name": "home_total_saved", "value": "Total saved (kg)" },
+    { "name": "home_total_trees", "value": "Trees planted" },
+    { "name": "home_go_record", "value": "Log a low-carbon action" },
+    { "name": "home_share_card", "value": "Create result card" },
+    { "name": "home_family_title", "value": "Family carbon points" },
+    { "name": "home_family_subtitle", "value": "Multi-device sync" },
+    { "name": "home_family_saved", "value": "Family saved (kg)" },
+    { "name": "home_family_points", "value": "Family points" },
+    { "name": "home_family_members", "value": "Family members" },
+    { "name": "home_tasks", "value": "Today's tasks" },
+    { "name": "home_suggestions", "value": "Smart tips" },
+
+    { "name": "common_me", "value": "Me" },
+    { "name": "common_close", "value": "Close" },
+
+    { "name": "family_status_none", "value": "Not joined" },
+    { "name": "family_status_online", "value": "Peer online" },
+    { "name": "family_status_waiting", "value": "Waiting for peer" },
+    { "name": "family_nickname_hint", "value": "My nickname" },
+    { "name": "family_code_hint", "value": "Family code (generate or enter)" },
+    { "name": "family_gen_code", "value": "Generate code" },
+    { "name": "family_join", "value": "Join" },
+    { "name": "family_sync", "value": "Sync my data" },
+    { "name": "family_leave", "value": "Leave family" },
+    { "name": "family_tip", "value": "Enter the same family code on another device signed in with the same HUAWEI ID to merge family carbon points." },
+    { "name": "family_collapse", "value": "Collapse" },
+    { "name": "family_manage", "value": "Join / Manage family" },
+    { "name": "family_need_code", "value": "Please enter or generate a family code first" },
+    { "name": "family_joined", "value": "Joined the family" },
+    { "name": "family_left", "value": "Left the family" },
+    { "name": "family_synced", "value": "My carbon points synced" },
+    { "name": "family_code_toast", "value": "Family code: %s" },
+
+    { "name": "reminder_title", "value": "Daily reminder" },
+    { "name": "reminder_subtitle", "value": "Reminder at %s to log low-carbon actions · tap to change" },
+    { "name": "reminder_on", "value": "Daily reminder set for %s" },
+    { "name": "reminder_off", "value": "Reminder turned off" },
+    { "name": "reminder_enable_failed", "value": "Failed to enable reminder" },
+    { "name": "reminder_time_set", "value": "Reminder time set to %s" },
+    { "name": "reminder_time_updated", "value": "Reminder time updated to %s" },
+
+    { "name": "a11y_reduce_motion", "value": "Reduce motion" },
+    { "name": "a11y_reduce_motion_desc", "value": "Disable entrance / chart / background motion" },
+
+    { "name": "share_title", "value": "My results" },
+    { "name": "share_brand", "value": "CarbonLife · Low-carbon living" },
+    { "name": "share_total_saved", "value": "Total CO₂e saved" },
+    { "name": "share_points", "value": "Points" },
+    { "name": "share_trees", "value": "Trees" },
+    { "name": "share_records", "value": "Records" },
+    { "name": "share_copy", "value": "Copy share text" },
+    { "name": "share_copied", "value": "Share text copied" }
   ]
 }

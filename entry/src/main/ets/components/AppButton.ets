@@ -5,7 +5,7 @@ export type ButtonType = 'primary' | 'secondary' | 'ghost';
 
 @Component
 export struct AppButton {
-  @Prop text: string = '';
+  @Prop text: ResourceStr = '';
   @Prop type: ButtonType = 'primary';
   @Prop icon: string = '';
   @Prop disabled: boolean = false;
