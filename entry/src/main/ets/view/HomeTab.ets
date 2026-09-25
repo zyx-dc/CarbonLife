@@ -11,6 +11,7 @@ import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { resolveStr } from '../common/Localize';
 
 @Component
 export struct HomeTab {
@@ -27,7 +28,7 @@ export struct HomeTab {
   @State reminderMinute: number = 0;
   @StorageLink('reduceMotion') reduceMotion: boolean = false;
   @State familyExpanded: boolean = false;
-  @State familyName: string = '我';
+  @State familyName: string = '';
   @State familyCode: string = '';
   @State ready: boolean = false;
 
@@ -51,7 +52,8 @@ export struct HomeTab {
     CarbonStore.get().addChangeListener(this.onStoreChange);
     FamilyService.get().addChangeListener(this.onChange);
     FamilyService.get().pushLocal();
-    this.familyName = FamilyService.get().getNickname();
+    const nick = FamilyService.get().getNickname();
+    this.familyName = (nick === '' || nick === '我') ? resolveStr($r('app.string.common_me')) : nick;
     ReminderService.isEnabled().then((v: boolean) => { this.reminderOn = v; });
     ReminderService.getHour().then((h: number) => { this.reminderHour = h; });
     ReminderService.getMinute().then((m: number) => { this.reminderMinute = m; });
@@ -167,9 +169,7 @@ export struct HomeTab {
   }
 
   shareText(): string {
-    return '我在「CarbonLife」App 已累计减排 ' + this.totalSaved +
-      ' kg CO₂e，获得 ' + this.totalPoints + ' 积分，种下 ' +
-      this.treeCount + ' 棵树。一起加入低碳生活吧！';
+    return resolveStr($r('app.string.home_share_text', this.totalSaved, this.totalPoints, this.treeCount));
   }
 
   @Builder shareStat(label: ResourceStr, value: string, color: string) {
@@ -197,7 +197,7 @@ export struct HomeTab {
 
   @Builder memberRow(m: MemberData) {
     Row({ space: AppSpacing.SM }) {
-      Text(m.nickname).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
+      Text(m.nickname === '' || m.nickname === '我' ? $r('app.string.common_me') : m.nickname).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
       if (FamilyService.get().isLocal(m.deviceId)) {
         Text($r('app.string.common_me')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.PRIMARY)
           .backgroundColor(AppColor.PRIMARY_SOFT)
@@ -205,7 +205,7 @@ export struct HomeTab {
           .borderRadius(AppRadius.SM);
       }
       Text(m.saved.toFixed(2) + ' kg').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.PRIMARY);
-      Text(m.points.toString() + ' 分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT).margin({ left: AppSpacing.SM });
+      Text($r('app.string.home_family_points_suffix', m.points.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT).margin({ left: AppSpacing.SM });
     }
     .width('100%').padding({ top: AppSpacing.XS, bottom: AppSpacing.XS });
   }
@@ -325,7 +325,7 @@ export struct HomeTab {
               }.width('100%').margin({ top: AppSpacing.SM });
               if (this.familyJoined && this.members.length > 0) {
                 Column({ space: AppSpacing.XS }) {
-                  this.sectionTitle($r('app.string.home_family_members'), this.members.length.toString() + ' 人');
+                  this.sectionTitle($r('app.string.home_family_members'), $r('app.string.home_family_people', this.members.length.toString()));
                   ForEach(this.members, (m: MemberData) => {
                     this.memberRow(m);
                   }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());

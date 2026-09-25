@@ -335,6 +335,10 @@
     { "name": "knowledge_k6_fact", "value": "骑行 10 km × 0.17 = 1.70 kg CO₂e" },
 
     { "name": "chart_axis_week", "value": "第 %s 周" },
-    { "name": "chart_axis_month", "value": "%s 月" }
+    { "name": "chart_axis_month", "value": "%s 月" },
+
+    { "name": "home_share_text", "value": "我在「CarbonLife」App 已累计减排 %s kg CO₂e，获得 %s 积分，种下 %s 棵树。一起加入低碳生活吧！" },
+    { "name": "home_family_points_suffix", "value": "%s 分" },
+    { "name": "home_family_people", "value": "%s 人" }
   ]
 }
