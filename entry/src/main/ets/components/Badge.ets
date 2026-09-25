@@ -1,6 +1,7 @@
 import { AppColor } from '../common/Constants';
 import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
 import { BadgeDef } from '../model/CarbonTypes';
+import { badgeNameRes, badgeDescRes } from '../common/Localize';
 
 function badgeIcon(key: string): Resource {
   switch (key) {
@@ -51,12 +52,12 @@ export struct BadgeItem {
         .height(32)
         .fillColor(this.unlocked ? AppColor.PRIMARY : AppColor.TEXT_SUB)
         .opacity(this.unlocked ? 1 : 0.45);
-      Text(this.badge.name)
+      Text(badgeNameRes(this.badge.key, this.badge.name))
         .fontSize(AppTypography.CAPTION_MEDIUM.size)
         .fontWeight(AppTypography.CAPTION_MEDIUM.weight)
         .fontColor(this.unlocked ? AppColor.TEXT : AppColor.TEXT_SUB)
         .maxLines(1);
-      Text(this.unlocked ? $r('app.string.badge_unlocked') : this.badge.desc)
+      Text(this.unlocked ? $r('app.string.badge_unlocked') : badgeDescRes(this.badge.key, this.badge.desc))
         .fontSize(AppTypography.SMALL.size)
         .fontColor(AppColor.TEXT_SUB)
         .maxLines(2)

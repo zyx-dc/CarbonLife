@@ -182,6 +182,39 @@
     { "name": "behavior_recycle_clothes", "value": "Recycle old clothes" },
     { "name": "behavior_clean_plate", "value": "Clean-plate action" },
     { "name": "behavior_no_disposable", "value": "Skip disposable tableware" },
-    { "name": "behavior_veg_meal", "value": "One vegetarian meal" }
+    { "name": "behavior_veg_meal", "value": "One vegetarian meal" },
+
+    { "name": "badge_b1_name", "value": "First green step" },
+    { "name": "badge_b1_desc", "value": "Total savings reach 1 kg CO₂e" },
+    { "name": "badge_b2_name", "value": "Green commuter" },
+    { "name": "badge_b2_desc", "value": "Travel savings reach 5 kg CO₂e" },
+    { "name": "badge_b3_name", "value": "Energy saver" },
+    { "name": "badge_b3_desc", "value": "Energy savings reach 3 kg CO₂e" },
+    { "name": "badge_b4_name", "value": "Recycle pioneer" },
+    { "name": "badge_b4_desc", "value": "Recycle savings reach 5 kg CO₂e" },
+    { "name": "badge_b5_name", "value": "Clean-plate hero" },
+    { "name": "badge_b5_desc", "value": "Clean-plate action 10 times" },
+    { "name": "badge_b6_name", "value": "Low-carbon master" },
+    { "name": "badge_b6_desc", "value": "Total savings reach 20 kg CO₂e" },
+    { "name": "badge_b7_name", "value": "Carbon-neutral pioneer" },
+    { "name": "badge_b7_desc", "value": "Total savings reach 50 kg CO₂e" },
+
+    { "name": "task_t1_name", "value": "Green commute" },
+    { "name": "task_t1_desc", "value": "Walk, cycle or take the bus once today" },
+    { "name": "task_t2_name", "value": "Clean plate" },
+    { "name": "task_t2_desc", "value": "Finish the clean-plate action once today" },
+    { "name": "task_t3_name", "value": "Keep logging" },
+    { "name": "task_t3_desc", "value": "Log one low-carbon action today" },
+    { "name": "task_t4_name", "value": "Save energy" },
+    { "name": "task_t4_desc", "value": "Save electricity or water once today" },
+
+    { "name": "tip_first_action", "value": "Log your first low-carbon action today — walking or finishing your plate is easy." },
+    { "name": "tip_commute", "value": "Prefer walking, cycling or public transport for your daily commute." },
+    { "name": "tip_travel_low", "value": "Travel savings are low. Try two green-commute days a week for the biggest gain." },
+    { "name": "tip_energy_low", "value": "Turn off lights and set the AC 1°C higher; each kWh saves about 0.581 kg CO₂e." },
+    { "name": "tip_recycle_low", "value": "Sort and recycle paper, plastic bottles and old clothes — higher reduction factors." },
+    { "name": "tip_food_low", "value": "Keep finishing your plate and eat one more vegetarian meal a week." },
+    { "name": "tip_today_empty", "value": "Nothing logged today yet — don't forget to record your low-carbon actions." },
+    { "name": "tip_all_good", "value": "Great job! Try a more ambitious reduction goal next." }
   ]
 }

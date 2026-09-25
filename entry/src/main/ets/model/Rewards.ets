@@ -87,11 +87,11 @@ export class Rewards {
     return pending.length;
   }
 
-  static suggestions(store: CarbonStore): string[] {
-    const tips: string[] = [];
+  static suggestions(store: CarbonStore): ResourceStr[] {
+    const tips: ResourceStr[] = [];
     if (store.totalCount() === 0) {
-      tips.push('从今天开始记录第一条低碳行为吧，步行、光盘行动都很简单。');
-      tips.push('建议每天通勤优先选择步行、骑行或公共交通。');
+      tips.push($r('app.string.tip_first_action'));
+      tips.push($r('app.string.tip_commute'));
       return tips;
     }
     const travel = store.savedByCategoryOf('出行');
@@ -99,22 +99,22 @@ export class Rewards {
     const recycle = store.savedByCategoryOf('回收');
     const food = store.savedByCategoryOf('餐饮');
     if (travel < energy || travel < 1) {
-      tips.push('出行类减排偏低，尝试每周 2 天绿色通勤，减排提升最明显。');
+      tips.push($r('app.string.tip_travel_low'));
     }
     if (energy < 1) {
-      tips.push('随手关灯、空调调高 1℃，每度电可减排约 0.581 kg CO₂e。');
+      tips.push($r('app.string.tip_energy_low'));
     }
     if (recycle < 1) {
-      tips.push('把废纸、塑料瓶、旧衣物分类回收，回收减排系数更高。');
+      tips.push($r('app.string.tip_recycle_low'));
     }
     if (food < 1) {
-      tips.push('坚持光盘行动，每周多吃一餐素食，减排又健康。');
+      tips.push($r('app.string.tip_food_low'));
     }
     if (store.todayCount() === 0) {
-      tips.push('今天还没有记录，别忘了记录你的低碳行为哦。');
+      tips.push($r('app.string.tip_today_empty'));
     }
     if (tips.length === 0) {
-      tips.push('表现很棒！可以尝试挑战更高阶的减排目标。');
+      tips.push($r('app.string.tip_all_good'));
     }
     return tips;
   }

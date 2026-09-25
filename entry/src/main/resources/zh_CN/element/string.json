@@ -182,6 +182,39 @@
     { "name": "behavior_recycle_clothes", "value": "旧衣回收" },
     { "name": "behavior_clean_plate", "value": "光盘行动" },
     { "name": "behavior_no_disposable", "value": "少用一次性餐具" },
-    { "name": "behavior_veg_meal", "value": "素食一餐" }
+    { "name": "behavior_veg_meal", "value": "素食一餐" },
+
+    { "name": "badge_b1_name", "value": "初识低碳" },
+    { "name": "badge_b1_desc", "value": "累计减排达到 1 kg CO₂e" },
+    { "name": "badge_b2_name", "value": "绿色出行家" },
+    { "name": "badge_b2_desc", "value": "出行类累计减排 5 kg CO₂e" },
+    { "name": "badge_b3_name", "value": "节能小能手" },
+    { "name": "badge_b3_desc", "value": "节能类累计减排 3 kg CO₂e" },
+    { "name": "badge_b4_name", "value": "回收先锋" },
+    { "name": "badge_b4_desc", "value": "回收类累计减排 5 kg CO₂e" },
+    { "name": "badge_b5_name", "value": "光盘行动派" },
+    { "name": "badge_b5_desc", "value": "光盘行动累计 10 次" },
+    { "name": "badge_b6_name", "value": "低碳达人" },
+    { "name": "badge_b6_desc", "value": "累计减排达到 20 kg CO₂e" },
+    { "name": "badge_b7_name", "value": "碳中和先锋" },
+    { "name": "badge_b7_desc", "value": "累计减排达到 50 kg CO₂e" },
+
+    { "name": "task_t1_name", "value": "绿色出行" },
+    { "name": "task_t1_desc", "value": "今日步行/骑行/公交出行 1 次" },
+    { "name": "task_t2_name", "value": "光盘行动" },
+    { "name": "task_t2_desc", "value": "今日完成光盘行动 1 次" },
+    { "name": "task_t3_name", "value": "坚持记录" },
+    { "name": "task_t3_desc", "value": "今日记录低碳行为 1 条" },
+    { "name": "task_t4_name", "value": "节能有我" },
+    { "name": "task_t4_desc", "value": "今日节约用电或用水 1 次" },
+
+    { "name": "tip_first_action", "value": "从今天开始记录第一条低碳行为吧，步行、光盘行动都很简单。" },
+    { "name": "tip_commute", "value": "建议每天通勤优先选择步行、骑行或公共交通。" },
+    { "name": "tip_travel_low", "value": "出行类减排偏低，尝试每周 2 天绿色通勤，减排提升最明显。" },
+    { "name": "tip_energy_low", "value": "随手关灯、空调调高 1℃，每度电可减排约 0.581 kg CO₂e。" },
+    { "name": "tip_recycle_low", "value": "把废纸、塑料瓶、旧衣物分类回收，回收减排系数更高。" },
+    { "name": "tip_food_low", "value": "坚持光盘行动，每周多吃一餐素食，减排又健康。" },
+    { "name": "tip_today_empty", "value": "今天还没有记录，别忘了记录你的低碳行为哦。" },
+    { "name": "tip_all_good", "value": "表现很棒！可以尝试挑战更高阶的减排目标。" }
   ]
 }

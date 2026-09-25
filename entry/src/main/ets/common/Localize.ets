@@ -44,3 +44,49 @@ export function resolveStr(v: ResourceStr): string {
   const ctx = getContext();
   return ctx ? ctx.resourceManager.getStringSync(v) : '';
 }
+
+export function badgeNameRes(key: string, fallback: string): ResourceStr {
+  switch (key) {
+    case 'b1': return $r('app.string.badge_b1_name');
+    case 'b2': return $r('app.string.badge_b2_name');
+    case 'b3': return $r('app.string.badge_b3_name');
+    case 'b4': return $r('app.string.badge_b4_name');
+    case 'b5': return $r('app.string.badge_b5_name');
+    case 'b6': return $r('app.string.badge_b6_name');
+    case 'b7': return $r('app.string.badge_b7_name');
+    default: return fallback;
+  }
+}
+
+export function badgeDescRes(key: string, fallback: string): ResourceStr {
+  switch (key) {
+    case 'b1': return $r('app.string.badge_b1_desc');
+    case 'b2': return $r('app.string.badge_b2_desc');
+    case 'b3': return $r('app.string.badge_b3_desc');
+    case 'b4': return $r('app.string.badge_b4_desc');
+    case 'b5': return $r('app.string.badge_b5_desc');
+    case 'b6': return $r('app.string.badge_b6_desc');
+    case 'b7': return $r('app.string.badge_b7_desc');
+    default: return fallback;
+  }
+}
+
+export function taskNameRes(key: string, fallback: string): ResourceStr {
+  switch (key) {
+    case 't1': return $r('app.string.task_t1_name');
+    case 't2': return $r('app.string.task_t2_name');
+    case 't3': return $r('app.string.task_t3_name');
+    case 't4': return $r('app.string.task_t4_name');
+    default: return fallback;
+  }
+}
+
+export function taskDescRes(key: string, fallback: string): ResourceStr {
+  switch (key) {
+    case 't1': return $r('app.string.task_t1_desc');
+    case 't2': return $r('app.string.task_t2_desc');
+    case 't3': return $r('app.string.task_t3_desc');
+    case 't4': return $r('app.string.task_t4_desc');
+    default: return fallback;
+  }
+}

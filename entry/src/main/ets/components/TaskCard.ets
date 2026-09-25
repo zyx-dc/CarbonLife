@@ -1,6 +1,7 @@
 import { AppColor } from '../common/Constants';
 import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
 import { DailyTask } from '../model/CarbonTypes';
+import { taskNameRes, taskDescRes } from '../common/Localize';
 
 @Component
 export struct TaskCard {
@@ -43,11 +44,11 @@ export struct TaskCard {
         .borderColor(AppColor.BORDER);
 
       Column({ space: 2 }) {
-        Text(this.task.name)
+        Text(taskNameRes(this.task.key, this.task.name))
           .fontSize(AppTypography.BODY_MEDIUM.size)
           .fontWeight(AppTypography.BODY_MEDIUM.weight)
           .fontColor(this.done ? AppColor.TEXT_SUB : AppColor.TEXT);
-        Text(this.task.desc)
+        Text(taskDescRes(this.task.key, this.task.desc))
           .fontSize(AppTypography.CAPTION.size)
           .fontColor(AppColor.TEXT_SUB);
       }

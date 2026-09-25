@@ -43,7 +43,7 @@ export struct HomeTab {
   @State familyJoined: boolean = false;
   @State members: MemberData[] = [];
   @State taskStates: boolean[] = [];
-  @State suggestionsList: string[] = [];
+  @State suggestionsList: ResourceStr[] = [];
   // 「不和谐的秩序」：品红活点，一屏仅此一处
   @State live: boolean = false;
 
@@ -402,7 +402,7 @@ export struct HomeTab {
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 6, marginBottom: AppSpacing.LG }) {
             Column({ space: AppSpacing.SM }) {
               this.sectionTitle($r('app.string.home_suggestions'));
-              ForEach(this.suggestionsList, (tip: string, index: number) => {
+              ForEach(this.suggestionsList, (tip: ResourceStr, index: number) => {
                 Row({ space: AppSpacing.SM }) {
                   Image($r('app.media.ic_power'))
                     .width(18)
@@ -410,7 +410,7 @@ export struct HomeTab {
                     .fillColor(AppColor.PRIMARY);
                   Text(tip).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).layoutWeight(1);
                 }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
-              }, (tip: string, index: number) => index.toString());
+              }, (tip: ResourceStr, index: number) => index.toString());
             }
           }
         }
