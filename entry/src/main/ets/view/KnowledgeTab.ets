@@ -131,7 +131,7 @@ export struct KnowledgeTab {
                 .borderRadius(AppRadius.FULL)
                 .margin({ right: AppSpacing.SM, bottom: AppSpacing.SM })
                 .onClick(() => this.pick(qi, oi));
-            }, (opt: QuizOption) => opt.label);
+            }, (opt: QuizOption, oi: number) => oi.toString());
           }
           .width('100%');
         }
@@ -246,7 +246,7 @@ export struct KnowledgeTab {
                     .lineHeight(AppTypography.BODY.lineHeight)
                     .width('100%');
                   Column({ space: AppSpacing.SM }) {
-                    ForEach(item.points, (p: string) => {
+                    ForEach(item.points, (p: ResourceStr) => {
                       Row({ space: AppSpacing.SM }) {
                         Column()
                           .width(6)
@@ -262,7 +262,7 @@ export struct KnowledgeTab {
                       }
                       .width('100%')
                       .alignItems(VerticalAlign.Top);
-                    }, (p: string) => p);
+                    }, (p: ResourceStr, pi: number) => pi.toString());
                   }
                   .width('100%');
 

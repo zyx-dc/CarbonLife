@@ -52,24 +52,24 @@ export interface TrendPoint {
 
 export interface KnowledgeItem {
   id: string;
-  title: string;
-  tag: string;
-  summary: string;
-  content: string;
-  points: string[];
-  factLabel: string;
-  fact: string;
+  title: ResourceStr;
+  tag: ResourceStr;
+  summary: ResourceStr;
+  content: ResourceStr;
+  points: ResourceStr[];
+  factLabel: ResourceStr;
+  fact: ResourceStr;
   readMin: number;
 }
 
 export interface QuizOption {
-  label: string;
+  label: ResourceStr;
   score: number;
 }
 
 export interface QuizQuestion {
   id: string;
-  q: string;
+  q: ResourceStr;
   options: QuizOption[];
 }
 
