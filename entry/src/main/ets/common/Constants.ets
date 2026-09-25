@@ -61,7 +61,10 @@ export class AppConst {
   static readonly KEY_FAMILY_SESSION: string = 'family_session';
   static readonly KEY_FAMILY_NAME: string = 'family_name';
   static readonly KEY_FAMILY_DEVICE_ID: string = 'family_device_id';
+  static readonly KEY_TASK_REWARDS: string = 'task_rewards';
   static readonly KEY_REMINDER_ID: string = 'reminder_id';
   static readonly POINTS_PER_KG: number = 100;
   static readonly TREE_PER_KG: number = 10;
+  // 每日「记录积分」上限，抑制极小减排的重复刷分
+  static readonly DAILY_RECORD_POINTS_CAP: number = 300;
 }

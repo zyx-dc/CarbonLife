@@ -1,5 +1,6 @@
-import { BadgeDef, DailyTask, KnowledgeItem, CarbonRecord, QuizQuestion } from './CarbonTypes';
+import { BadgeDef, DailyTask, KnowledgeItem, CarbonRecord, QuizQuestion, TaskRewardRecord } from './CarbonTypes';
 import { CarbonStore } from './CarbonStore';
+import { DateUtil } from '../common/DateUtil';
 import { AppConst } from '../common/Constants';
 
 export class Rewards {
@@ -65,6 +66,25 @@ export class Rewards {
       return list.some((r: CarbonRecord) => r.behaviorKey === 'save_power' || r.behaviorKey === 'save_water');
     }
     return false;
+  }
+
+  /**
+   * 结算今日任务奖励：对「已完成但今日尚未发放」的任务发放积分。
+   * 幂等——同一天同一任务只发放一次。返回本次新发放的任务数。
+   */
+  static syncTaskRewards(store: CarbonStore): number {
+    const now = Date.now();
+    const dateKey = DateUtil.dayKey(now);
+    const pending: TaskRewardRecord[] = [];
+    Rewards.TASKS.forEach((t: DailyTask) => {
+      if (Rewards.taskDone(t.key, store) && !store.hasTaskReward(dateKey, t.key)) {
+        pending.push({ dateKey: dateKey, taskKey: t.key, points: t.points, timestamp: now });
+      }
+    });
+    if (pending.length > 0) {
+      store.addTaskRewards(pending);
+    }
+    return pending.length;
   }
 
   static suggestions(store: CarbonStore): string[] {

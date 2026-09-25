@@ -1,7 +1,7 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord } from './CarbonTypes';
+import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord, TaskRewardRecord } from './CarbonTypes';
 import { CarbonFactors } from './CarbonFactors';
 import { AppConst, AppColor } from '../common/Constants';
 import { DateUtil } from '../common/DateUtil';
@@ -11,6 +11,7 @@ export class CarbonStore {
   private prefs: preferences.Preferences | null = null;
   private records: CarbonRecord[] = [];
   private redemptions: RedemptionRecord[] = [];
+  private taskRewards: TaskRewardRecord[] = [];
   private loaded: boolean = false;
   private versionCounter: number = 1;
   private changeListeners: Array<() => void> = [];
@@ -33,6 +34,8 @@ export class CarbonStore {
       this.records = this.parse(raw);
       const rawRedeem = await this.prefs.get(AppConst.KEY_REDEMPTIONS, '[]') as string;
       this.redemptions = this.parseRedemptions(rawRedeem);
+      const rawTasks = await this.prefs.get(AppConst.KEY_TASK_REWARDS, '[]') as string;
+      this.taskRewards = this.parseTaskRewards(rawTasks);
       this.loaded = true;
       this.notify();
     } catch (e) {
@@ -52,6 +55,15 @@ export class CarbonStore {
   private parseRedemptions(raw: string): RedemptionRecord[] {
     try {
       const arr: RedemptionRecord[] = JSON.parse(raw) as RedemptionRecord[];
+      return arr;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  private parseTaskRewards(raw: string): TaskRewardRecord[] {
+    try {
+      const arr: TaskRewardRecord[] = JSON.parse(raw) as TaskRewardRecord[];
       return arr;
     } catch (e) {
       return [];
@@ -84,17 +96,19 @@ export class CarbonStore {
   private persist(): void {
     const recordsJson = JSON.stringify(this.records);
     const redeemJson = JSON.stringify(this.redemptions);
+    const taskJson = JSON.stringify(this.taskRewards);
     // 串行化写入，避免并发 put/flush 交错导致旧快照覆盖新状态
-    this.writeQueue = this.writeQueue.then(() => this.writeSnapshot(recordsJson, redeemJson));
+    this.writeQueue = this.writeQueue.then(() => this.writeSnapshot(recordsJson, redeemJson, taskJson));
   }
 
-  private async writeSnapshot(recordsJson: string, redeemJson: string): Promise<void> {
+  private async writeSnapshot(recordsJson: string, redeemJson: string, taskJson: string): Promise<void> {
     if (this.prefs === null) {
       return;
     }
     try {
       await this.prefs.put(AppConst.KEY_RECORDS, recordsJson);
       await this.prefs.put(AppConst.KEY_REDEMPTIONS, redeemJson);
+      await this.prefs.put(AppConst.KEY_TASK_REWARDS, taskJson);
       await this.prefs.flush();
     } catch (e) {
       console.error('CarbonStore persist failed: ' + JSON.stringify(e));
@@ -123,7 +137,10 @@ export class CarbonStore {
 
   addRecord(behavior: BehaviorDef, amount: number, note: string): CarbonRecord {
     const saved = behavior.factor * amount;
-    const points = Math.max(1, Math.round(saved * AppConst.POINTS_PER_KG));
+    let points = saved > 0 ? Math.max(1, Math.round(saved * AppConst.POINTS_PER_KG)) : 0;
+    // 每日「记录积分」封顶，抑制极小减排的重复刷分
+    const remaining = AppConst.DAILY_RECORD_POINTS_CAP - this.recordPointsToday();
+    points = remaining <= 0 ? 0 : Math.min(points, remaining);
     const now = Date.now();
     const rec: CarbonRecord = {
       id: util.generateRandomUUID(true),
@@ -154,6 +171,7 @@ export class CarbonStore {
   clearAll(): void {
     this.records = [];
     this.redemptions = [];
+    this.taskRewards = [];
     this.persist();
     this.notify();
   }
@@ -170,6 +188,9 @@ export class CarbonStore {
     let sum = 0;
     this.records.forEach((r: CarbonRecord) => {
       sum += r.points;
+    });
+    this.taskRewards.forEach((t: TaskRewardRecord) => {
+      sum += t.points;
     });
     return sum;
   }
@@ -222,6 +243,11 @@ export class CarbonStore {
         sum += r.points;
       }
     });
+    this.taskRewards.forEach((t: TaskRewardRecord) => {
+      if (t.timestamp >= start) {
+        sum += t.points;
+      }
+    });
     return sum;
   }
 
@@ -234,6 +260,35 @@ export class CarbonStore {
       }
     });
     return n;
+  }
+
+  // 今日「记录」产生的积分（不含任务奖励），用于每日上限判断
+  recordPointsToday(): number {
+    const start = DateUtil.startOfDay(Date.now());
+    let sum = 0;
+    this.records.forEach((r: CarbonRecord) => {
+      if (r.timestamp >= start) {
+        sum += r.points;
+      }
+    });
+    return sum;
+  }
+
+  hasTaskReward(dateKey: string, taskKey: string): boolean {
+    return this.taskRewards.some((t: TaskRewardRecord) => t.dateKey === dateKey && t.taskKey === taskKey);
+  }
+
+  addTaskRewards(list: TaskRewardRecord[]): void {
+    if (list.length === 0) {
+      return;
+    }
+    list.forEach((t: TaskRewardRecord) => this.taskRewards.push(t));
+    this.persist();
+    this.notify();
+  }
+
+  getTaskRewards(): TaskRewardRecord[] {
+    return this.taskRewards.slice();
   }
 
   countByBehavior(key: string): number {

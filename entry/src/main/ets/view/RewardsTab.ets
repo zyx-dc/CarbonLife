@@ -42,6 +42,8 @@ export struct RewardsTab {
 
   refresh(): void {
     const store = CarbonStore.get();
+    // 结算今日任务奖励（幂等），保证积分页与首页一致
+    Rewards.syncTaskRewards(store);
     this.balance = store.pointsBalance();
     this.totalPoints = store.totalPoints();
     this.spentPoints = store.spentPoints();

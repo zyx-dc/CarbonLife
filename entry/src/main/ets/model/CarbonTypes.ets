@@ -89,3 +89,11 @@ export interface RedemptionRecord {
   cost: number;
   timestamp: number;
 }
+
+// 每日任务的奖励发放记录：保证同一任务在同一天只发放一次积分
+export interface TaskRewardRecord {
+  dateKey: string;
+  taskKey: string;
+  points: number;
+  timestamp: number;
+}

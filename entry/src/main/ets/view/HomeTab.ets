@@ -64,6 +64,8 @@ export struct HomeTab {
   refresh(): void {
     const store = CarbonStore.get();
     const family = FamilyService.get();
+    // 结算今日任务奖励（幂等），让任务积分实时计入今日/累计积分
+    Rewards.syncTaskRewards(store);
     this.todaySaved = store.todaySaved().toFixed(2);
     this.todayPoints = store.todayPoints().toString();
     this.totalSaved = store.totalSaved().toFixed(2);
