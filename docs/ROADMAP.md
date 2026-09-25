@@ -94,6 +94,10 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 `AppScope/resources/base/media/app_icon.png`、`entry/.../media/app_icon.png`、`startIcon.png`
 仍为模板占位资源。
 
+> **进度（已实施）**：占位图已由 `scripts/make-icon.ps1` 生成的正式图标替换——
+> 深绿渐变底 + 青柠叶（品牌色 `#B6FF2E`）；`AppScope/app_icon.png`(1024)、
+> `entry/app_icon.png`(288)、`startIcon.png`(288, 透明)。桌面图标实机核对通过。
+
 ### 规格
 | 资源 | 位置 | 建议规格 |
 |---|---|---|
