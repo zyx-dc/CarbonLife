@@ -230,6 +230,18 @@
     { "name": "mall_m6_name", "value": "City carbon e-certificate" },
     { "name": "mall_m6_desc", "value": "E-certificate issued by the carbon program" },
     { "name": "mall_redeem_success", "value": "Redeemed" },
-    { "name": "mall_redeem_lack", "value": "Not enough points — %s more needed" }
+    { "name": "mall_redeem_lack", "value": "Not enough points — %s more needed" },
+
+    { "name": "vision_food", "value": "Food detected — try logging “Clean-plate action”" },
+    { "name": "vision_vehicle", "value": "Vehicle detected — try logging “Bus instead of driving”" },
+    { "name": "vision_person", "value": "Person detected — try logging “Walking instead of driving”" },
+    { "name": "vision_plant", "value": "Plant detected — try logging “One vegetarian meal”" },
+    { "name": "vision_paper", "value": "Paper detected — try logging “Recycle paper”" },
+    { "name": "vision_no_image", "value": "No image selected" },
+    { "name": "vision_failed", "value": "Recognition failed — please pick an action manually" },
+    { "name": "vision_no_match", "value": "No matching scene — please pick an action manually" },
+
+    { "name": "reminder_notif_title", "value": "Low-carbon reminder" },
+    { "name": "reminder_notif_content", "value": "Log today's low-carbon actions and earn points!" }
   ]
 }

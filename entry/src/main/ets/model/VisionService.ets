@@ -8,14 +8,14 @@ export interface VisionResult {
   label: string;
   behaviorKey: string;
   score: number;
-  message: string;
+  message: ResourceStr;
 }
 
 interface LabelMapping {
   labels: number[];
   name: string;
   behaviorKey: string;
-  message: string;
+  message: ResourceStr;
 }
 
 export class VisionService {
@@ -26,11 +26,11 @@ export class VisionService {
   // 需要覆盖更多场景时，只需在此追加一条 {labels, name, behaviorKey, message}，
   // 判定逻辑无需改动；未命中的情况一律回退为「手动选择」。
   private static readonly LABEL_MAP: LabelMapping[] = [
-    { labels: [11, 6], name: '食物 / 餐桌', behaviorKey: 'clean_plate', message: '识别到食物，建议记录「光盘行动」' },
-    { labels: [12], name: '车辆', behaviorKey: 'bus', message: '识别到车辆，建议记录「公交替代驾车」' },
-    { labels: [13, 8, 5], name: '人物', behaviorKey: 'walk', message: '识别到人物，建议记录「步行替代驾车」' },
-    { labels: [2], name: '植物', behaviorKey: 'veg_meal', message: '识别到植物，建议记录「素食一餐」' },
-    { labels: [22, 21, 7], name: '纸张 / 文档', behaviorKey: 'recycle_paper', message: '识别到纸张类，建议记录「回收纸张」' }
+    { labels: [11, 6], name: '食物 / 餐桌', behaviorKey: 'clean_plate', message: $r('app.string.vision_food') },
+    { labels: [12], name: '车辆', behaviorKey: 'bus', message: $r('app.string.vision_vehicle') },
+    { labels: [13, 8, 5], name: '人物', behaviorKey: 'walk', message: $r('app.string.vision_person') },
+    { labels: [2], name: '植物', behaviorKey: 'veg_meal', message: $r('app.string.vision_plant') },
+    { labels: [22, 21, 7], name: '纸张 / 文档', behaviorKey: 'recycle_paper', message: $r('app.string.vision_paper') }
   ];
 
   static async pickAndDetect(): Promise<VisionResult> {
@@ -42,7 +42,7 @@ export class VisionService {
       options.maxSelectNumber = 1;
       const picked = await picker.select(options);
       if (picked.photoUris.length === 0) {
-        return { ok: false, label: '', behaviorKey: '', score: 0, message: '未选择图片' };
+        return { ok: false, label: '', behaviorKey: '', score: 0, message: $r('app.string.vision_no_image') };
       }
       const uri = picked.photoUris[0];
       file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
@@ -69,7 +69,7 @@ export class VisionService {
         } catch (err) {
         }
       }
-      return { ok: false, label: '', behaviorKey: '', score: 0, message: '识别失败，请手动选择行为' };
+      return { ok: false, label: '', behaviorKey: '', score: 0, message: $r('app.string.vision_failed') };
     }
   }
 
@@ -85,7 +85,7 @@ export class VisionService {
         return mapped;
       }
     }
-    return { ok: false, label: '', behaviorKey: '', score: 0, message: '未识别到匹配场景，请手动选择行为' };
+    return { ok: false, label: '', behaviorKey: '', score: 0, message: $r('app.string.vision_no_match') };
   }
 
   // 在候选标签中查找第一个可映射的行为
@@ -96,7 +96,7 @@ export class VisionService {
         return r;
       }
     }
-    return { ok: false, label: '', behaviorKey: '', score: score, message: '未识别到匹配场景，请手动选择行为' };
+    return { ok: false, label: '', behaviorKey: '', score: score, message: $r('app.string.vision_no_match') };
   }
 
   static mapLabel(label: number, score: number): VisionResult {
@@ -106,6 +106,6 @@ export class VisionService {
         return { ok: true, label: m.name, behaviorKey: m.behaviorKey, score: score, message: m.message };
       }
     }
-    return { ok: false, label: '', behaviorKey: '', score: score, message: '未识别到匹配场景，请手动选择行为' };
+    return { ok: false, label: '', behaviorKey: '', score: score, message: $r('app.string.vision_no_match') };
   }
 }

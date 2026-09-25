@@ -230,6 +230,18 @@
     { "name": "mall_m6_name", "value": "城市碳普惠电子证书" },
     { "name": "mall_m6_desc", "value": "碳普惠平台颁发的电子荣誉证书" },
     { "name": "mall_redeem_success", "value": "兑换成功" },
-    { "name": "mall_redeem_lack", "value": "积分不足，还差 %s 分" }
+    { "name": "mall_redeem_lack", "value": "积分不足，还差 %s 分" },
+
+    { "name": "vision_food", "value": "识别到食物，建议记录「光盘行动」" },
+    { "name": "vision_vehicle", "value": "识别到车辆，建议记录「公交替代驾车」" },
+    { "name": "vision_person", "value": "识别到人物，建议记录「步行替代驾车」" },
+    { "name": "vision_plant", "value": "识别到植物，建议记录「素食一餐」" },
+    { "name": "vision_paper", "value": "识别到纸张类，建议记录「回收纸张」" },
+    { "name": "vision_no_image", "value": "未选择图片" },
+    { "name": "vision_failed", "value": "识别失败，请手动选择行为" },
+    { "name": "vision_no_match", "value": "未识别到匹配场景，请手动选择行为" },
+
+    { "name": "reminder_notif_title", "value": "低碳生活提醒" },
+    { "name": "reminder_notif_content", "value": "记录今天的低碳行为，坚持减排赢积分！" }
   ]
 }

@@ -1,6 +1,7 @@
 import { reminderAgentManager } from '@kit.BackgroundTasksKit';
 import { CarbonStore } from './CarbonStore';
 import { AppConst } from '../common/Constants';
+import { resolveStr } from '../common/Localize';
 
 export class ReminderService {
   static readonly DEFAULT_HOUR: number = 20;
@@ -43,8 +44,8 @@ export class ReminderService {
       hour: hour,
       minute: minute,
       daysOfWeek: [1, 2, 3, 4, 5, 6, 7],
-      title: '低碳生活提醒',
-      content: '记录今天的低碳行为，坚持减排赢积分！',
+      title: resolveStr($r('app.string.reminder_notif_title')),
+      content: resolveStr($r('app.string.reminder_notif_content')),
       notificationId: 1001,
       wantAgent: {
         pkgName: 'com.example.carbonlife',
