@@ -118,19 +118,19 @@ export struct RecordTab {
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 2}) {
           Column({ space: AppSpacing.SM }) {
             Text($r('app.string.record_category_title')).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
-            Flex({ wrap: FlexWrap.Wrap }) {
+            Row({ space: AppSpacing.XS }) {
               ForEach(CarbonFactors.CATEGORIES, (cat: string) => {
                 Text(categoryRes(cat))
-                  .fontSize(AppTypography.BODY.size)
+                  .fontSize(AppTypography.SMALL.size)
                   .fontColor(this.category === cat ? AppColor.ON_SIGNAL : AppColor.TEXT)
                   .backgroundColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_STRONG)
                   .borderWidth(1)
                   .borderColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_BORDER)
-                  .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
-                  .height(44)
+                  .padding({ left: AppSpacing.SM, right: AppSpacing.SM })
+                  .height(38)
+                  .layoutWeight(1)
                   .textAlign(TextAlign.Center)
                   .borderRadius(AppRadius.FULL)
-                  .margin({ right: AppSpacing.XS, bottom: AppSpacing.XS })
                   .onClick(() => {
                     this.category = cat;
                     const list = CarbonFactors.getByCategory(cat);
