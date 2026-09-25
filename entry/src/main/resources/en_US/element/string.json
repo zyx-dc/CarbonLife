@@ -60,6 +60,29 @@
     { "name": "share_trees", "value": "Trees" },
     { "name": "share_records", "value": "Records" },
     { "name": "share_copy", "value": "Copy share text" },
-    { "name": "share_copied", "value": "Share text copied" }
+    { "name": "share_copied", "value": "Share text copied" },
+
+    { "name": "common_cancel", "value": "Cancel" },
+    { "name": "common_delete", "value": "Delete" },
+
+    { "name": "record_title", "value": "Log a low-carbon action" },
+    { "name": "record_ai_title", "value": "AI scene recognition" },
+    { "name": "record_ai_desc", "value": "Pick a photo; on-device AI recognizes the scene and suggests a low-carbon action" },
+    { "name": "record_ai_button", "value": "Take / pick photo" },
+    { "name": "record_category_title", "value": "Category" },
+    { "name": "record_behavior_title", "value": "Action" },
+    { "name": "record_behavior_factor", "value": "Per %s, saves about %s kg CO₂e" },
+    { "name": "record_amount_title", "value": "Amount (%s)" },
+    { "name": "record_note_placeholder", "value": "Note (optional)" },
+    { "name": "record_estimated", "value": "Estimated saving %s kg CO₂e" },
+    { "name": "record_points", "value": "+%s points" },
+    { "name": "record_save", "value": "Save record" },
+    { "name": "record_today_title", "value": "Today's records" },
+    { "name": "record_empty", "value": "No records yet today" },
+    { "name": "record_err_amount", "value": "Please enter an amount greater than 0" },
+    { "name": "record_saved_toast", "value": "Recorded: %s kg CO₂e saved" },
+    { "name": "record_delete_title", "value": "Delete record" },
+    { "name": "record_delete_message", "value": "Delete \"%s\"?" },
+    { "name": "record_deleted", "value": "Deleted" }
   ]
 }
