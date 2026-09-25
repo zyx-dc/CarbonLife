@@ -83,6 +83,23 @@
     { "name": "record_saved_toast", "value": "Recorded: %s kg CO₂e saved" },
     { "name": "record_delete_title", "value": "Delete record" },
     { "name": "record_delete_message", "value": "Delete \"%s\"?" },
-    { "name": "record_deleted", "value": "Deleted" }
+    { "name": "record_deleted", "value": "Deleted" },
+
+    { "name": "rewards_title", "value": "Points & honors" },
+    { "name": "rewards_balance", "value": "Available points" },
+    { "name": "rewards_total_earned", "value": "Earned %s" },
+    { "name": "rewards_spent", "value": "Redeemed %s" },
+    { "name": "rewards_tree_cert", "value": "My tree certificate" },
+    { "name": "rewards_tree_congrats", "value": "Congrats! You've saved %s kg CO₂e in total — equivalent to planting %s trees." },
+    { "name": "rewards_tree_hint", "value": "Every 10 kg CO₂e saved plants one tree. Keep going!" },
+    { "name": "rewards_tree_count", "value": "%s trees" },
+    { "name": "rewards_mall_title", "value": "Carbon rewards mall" },
+    { "name": "rewards_redeem", "value": "Redeem" },
+    { "name": "rewards_redeem_gap", "value": "%s more" },
+    { "name": "rewards_redeem_success", "value": "Redeemed. Code: %s" },
+    { "name": "rewards_redemptions", "value": "Redemption history" },
+    { "name": "rewards_tasks", "value": "Today's tasks" },
+    { "name": "rewards_badges", "value": "Low-carbon badges" },
+    { "name": "badge_unlocked", "value": "Unlocked" }
   ]
 }

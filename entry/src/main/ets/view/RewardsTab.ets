@@ -59,7 +59,7 @@ export struct RewardsTab {
     MallService.redeem(item).then((res: RedeemResult) => {
       if (res.ok) {
         this.refresh();
-        this.promptAction.showToast({ message: '兑换成功，兑换码 ' + res.code });
+        this.promptAction.showToast({ message: $r('app.string.rewards_redeem_success', res.code) });
       } else {
         this.promptAction.showToast({ message: res.message });
       }
@@ -71,17 +71,17 @@ export struct RewardsTab {
       Column({ space: AppSpacing.MD }) {
         Column({ space: AppSpacing.XS }) {
           Text('REWARDS').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
-          Text('积分与荣誉').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
+          Text($r('app.string.rewards_title')).fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
         }
         .width('100%').alignItems(HorizontalAlign.Start)
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
         Column({ space: AppSpacing.SM }) {
-          Text('可用碳积分').fontSize(AppTypography.CAPTION.size).letterSpacing(1.5).fontColor(AppColor.TEXT_SUB);
+          Text($r('app.string.rewards_balance')).fontSize(AppTypography.CAPTION.size).letterSpacing(1.5).fontColor(AppColor.TEXT_SUB);
           AnimatedNumber({ value: this.balance, textSize: AppTypography.DISPLAY_LG.size, textColor: AppColor.ACCENT });
           Row({ space: AppSpacing.LG }) {
-            Text('累计获得 ' + this.totalPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-            Text('已兑换 ' + this.spentPoints.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text($r('app.string.rewards_total_earned', this.totalPoints.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text($r('app.string.rewards_spent', this.spentPoints.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           }.margin({ top: AppSpacing.XS });
         }
         .width('100%')
@@ -101,21 +101,21 @@ export struct RewardsTab {
             Column() {
               Row({ space: AppSpacing.XS }) {
                 Image($r('app.media.ic_tree')).width(22).height(22).fillColor(AppColor.TEXT_SUB);
-                Text('我的植树证书').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
+                Text($r('app.string.rewards_tree_cert')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               }.width('100%');
               Text(this.treeCount > 0
-                ? '恭喜！你已累计减排 ' + this.totalSaved + ' kg CO₂e，相当于种下 ' + this.treeCount.toString() + ' 棵树。'
-                : '每减排 10 kg CO₂e 即可种下 1 棵树，继续加油！')
+                ? $r('app.string.rewards_tree_congrats', this.totalSaved, this.treeCount.toString())
+                : $r('app.string.rewards_tree_hint'))
                 .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%');
             }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-            Text(this.treeCount.toString() + ' 棵').fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+            Text($r('app.string.rewards_tree_count', this.treeCount.toString())).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
           }.width('100%').alignItems(VerticalAlign.Top);
         }
 
         AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
           Column({ space: AppSpacing.SM }) {
             Row() {
-              Text('碳普惠权益商城').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
+              Text($r('app.string.rewards_mall_title')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
             }.width('100%');
             ForEach(MallService.ITEMS, (item: RedeemItem, index: number) => {
@@ -128,7 +128,7 @@ export struct RewardsTab {
                   Text(item.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
                   Text(item.desc).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                Text(this.balance >= item.cost ? '兑换' : '差 ' + (item.cost - this.balance).toString() + ' 分')
+                Text(this.balance >= item.cost ? $r('app.string.rewards_redeem') : $r('app.string.rewards_redeem_gap', (item.cost - this.balance).toString()))
                   .height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
                   .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
@@ -149,7 +149,7 @@ export struct RewardsTab {
         if (this.redemptions.length > 0) {
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
             Column({ space: AppSpacing.SM }) {
-              Text('兑换记录').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+              Text($r('app.string.rewards_redemptions')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
               ForEach(this.redemptions, (r: RedemptionRecord) => {
                 Row() {
                   Text(r.itemName).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
@@ -164,7 +164,7 @@ export struct RewardsTab {
         AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 5 }) {
           Column({ space: AppSpacing.SM }) {
             Row() {
-              Text('今日任务').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
+              Text($r('app.string.rewards_tasks')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
             }.width('100%');
             ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
@@ -176,7 +176,7 @@ export struct RewardsTab {
         AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 6, marginBottom: AppSpacing.LG }) {
           Column({ space: AppSpacing.SM }) {
             Row() {
-              Text('低碳徽章').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
+              Text($r('app.string.rewards_badges')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
               Text(this.unlockedCount.toString() + '/' + Rewards.BADGES.length.toString()).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
             }.width('100%');

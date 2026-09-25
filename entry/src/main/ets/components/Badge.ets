@@ -56,7 +56,7 @@ export struct BadgeItem {
         .fontWeight(AppTypography.CAPTION_MEDIUM.weight)
         .fontColor(this.unlocked ? AppColor.TEXT : AppColor.TEXT_SUB)
         .maxLines(1);
-      Text(this.unlocked ? '已解锁' : this.badge.desc)
+      Text(this.unlocked ? $r('app.string.badge_unlocked') : this.badge.desc)
         .fontSize(AppTypography.SMALL.size)
         .fontColor(AppColor.TEXT_SUB)
         .maxLines(2)

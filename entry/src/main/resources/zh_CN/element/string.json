@@ -83,6 +83,23 @@
     { "name": "record_saved_toast", "value": "记录成功，减排 %s kg CO₂e" },
     { "name": "record_delete_title", "value": "删除记录" },
     { "name": "record_delete_message", "value": "确定删除「%s」吗？" },
-    { "name": "record_deleted", "value": "已删除" }
+    { "name": "record_deleted", "value": "已删除" },
+
+    { "name": "rewards_title", "value": "积分与荣誉" },
+    { "name": "rewards_balance", "value": "可用碳积分" },
+    { "name": "rewards_total_earned", "value": "累计获得 %s" },
+    { "name": "rewards_spent", "value": "已兑换 %s" },
+    { "name": "rewards_tree_cert", "value": "我的植树证书" },
+    { "name": "rewards_tree_congrats", "value": "恭喜！你已累计减排 %s kg CO₂e，相当于种下 %s 棵树。" },
+    { "name": "rewards_tree_hint", "value": "每减排 10 kg CO₂e 即可种下 1 棵树，继续加油！" },
+    { "name": "rewards_tree_count", "value": "%s 棵" },
+    { "name": "rewards_mall_title", "value": "碳普惠权益商城" },
+    { "name": "rewards_redeem", "value": "兑换" },
+    { "name": "rewards_redeem_gap", "value": "差 %s 分" },
+    { "name": "rewards_redeem_success", "value": "兑换成功，兑换码 %s" },
+    { "name": "rewards_redemptions", "value": "兑换记录" },
+    { "name": "rewards_tasks", "value": "今日任务" },
+    { "name": "rewards_badges", "value": "低碳徽章" },
+    { "name": "badge_unlocked", "value": "已解锁" }
   ]
 }
