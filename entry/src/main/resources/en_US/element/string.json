@@ -66,9 +66,9 @@
     { "name": "common_delete", "value": "Delete" },
 
     { "name": "record_title", "value": "Log a low-carbon action" },
-    { "name": "record_ai_title", "value": "AI scene recognition" },
-    { "name": "record_ai_desc", "value": "Pick a photo; on-device AI recognizes the scene and suggests a low-carbon action" },
-    { "name": "record_ai_button", "value": "Take / pick photo" },
+    { "name": "record_ai_title", "value": "AI recognition" },
+    { "name": "record_ai_desc", "value": "Pick a photo; AI suggests an action" },
+    { "name": "record_ai_button", "value": "Pick photo" },
     { "name": "record_category_title", "value": "Category" },
     { "name": "record_behavior_title", "value": "Action" },
     { "name": "record_behavior_factor", "value": "Per %s, saves about %s kg CO₂e" },

@@ -118,7 +118,7 @@ export struct RecordTab {
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 2}) {
           Column({ space: AppSpacing.SM }) {
             Text($r('app.string.record_category_title')).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
-            Row({ space: AppSpacing.XS }) {
+            Flex({ wrap: FlexWrap.Wrap }) {
               ForEach(CarbonFactors.CATEGORIES, (cat: string) => {
                 Text(categoryRes(cat))
                   .fontSize(AppTypography.BODY.size)
@@ -130,6 +130,7 @@ export struct RecordTab {
                   .height(44)
                   .textAlign(TextAlign.Center)
                   .borderRadius(AppRadius.FULL)
+                  .margin({ right: AppSpacing.XS, bottom: AppSpacing.XS })
                   .onClick(() => {
                     this.category = cat;
                     const list = CarbonFactors.getByCategory(cat);
