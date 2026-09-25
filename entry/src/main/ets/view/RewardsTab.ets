@@ -56,13 +56,14 @@ export struct RewardsTab {
   }
 
   onRedeem(item: RedeemItem): void {
-    const res: RedeemResult = MallService.redeem(item);
-    if (res.ok) {
-      this.refresh();
-      this.promptAction.showToast({ message: '兑换成功，兑换码 ' + res.code });
-    } else {
-      this.promptAction.showToast({ message: res.message });
-    }
+    MallService.redeem(item).then((res: RedeemResult) => {
+      if (res.ok) {
+        this.refresh();
+        this.promptAction.showToast({ message: '兑换成功，兑换码 ' + res.code });
+      } else {
+        this.promptAction.showToast({ message: res.message });
+      }
+    });
   }
 
   build() {

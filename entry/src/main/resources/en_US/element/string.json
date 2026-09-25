@@ -11,6 +11,14 @@
     {
       "name": "EntryAbility_label",
       "value": "CarbonLife"
+    },
+    {
+      "name": "perm_distributed_reason",
+      "value": "Used to sync family carbon points across devices"
+    },
+    {
+      "name": "perm_reminder_reason",
+      "value": "Used for a daily reminder to log low-carbon actions"
     }
   ]
 }

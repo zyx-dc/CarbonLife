@@ -443,4 +443,105 @@ export class CarbonStore {
   exportJson(): string {
     return JSON.stringify(this.records, null, 2);
   }
+
+  // ---- 数据导入 ----
+
+  private static parseCsvLine(line: string): string[] {
+    const out: string[] = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line.charAt(i);
+      if (inQuotes) {
+        if (ch === '"') {
+          if (i + 1 < line.length && line.charAt(i + 1) === '"') {
+            cur += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          cur += ch;
+        }
+      } else if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        out.push(cur);
+        cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
+  // 合并导入记录：按 id 去重，返回新增条数
+  importRecords(list: CarbonRecord[]): number {
+    const ids: string[] = this.records.map((r: CarbonRecord) => r.id);
+    let added = 0;
+    list.forEach((r: CarbonRecord) => {
+      if (r.id === '' || ids.indexOf(r.id) >= 0) {
+        return;
+      }
+      ids.push(r.id);
+      this.records.push(r);
+      added += 1;
+    });
+    if (added > 0) {
+      this.persist();
+      this.notify();
+    }
+    return added;
+  }
+
+  // 导入导出的 JSON（CarbonRecord 数组）。返回新增条数，解析失败返回 -1
+  importJson(text: string): number {
+    try {
+      const arr = JSON.parse(text) as CarbonRecord[];
+      if (!Array.isArray(arr)) {
+        return -1;
+      }
+      return this.importRecords(arr);
+    } catch (e) {
+      return -1;
+    }
+  }
+
+  // 导入导出的 CSV。返回新增条数，解析失败返回 -1
+  importCsv(text: string): number {
+    try {
+      const lines = text.replace(/\r\n/g, '\n').split('\n').filter((l: string) => l.trim() !== '');
+      if (lines.length <= 1) {
+        return 0;
+      }
+      const list: CarbonRecord[] = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = CarbonStore.parseCsvLine(lines[i]);
+        if (cols.length < 9) {
+          continue;
+        }
+        const name = cols[3];
+        const matches = CarbonFactors.BEHAVIORS.filter((b: BehaviorDef) => b.name === name);
+        const def = matches.length > 0 ? matches[0] : CarbonFactors.BEHAVIORS[0];
+        list.push({
+          id: cols[0],
+          behaviorKey: def.key,
+          category: cols[2] !== '' ? cols[2] : def.category,
+          name: name !== '' ? name : def.name,
+          amount: parseFloat(cols[4]) || 0,
+          unit: cols[5] !== '' ? cols[5] : def.unit,
+          factor: def.factor,
+          saved: parseFloat(cols[6]) || 0,
+          points: parseInt(cols[7]) || 0,
+          timestamp: DateUtil.dayKeyToTimestamp(cols[1]),
+          dateKey: cols[1],
+          note: cols[8] === '-' ? '' : cols[8]
+        });
+      }
+      return this.importRecords(list);
+    } catch (e) {
+      return -1;
+    }
+  }
 }

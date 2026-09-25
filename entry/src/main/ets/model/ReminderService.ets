@@ -3,10 +3,33 @@ import { CarbonStore } from './CarbonStore';
 import { AppConst } from '../common/Constants';
 
 export class ReminderService {
-  static readonly HOUR: number = 20;
-  static readonly MINUTE: number = 0;
+  static readonly DEFAULT_HOUR: number = 20;
+  static readonly DEFAULT_MINUTE: number = 0;
+
+  static async getHour(): Promise<number> {
+    const s = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_HOUR, ReminderService.DEFAULT_HOUR.toString());
+    const n = parseInt(s);
+    return isNaN(n) ? ReminderService.DEFAULT_HOUR : n;
+  }
+
+  static async getMinute(): Promise<number> {
+    const s = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_MINUTE, ReminderService.DEFAULT_MINUTE.toString());
+    const n = parseInt(s);
+    return isNaN(n) ? ReminderService.DEFAULT_MINUTE : n;
+  }
+
+  static async setTime(hour: number, minute: number): Promise<void> {
+    await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_HOUR, hour.toString());
+    await CarbonStore.get().setSetting(AppConst.KEY_REMINDER_MINUTE, minute.toString());
+  }
 
   static async enable(): Promise<number> {
+    const h = await ReminderService.getHour();
+    const m = await ReminderService.getMinute();
+    return ReminderService.enableAt(h, m);
+  }
+
+  static async enableAt(hour: number, minute: number): Promise<number> {
     // 先取消已存在的提醒，避免重复发布导致多条告警
     const prev = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_ID, '');
     if (prev !== '') {
@@ -17,8 +40,8 @@ export class ReminderService {
     }
     const req: reminderAgentManager.ReminderRequestAlarm = {
       reminderType: reminderAgentManager.ReminderType.REMINDER_TYPE_ALARM,
-      hour: ReminderService.HOUR,
-      minute: ReminderService.MINUTE,
+      hour: hour,
+      minute: minute,
       daysOfWeek: [1, 2, 3, 4, 5, 6, 7],
       title: '低碳生活提醒',
       content: '记录今天的低碳行为，坚持减排赢积分！',

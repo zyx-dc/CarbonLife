@@ -55,4 +55,19 @@ export class DateUtil {
     const d = new Date(ts);
     return DateUtil.pad(d.getMonth() + 1) + '-' + DateUtil.pad(d.getDate());
   }
+
+  // 将 'YYYY-MM-DD' 解析为当天中午的时间戳，用于导入记录
+  static dayKeyToTimestamp(dateKey: string): number {
+    const parts = dateKey.split('-');
+    if (parts.length !== 3) {
+      return Date.now();
+    }
+    const y = parseInt(parts[0]);
+    const m = parseInt(parts[1]);
+    const d = parseInt(parts[2]);
+    if (isNaN(y) || isNaN(m) || isNaN(d)) {
+      return Date.now();
+    }
+    return new Date(y, m - 1, d, 12, 0, 0).getTime();
+  }
 }

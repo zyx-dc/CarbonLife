@@ -23,6 +23,8 @@ export struct HomeTab {
   private onStoreChange: () => void = () => { FamilyService.get().pushLocal(); this.refresh(); };
   @State showShare: boolean = false;
   @State reminderOn: boolean = false;
+  @State reminderHour: number = 20;
+  @State reminderMinute: number = 0;
   @StorageLink('reduceMotion') reduceMotion: boolean = false;
   @State familyExpanded: boolean = false;
   @State familyName: string = '我';
@@ -51,6 +53,8 @@ export struct HomeTab {
     FamilyService.get().pushLocal();
     this.familyName = FamilyService.get().getNickname();
     ReminderService.isEnabled().then((v: boolean) => { this.reminderOn = v; });
+    ReminderService.getHour().then((h: number) => { this.reminderHour = h; });
+    ReminderService.getMinute().then((m: number) => { this.reminderMinute = m; });
     this.refresh();
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
     setTimeout(() => this.live = true, AppMotion.reduceMotion() ? 0 : 200);
@@ -114,11 +118,42 @@ export struct HomeTab {
     this.promptAction.showToast({ message: '已同步我的碳积分' });
   }
 
+  timeText(): string {
+    const h = this.reminderHour < 10 ? '0' + this.reminderHour.toString() : this.reminderHour.toString();
+    const m = this.reminderMinute < 10 ? '0' + this.reminderMinute.toString() : this.reminderMinute.toString();
+    return h + ':' + m;
+  }
+
+  reminderDate(): Date {
+    const d = new Date();
+    d.setHours(this.reminderHour, this.reminderMinute, 0, 0);
+    return d;
+  }
+
+  onPickTime(): void {
+    this.uiContext.showTimePickerDialog({
+      selected: this.reminderDate(),
+      onAccept: (value: TimePickerResult) => {
+        this.reminderHour = value.hour;
+        this.reminderMinute = value.minute;
+        ReminderService.setTime(value.hour, value.minute).then(() => {
+          if (this.reminderOn) {
+            ReminderService.enable().then(() => {
+              this.promptAction.showToast({ message: '提醒时间已更新为 ' + this.timeText() });
+            });
+          } else {
+            this.promptAction.showToast({ message: '提醒时间已设置为 ' + this.timeText() });
+          }
+        });
+      }
+    });
+  }
+
   onReminderChange(isOn: boolean): void {
     this.reminderOn = isOn;
     if (isOn) {
       ReminderService.enable().then(() => {
-        this.promptAction.showToast({ message: '已开启每日 20:00 提醒' });
+        this.promptAction.showToast({ message: '已开启每日 ' + this.timeText() + ' 提醒' });
       }).catch(() => {
         this.reminderOn = false;
         this.promptAction.showToast({ message: '开启提醒失败' });
@@ -336,8 +371,9 @@ export struct HomeTab {
               Row() {
                 Column() {
                   Text('每日低碳提醒').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text('每天 20:00 提醒记录低碳行为').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+                  Text('每天 ' + this.timeText() + ' 提醒记录低碳行为 · 点击修改时间').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
+                .onClick(() => this.onPickTime());
                 Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
               }.width('100%');
               Divider().color(AppColor.DIVIDER);

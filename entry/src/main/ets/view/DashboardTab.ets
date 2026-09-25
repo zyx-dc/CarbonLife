@@ -1,5 +1,6 @@
 import { PromptAction, UIContext } from '@kit.ArkUI';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
+import { util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { CarbonFactors } from '../model/CarbonFactors';
@@ -93,6 +94,43 @@ export struct DashboardTab {
       this.promptAction.showToast({ message: '已导出' });
     } catch (e) {
       this.promptAction.showToast({ message: '导出失败' });
+    } finally {
+      if (file !== null) {
+        try { fs.closeSync(file); } catch (err) { }
+      }
+    }
+  }
+
+  async importFile(): Promise<void> {
+    let file: fs.File | null = null;
+    try {
+      const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
+      const docPicker = new picker.DocumentViewPicker(ctx);
+      const opt = new picker.DocumentSelectOptions();
+      opt.maxSelectNumber = 1;
+      const uris = await docPicker.select(opt);
+      if (uris.length === 0) {
+        return;
+      }
+      file = fs.openSync(uris[0], fs.OpenMode.READ_ONLY);
+      const stat = fs.statSync(file.fd);
+      const buf = new ArrayBuffer(stat.size);
+      const readLen = fs.readSync(file.fd, buf);
+      const bytes = new Uint8Array(buf.slice(0, readLen));
+      const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
+      const trimmed = text.trim();
+      const isJson = trimmed.startsWith('[') || trimmed.startsWith('{');
+      const added = isJson ? CarbonStore.get().importJson(text) : CarbonStore.get().importCsv(text);
+      if (added < 0) {
+        this.promptAction.showToast({ message: '文件格式无法识别' });
+      } else if (added === 0) {
+        this.promptAction.showToast({ message: '没有新增记录（可能已存在或文件为空）' });
+      } else {
+        this.promptAction.showToast({ message: '已导入 ' + added.toString() + ' 条记录' });
+        this.refreshData();
+      }
+    } catch (e) {
+      this.promptAction.showToast({ message: '导入失败' });
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -265,6 +303,7 @@ export struct DashboardTab {
               AppButton({ text: '导出 CSV', type: 'primary' }).layoutWeight(1).onClick(() => this.exportFile('csv'));
               AppButton({ text: '导出 JSON', type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
             }.width('100%').margin({ top: AppSpacing.SM });
+            AppButton({ text: '导入数据（CSV / JSON）', type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
             AppButton({ text: '清空全部数据', type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
           }
         }

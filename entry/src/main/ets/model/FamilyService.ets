@@ -82,9 +82,11 @@ export class FamilyService {
     if (!member) {
       member = new MemberData();
       member.deviceId = this.localDeviceId;
-      // 仅在 deviceId 就绪后才写入成员表，避免 init 完成前产生幽灵成员
+      // 整体赋值而非原地 push：分布式数据对象对嵌套数组的原地修改不会触发同步
       if (this.localDeviceId !== '') {
-        data.members.push(member);
+        const next: MemberData[] = data.members.slice();
+        next.push(member);
+        data.members = next;
       }
     }
     return member;
@@ -123,13 +125,30 @@ export class FamilyService {
       return;
     }
     const store = CarbonStore.get();
-    const member = this.localMember();
-    if (member.nickname === '') {
-      member.nickname = '我';
+    const data = this.data();
+    const next: MemberData[] = [];
+    let found = false;
+    data.members.forEach((m: MemberData) => {
+      if (m.deviceId === this.localDeviceId) {
+        m.nickname = m.nickname === '' ? '我' : m.nickname;
+        m.saved = store.totalSaved();
+        m.points = store.pointsBalance();
+        m.updatedAt = Date.now();
+        found = true;
+      }
+      next.push(m);
+    });
+    if (!found && this.localDeviceId !== '') {
+      const me = new MemberData();
+      me.deviceId = this.localDeviceId;
+      me.nickname = '我';
+      me.saved = store.totalSaved();
+      me.points = store.pointsBalance();
+      me.updatedAt = Date.now();
+      next.push(me);
     }
-    member.saved = store.totalSaved();
-    member.points = store.pointsBalance();
-    member.updatedAt = Date.now();
+    // 整体赋值：确保分布式数据对象感知到变更并同步到组内其他设备
+    data.members = next;
     this.notify();
   }
 
