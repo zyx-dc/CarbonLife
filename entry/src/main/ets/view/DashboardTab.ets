@@ -91,9 +91,9 @@ export struct DashboardTab {
       }
       file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
       fs.writeSync(file.fd, content);
-      this.promptAction.showToast({ message: '已导出' });
+      this.promptAction.showToast({ message: $r('app.string.dashboard_exported') });
     } catch (e) {
-      this.promptAction.showToast({ message: '导出失败' });
+      this.promptAction.showToast({ message: $r('app.string.dashboard_export_failed') });
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -122,15 +122,15 @@ export struct DashboardTab {
       const isJson = trimmed.startsWith('[') || trimmed.startsWith('{');
       const added = isJson ? CarbonStore.get().importJson(text) : CarbonStore.get().importCsv(text);
       if (added < 0) {
-        this.promptAction.showToast({ message: '文件格式无法识别' });
+        this.promptAction.showToast({ message: $r('app.string.dashboard_import_bad_format') });
       } else if (added === 0) {
-        this.promptAction.showToast({ message: '没有新增记录（可能已存在或文件为空）' });
+        this.promptAction.showToast({ message: $r('app.string.dashboard_import_none') });
       } else {
-        this.promptAction.showToast({ message: '已导入 ' + added.toString() + ' 条记录' });
+        this.promptAction.showToast({ message: $r('app.string.dashboard_imported', added.toString()) });
         this.refreshData();
       }
     } catch (e) {
-      this.promptAction.showToast({ message: '导入失败' });
+      this.promptAction.showToast({ message: $r('app.string.dashboard_import_failed') });
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -140,35 +140,49 @@ export struct DashboardTab {
 
   confirmClear(): void {
     this.uiContext.showAlertDialog({
-      title: '清空数据',
-      message: '确定要清空全部低碳记录与兑换记录吗？此操作不可恢复。',
-      primaryButton: { value: '取消', action: () => {} },
-      secondaryButton: { value: '确定清空', fontColor: AppColor.DANGER, action: () => {
+      title: $r('app.string.dashboard_clear_title'),
+      message: $r('app.string.dashboard_clear_message'),
+      primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
+      secondaryButton: { value: $r('app.string.dashboard_clear_confirm'), fontColor: AppColor.DANGER, action: () => {
         CarbonStore.get().clearAll();
-        this.promptAction.showToast({ message: '已清空' });
+        this.promptAction.showToast({ message: $r('app.string.dashboard_cleared') });
       }}
     });
   }
 
-  periodLabel(p: string): string {
-    if (p === 'week') return '周';
-    if (p === 'month') return '月';
-    if (p === 'year') return '年';
-    return '日';
+  periodLabel(p: string): Resource {
+    if (p === 'week') return $r('app.string.dashboard_period_week');
+    if (p === 'month') return $r('app.string.dashboard_period_month');
+    if (p === 'year') return $r('app.string.dashboard_period_year');
+    return $r('app.string.dashboard_period_day');
   }
 
-  periodScopeLabel(p: string): string {
-    if (p === 'week') return '本周';
-    if (p === 'month') return '本月';
-    if (p === 'year') return '本年';
-    return '今日';
+  savedLabel(p: string): Resource {
+    if (p === 'week') return $r('app.string.dashboard_saved_week');
+    if (p === 'month') return $r('app.string.dashboard_saved_month');
+    if (p === 'year') return $r('app.string.dashboard_saved_year');
+    return $r('app.string.dashboard_saved_day');
   }
 
-  trendTitle(p: string): string {
-    if (p === 'week') return '减排趋势 · 近 6 周';
-    if (p === 'month') return '减排趋势 · 近 6 月';
-    if (p === 'year') return '减排趋势 · 近 5 年';
-    return '减排趋势 · 近 7 日';
+  pointsLabel(p: string): Resource {
+    if (p === 'week') return $r('app.string.dashboard_points_week');
+    if (p === 'month') return $r('app.string.dashboard_points_month');
+    if (p === 'year') return $r('app.string.dashboard_points_year');
+    return $r('app.string.dashboard_points_day');
+  }
+
+  countLabel(p: string): Resource {
+    if (p === 'week') return $r('app.string.dashboard_count_week');
+    if (p === 'month') return $r('app.string.dashboard_count_month');
+    if (p === 'year') return $r('app.string.dashboard_count_year');
+    return $r('app.string.dashboard_count_day');
+  }
+
+  trendTitle(p: string): Resource {
+    if (p === 'week') return $r('app.string.dashboard_trend_week');
+    if (p === 'month') return $r('app.string.dashboard_trend_month');
+    if (p === 'year') return $r('app.string.dashboard_trend_year');
+    return $r('app.string.dashboard_trend_day');
   }
 
   periodStart(p: string): number {
@@ -180,7 +194,7 @@ export struct DashboardTab {
   }
 
   @Builder
-  emptyState(hint: string) {
+  emptyState(hint: Resource) {
     Column({ space: AppSpacing.SM }) {
       Image($r('app.media.ic_nav_dashboard'))
         .width(40)
@@ -198,7 +212,7 @@ export struct DashboardTab {
       Column({ space: AppSpacing.MD }) {
         Column({ space: AppSpacing.XS }) {
           Text('DASHBOARD').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
-          Text('数据看板').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
+          Text($r('app.string.dashboard_title')).fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
         }
         .width('100%').alignItems(HorizontalAlign.Start)
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
@@ -232,15 +246,15 @@ export struct DashboardTab {
         Row({ space: AppSpacing.SM }) {
           Column({ space: AppSpacing.XS }) {
             AnimatedNumber({ value: parseFloat(this.summarySaved), decimals: 2, textSize: AppTypography.H3.size, textColor: AppColor.PRIMARY });
-            Text('kg ' + this.periodScopeLabel(this.period) + '减排').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text(this.savedLabel(this.period)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           }.layoutWeight(1).padding({ top: AppSpacing.MD, bottom: AppSpacing.MD }).backgroundColor(AppColor.GLASS).borderWidth(1).borderColor(AppColor.GLASS_BORDER).borderRadius(AppRadius.MD).alignItems(HorizontalAlign.Center);
           Column({ space: AppSpacing.XS }) {
             AnimatedNumber({ value: parseFloat(this.summaryPoints), textSize: AppTypography.H3.size, textColor: AppColor.ACCENT });
-            Text('分 ' + this.periodScopeLabel(this.period) + '积分').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text(this.pointsLabel(this.period)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           }.layoutWeight(1).padding({ top: AppSpacing.MD, bottom: AppSpacing.MD }).backgroundColor(AppColor.GLASS).borderWidth(1).borderColor(AppColor.GLASS_BORDER).borderRadius(AppRadius.MD).alignItems(HorizontalAlign.Center);
           Column({ space: AppSpacing.XS }) {
             AnimatedNumber({ value: parseFloat(this.summaryCount), textSize: AppTypography.H3.size, textColor: AppColor.TEXT });
-            Text('条 ' + this.periodScopeLabel(this.period) + '记录').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            Text(this.countLabel(this.period)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           }.layoutWeight(1).padding({ top: AppSpacing.MD, bottom: AppSpacing.MD }).backgroundColor(AppColor.GLASS).borderWidth(1).borderColor(AppColor.GLASS_BORDER).borderRadius(AppRadius.MD).alignItems(HorizontalAlign.Center);
         }
         .width('100%')
@@ -251,11 +265,11 @@ export struct DashboardTab {
           Column({ space: AppSpacing.SM }) {
             Text(this.trendTitle(this.period)).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
             if (this.summaryCount === '0') {
-              this.emptyState('该周期暂无记录');
+              this.emptyState($r('app.string.dashboard_empty'));
             } else if (this.trendNonZero < 2) {
               // 稀疏数据用柱状更诚实（折线连接零点会制造「长期无排放」错觉）
               BarChartView({ data: this.trendValues, labels: this.trendLabels, barColor: AppColor.CHART_LINE }).margin({ top: AppSpacing.SM });
-              Text('数据点较少，改用柱状展示').fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%');
+              Text($r('app.string.dashboard_sparse')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%');
             } else {
               LineChartView({ data: this.trendValues, labels: this.trendLabels }).margin({ top: AppSpacing.SM });
             }
@@ -264,7 +278,7 @@ export struct DashboardTab {
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 4}) {
           Column({ space: AppSpacing.SM }) {
-            Text('类别占比（饼图）').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+            Text($r('app.string.dashboard_category_pie')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
             PieChartView({ data: this.categoryValues, colors: this.categoryColors }).margin({ top: AppSpacing.SM });
             Row({ space: AppSpacing.MD }) {
               ForEach(this.legendData, (c: CategoryStat) => {
@@ -280,9 +294,9 @@ export struct DashboardTab {
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 6}) {
           Column({ space: AppSpacing.SM }) {
-            Text('最近记录').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+            Text($r('app.string.dashboard_recent')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
             if (this.recentList.length === 0) {
-              Text('暂无记录').fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.SM });
+              Text($r('app.string.dashboard_no_records')).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.SM });
             } else {
               ForEach(this.recentList, (r: CarbonRecord) => {
                 Row() {
@@ -298,13 +312,13 @@ export struct DashboardTab {
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 7, marginBottom: AppSpacing.LG}) {
           Column({ space: AppSpacing.SM }) {
-            Text('本地数据管理').fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+            Text($r('app.string.dashboard_data_mgmt')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
             Row({ space: AppSpacing.SM }) {
-              AppButton({ text: '导出 CSV', type: 'primary' }).layoutWeight(1).onClick(() => this.exportFile('csv'));
-              AppButton({ text: '导出 JSON', type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
+              AppButton({ text: $r('app.string.dashboard_export_csv'), type: 'primary' }).layoutWeight(1).onClick(() => this.exportFile('csv'));
+              AppButton({ text: $r('app.string.dashboard_export_json'), type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
             }.width('100%').margin({ top: AppSpacing.SM });
-            AppButton({ text: '导入数据（CSV / JSON）', type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
-            AppButton({ text: '清空全部数据', type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
+            AppButton({ text: $r('app.string.dashboard_import'), type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
+            AppButton({ text: $r('app.string.dashboard_clear_all'), type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
           }
         }
       }
