@@ -144,6 +144,16 @@
     { "name": "dashboard_clear_confirm", "value": "确定清空" },
     { "name": "dashboard_cleared", "value": "已清空" },
     { "name": "chart_no_data", "value": "暂无数据" },
-    { "name": "chart_kg_total", "value": "kg 合计" }
+    { "name": "chart_kg_total", "value": "kg 合计" },
+
+    { "name": "knowledge_title", "value": "双碳科普专栏" },
+    { "name": "knowledge_subtitle", "value": "碳达峰 · 碳中和 · 低碳生活" },
+    { "name": "knowledge_quiz_title", "value": "碳足迹自测" },
+    { "name": "knowledge_quiz_subtitle", "value": "5 道题，测测你的低碳指数" },
+    { "name": "knowledge_quiz_progress", "value": "已答 %s / %s" },
+    { "name": "knowledge_quiz_result", "value": "你的低碳指数" },
+    { "name": "knowledge_quiz_retry", "value": "重新测一次" },
+    { "name": "knowledge_disclaimer_title", "value": "温馨提示" },
+    { "name": "knowledge_disclaimer", "value": "科普资料，碳排放因子为常用参考值，实际因地区与统计口径略有差异。" }
   ]
 }

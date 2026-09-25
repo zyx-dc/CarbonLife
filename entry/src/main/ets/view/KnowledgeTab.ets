@@ -89,10 +89,10 @@ export struct KnowledgeTab {
     Column({ space: AppSpacing.MD }) {
       Row() {
         Column({ space: AppSpacing.XXS }) {
-          Text('碳足迹自测').fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);
-          Text('5 道题，测测你的低碳指数').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+          Text($r('app.string.knowledge_quiz_title')).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);
+          Text($r('app.string.knowledge_quiz_subtitle')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
         }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-        Text('已答 ' + this.answeredCount().toString() + ' / ' + QuizData.QUESTIONS.length.toString())
+        Text($r('app.string.knowledge_quiz_progress', this.answeredCount().toString(), QuizData.QUESTIONS.length.toString()))
           .fontSize(AppTypography.CAPTION_MEDIUM.size)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppColor.TEXT_SUB)
@@ -147,7 +147,7 @@ export struct KnowledgeTab {
             .backgroundColor(AppColor.SIGNAL);
           Column({ space: AppSpacing.XXS }) {
             Row({ space: AppSpacing.SM }) {
-              Text('你的低碳指数').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+              Text($r('app.string.knowledge_quiz_result')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
               Text(QuizData.level(this.quizScore()))
                 .fontSize(AppTypography.H4.size)
                 .fontWeight(FontWeight.Bold)
@@ -168,7 +168,7 @@ export struct KnowledgeTab {
         .backgroundColor(AppColor.PRIMARY_SOFT)
         .borderRadius(AppRadius.MD);
 
-        Text('重新测一次')
+        Text($r('app.string.knowledge_quiz_retry'))
           .fontSize(AppTypography.SMALL.size)
           .fontColor(AppColor.PRIMARY)
           .fontWeight(FontWeight.Medium)
@@ -190,8 +190,8 @@ export struct KnowledgeTab {
             .fontSize(AppTypography.SMALL.size)
             .letterSpacing(2.5)
             .fontColor(AppColor.TEXT_SUB);
-          Text('双碳科普专栏').fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
-          Text('碳达峰 · 碳中和 · 低碳生活').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%');
+          Text($r('app.string.knowledge_title')).fontSize(AppTypography.H2.size).fontWeight(AppTypography.H2.weight).fontColor(AppColor.TEXT).width('100%');
+          Text($r('app.string.knowledge_subtitle')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%');
         }
         .width('100%').alignItems(HorizontalAlign.Start)
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
@@ -299,8 +299,8 @@ export struct KnowledgeTab {
 
         AppCard({ cardPadding: AppSpacing.MD, showBorder: true, enter: this.ready, enterDelayIndex: KnowledgeData.LIST.length + 2, marginBottom: AppSpacing.LG }) {
           Column({ space: AppSpacing.XS }) {
-            Text('温馨提示').fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT).width('100%');
-            Text('科普资料，碳排放因子为常用参考值，实际因地区与统计口径略有差异。')
+            Text($r('app.string.knowledge_disclaimer_title')).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT).width('100%');
+            Text($r('app.string.knowledge_disclaimer'))
               .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).lineHeight(AppTypography.CAPTION.lineHeight).width('100%');
           }
         }
