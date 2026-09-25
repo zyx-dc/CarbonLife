@@ -109,7 +109,7 @@ export struct RewardsTab {
                 : $r('app.string.rewards_tree_hint'))
                 .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%');
             }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-            Text($r('app.string.rewards_tree_count', this.treeCount.toString())).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
+            Text(this.treeCount === 1 ? $r('app.string.rewards_tree_count_one', this.treeCount.toString()) : $r('app.string.rewards_tree_count', this.treeCount.toString())).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.ACCENT);
           }.width('100%').alignItems(VerticalAlign.Top);
         }
 

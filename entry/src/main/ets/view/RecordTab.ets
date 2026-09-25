@@ -187,7 +187,7 @@ export struct RecordTab {
             Row() {
               Text($r('app.string.record_estimated', this.savedValue().toFixed(2))).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
               Blank();
-              Text($r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.BODY.size).fontColor(AppColor.ACCENT);
+              Text(this.pointsValue() === 1 ? $r('app.string.record_points_one', this.pointsValue().toString()) : $r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.BODY.size).fontColor(AppColor.ACCENT);
             }.width('100%').margin({ top: AppSpacing.SM });
             AppButton({ text: $r('app.string.record_save'), type: 'primary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.onSave());
           }

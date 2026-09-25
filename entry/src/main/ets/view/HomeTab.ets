@@ -325,7 +325,7 @@ export struct HomeTab {
               }.width('100%').margin({ top: AppSpacing.SM });
               if (this.familyJoined && this.members.length > 0) {
                 Column({ space: AppSpacing.XS }) {
-                  this.sectionTitle($r('app.string.home_family_members'), $r('app.string.home_family_people', this.members.length.toString()));
+                  this.sectionTitle($r('app.string.home_family_members'), this.members.length === 1 ? $r('app.string.home_family_person', this.members.length.toString()) : $r('app.string.home_family_people', this.members.length.toString()));
                   ForEach(this.members, (m: MemberData) => {
                     this.memberRow(m);
                   }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
