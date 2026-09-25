@@ -10,3 +10,12 @@
 /.clang-tidy
 **/.test
 /.appanalyzer
+
+# QA 取证与过程截图（归档至 docs/qa，不纳入版本控制）
+/docs/qa/
+*.jpeg
+*.jpg
+
+# 构建产物与签名材料（绝不入库）
+/dist/
+*.hap
