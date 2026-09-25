@@ -154,6 +154,13 @@
     { "name": "knowledge_quiz_result", "value": "你的低碳指数" },
     { "name": "knowledge_quiz_retry", "value": "重新测一次" },
     { "name": "knowledge_disclaimer_title", "value": "温馨提示" },
-    { "name": "knowledge_disclaimer", "value": "科普资料，碳排放因子为常用参考值，实际因地区与统计口径略有差异。" }
+    { "name": "knowledge_disclaimer", "value": "科普资料，碳排放因子为常用参考值，实际因地区与统计口径略有差异。" },
+
+    { "name": "tab_home", "value": "首页" },
+    { "name": "tab_record", "value": "记录" },
+    { "name": "tab_dashboard", "value": "看板" },
+    { "name": "tab_rewards", "value": "积分" },
+    { "name": "tab_knowledge", "value": "科普" },
+    { "name": "splash_tagline", "value": "全民绿色生活 · 碳积分与减排指南" }
   ]
 }

@@ -121,7 +121,7 @@ struct Splash {
           .scale({ x: this.logoScale, y: this.logoScale })
           .animation({ duration: AppMotion.reduceMotion() ? 0 : 500, curve: AppMotion.EASE })
 
-        Text('全民绿色生活 · 碳积分与减排指南')
+        Text($r('app.string.splash_tagline'))
           .fontSize(AppTypography.BODY.size)
           .fontColor('rgba(255,255,255,0.90)')
           .opacity(this.taglineOpacity)

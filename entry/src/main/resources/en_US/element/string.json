@@ -154,6 +154,13 @@
     { "name": "knowledge_quiz_result", "value": "Your low-carbon index" },
     { "name": "knowledge_quiz_retry", "value": "Retake quiz" },
     { "name": "knowledge_disclaimer_title", "value": "Note" },
-    { "name": "knowledge_disclaimer", "value": "Reference material. Carbon factors are common estimates and may vary by region and methodology." }
+    { "name": "knowledge_disclaimer", "value": "Reference material. Carbon factors are common estimates and may vary by region and methodology." },
+
+    { "name": "tab_home", "value": "Home" },
+    { "name": "tab_record", "value": "Record" },
+    { "name": "tab_dashboard", "value": "Dashboard" },
+    { "name": "tab_rewards", "value": "Rewards" },
+    { "name": "tab_knowledge", "value": "Learn" },
+    { "name": "splash_tagline", "value": "Green living for everyone · Carbon points & reduction guide" }
   ]
 }

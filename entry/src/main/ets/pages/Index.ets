@@ -28,7 +28,7 @@ struct Index {
   }
 
   @Builder
-  tabItem(icon: Resource, title: string, index: number) {
+  tabItem(icon: Resource, title: ResourceStr, index: number) {
     Column({ space: 2 }) {
       Image(icon)
         .width(24)
@@ -106,11 +106,11 @@ struct Index {
       .height('100%')
 
       Tabs({ barPosition: BarPosition.End, controller: this.controller }) {
-        TabContent() { HomeTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), '首页', 0))
-        TabContent() { RecordTab() }.tabBar(this.tabItem($r('app.media.ic_nav_record'), '记录', 1))
-        TabContent() { DashboardTab() }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), '看板', 2))
-        TabContent() { RewardsTab() }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), '积分', 3))
-        TabContent() { KnowledgeTab() }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), '科普', 4))
+        TabContent() { HomeTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), $r('app.string.tab_home'), 0))
+        TabContent() { RecordTab() }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
+        TabContent() { DashboardTab() }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), $r('app.string.tab_dashboard'), 2))
+        TabContent() { RewardsTab() }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), $r('app.string.tab_rewards'), 3))
+        TabContent() { KnowledgeTab() }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), $r('app.string.tab_knowledge'), 4))
       }
       .barMode(BarMode.Fixed)
       .barHeight(64)
