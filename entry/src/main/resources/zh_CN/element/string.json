@@ -215,6 +215,21 @@
     { "name": "tip_recycle_low", "value": "把废纸、塑料瓶、旧衣物分类回收，回收减排系数更高。" },
     { "name": "tip_food_low", "value": "坚持光盘行动，每周多吃一餐素食，减排又健康。" },
     { "name": "tip_today_empty", "value": "今天还没有记录，别忘了记录你的低碳行为哦。" },
-    { "name": "tip_all_good", "value": "表现很棒！可以尝试挑战更高阶的减排目标。" }
+    { "name": "tip_all_good", "value": "表现很棒！可以尝试挑战更高阶的减排目标。" },
+
+    { "name": "mall_m1_name", "value": "低碳徽章·青铜" },
+    { "name": "mall_m1_desc", "value": "虚拟荣誉徽章，点亮你的荣誉墙" },
+    { "name": "mall_m2_name", "value": "共享单车骑行券" },
+    { "name": "mall_m2_desc", "value": "碳普惠权益：1 次免费骑行" },
+    { "name": "mall_m3_name", "value": "地铁 9 折券" },
+    { "name": "mall_m3_desc", "value": "碳普惠权益：地铁乘车优惠" },
+    { "name": "mall_m4_name", "value": "环保购物袋" },
+    { "name": "mall_m4_desc", "value": "碳普惠权益：可降解环保袋" },
+    { "name": "mall_m5_name", "value": "认养一棵树" },
+    { "name": "mall_m5_desc", "value": "以你的名义在碳普惠平台认养一棵树" },
+    { "name": "mall_m6_name", "value": "城市碳普惠电子证书" },
+    { "name": "mall_m6_desc", "value": "碳普惠平台颁发的电子荣誉证书" },
+    { "name": "mall_redeem_success", "value": "兑换成功" },
+    { "name": "mall_redeem_lack", "value": "积分不足，还差 %s 分" }
   ]
 }

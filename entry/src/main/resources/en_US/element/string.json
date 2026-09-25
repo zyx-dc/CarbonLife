@@ -215,6 +215,21 @@
     { "name": "tip_recycle_low", "value": "Sort and recycle paper, plastic bottles and old clothes — higher reduction factors." },
     { "name": "tip_food_low", "value": "Keep finishing your plate and eat one more vegetarian meal a week." },
     { "name": "tip_today_empty", "value": "Nothing logged today yet — don't forget to record your low-carbon actions." },
-    { "name": "tip_all_good", "value": "Great job! Try a more ambitious reduction goal next." }
+    { "name": "tip_all_good", "value": "Great job! Try a more ambitious reduction goal next." },
+
+    { "name": "mall_m1_name", "value": "Low-carbon badge · Bronze" },
+    { "name": "mall_m1_desc", "value": "Virtual honor badge to light up your wall" },
+    { "name": "mall_m2_name", "value": "Shared-bike voucher" },
+    { "name": "mall_m2_desc", "value": "Carbon program: one free ride" },
+    { "name": "mall_m3_name", "value": "Subway 10% off" },
+    { "name": "mall_m3_desc", "value": "Carbon program: subway fare discount" },
+    { "name": "mall_m4_name", "value": "Reusable shopping bag" },
+    { "name": "mall_m4_desc", "value": "Carbon program: biodegradable bag" },
+    { "name": "mall_m5_name", "value": "Adopt a tree" },
+    { "name": "mall_m5_desc", "value": "Adopt a tree in the carbon program in your name" },
+    { "name": "mall_m6_name", "value": "City carbon e-certificate" },
+    { "name": "mall_m6_desc", "value": "E-certificate issued by the carbon program" },
+    { "name": "mall_redeem_success", "value": "Redeemed" },
+    { "name": "mall_redeem_lack", "value": "Not enough points — %s more needed" }
   ]
 }

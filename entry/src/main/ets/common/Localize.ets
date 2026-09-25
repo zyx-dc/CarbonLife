@@ -90,3 +90,27 @@ export function taskDescRes(key: string, fallback: string): ResourceStr {
     default: return fallback;
   }
 }
+
+export function mallNameRes(id: string, fallback: string): ResourceStr {
+  switch (id) {
+    case 'm1': return $r('app.string.mall_m1_name');
+    case 'm2': return $r('app.string.mall_m2_name');
+    case 'm3': return $r('app.string.mall_m3_name');
+    case 'm4': return $r('app.string.mall_m4_name');
+    case 'm5': return $r('app.string.mall_m5_name');
+    case 'm6': return $r('app.string.mall_m6_name');
+    default: return fallback;
+  }
+}
+
+export function mallDescRes(id: string, fallback: string): ResourceStr {
+  switch (id) {
+    case 'm1': return $r('app.string.mall_m1_desc');
+    case 'm2': return $r('app.string.mall_m2_desc');
+    case 'm3': return $r('app.string.mall_m3_desc');
+    case 'm4': return $r('app.string.mall_m4_desc');
+    case 'm5': return $r('app.string.mall_m5_desc');
+    case 'm6': return $r('app.string.mall_m6_desc');
+    default: return fallback;
+  }
+}

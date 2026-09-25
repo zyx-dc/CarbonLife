@@ -4,7 +4,7 @@ import { RedeemItem, RedemptionRecord } from './CarbonTypes';
 
 export interface RedeemResult {
   ok: boolean;
-  message: string;
+  message: ResourceStr;
   code: string;
 }
 
@@ -21,7 +21,7 @@ export interface CarbonExchangeApi {
 class LocalMockExchangeApi implements CarbonExchangeApi {
   async redeem(item: RedeemItem): Promise<RedeemResult> {
     const rand = Math.floor(Math.random() * 900000 + 100000);
-    return { ok: true, message: '兑换成功', code: 'CP' + item.id.toUpperCase() + rand.toString() };
+    return { ok: true, message: $r('app.string.mall_redeem_success'), code: 'CP' + item.id.toUpperCase() + rand.toString() };
   }
 }
 
@@ -46,7 +46,7 @@ export class MallService {
     const store = CarbonStore.get();
     if (store.pointsBalance() < item.cost) {
       const lack = item.cost - store.pointsBalance();
-      return { ok: false, message: '积分不足，还差 ' + lack.toString() + ' 分', code: '' };
+      return { ok: false, message: $r('app.string.mall_redeem_lack', lack.toString()), code: '' };
     }
     const res = await MallService.api.redeem(item);
     if (!res.ok) {

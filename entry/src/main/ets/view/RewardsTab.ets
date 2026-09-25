@@ -11,6 +11,7 @@ import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
 import { AppButton } from '../components/AppButton';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { mallNameRes, mallDescRes } from '../common/Localize';
 
 @Component
 export struct RewardsTab {
@@ -125,8 +126,8 @@ export struct RewardsTab {
                   .height(28)
                   .fillColor(AppColor.TEXT_SUB);
                 Column({ space: AppSpacing.XXS }) {
-                  Text(item.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text(item.desc).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text(mallNameRes(item.id, item.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                  Text(mallDescRes(item.id, item.desc)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                 Text(this.balance >= item.cost ? $r('app.string.rewards_redeem') : $r('app.string.rewards_redeem_gap', (item.cost - this.balance).toString()))
                   .height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
@@ -152,7 +153,7 @@ export struct RewardsTab {
               Text($r('app.string.rewards_redemptions')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
               ForEach(this.redemptions, (r: RedemptionRecord) => {
                 Row() {
-                  Text(r.itemName).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
+                  Text(mallNameRes(r.itemId, r.itemName)).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
                   Text('-' + r.cost.toString()).fontSize(AppTypography.BODY.size).fontColor(AppColor.DANGER);
                   Text(DateUtil.formatTime(r.timestamp)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ left: AppSpacing.SM });
                 }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
