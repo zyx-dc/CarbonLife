@@ -332,6 +332,9 @@
     { "name": "knowledge_k6_p3", "value": "本应用内置常见低碳行为的因子库" },
     { "name": "knowledge_k6_p4", "value": "录入活动量即可自动估算减排量" },
     { "name": "knowledge_k6_fact_label", "value": "计算示例" },
-    { "name": "knowledge_k6_fact", "value": "骑行 10 km × 0.17 = 1.70 kg CO₂e" }
+    { "name": "knowledge_k6_fact", "value": "骑行 10 km × 0.17 = 1.70 kg CO₂e" },
+
+    { "name": "chart_axis_week", "value": "第 %s 周" },
+    { "name": "chart_axis_month", "value": "%s 月" }
   ]
 }

@@ -5,6 +5,7 @@ import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord, 
 import { CarbonFactors } from './CarbonFactors';
 import { AppConst, AppColor } from '../common/Constants';
 import { DateUtil } from '../common/DateUtil';
+import { resolveStr } from '../common/Localize';
 
 export class CarbonStore {
   private static instance: CarbonStore | null = null;
@@ -363,7 +364,7 @@ export class CarbonStore {
           sum += r.saved;
         }
       });
-      points.push({ label: '第' + (6 - i).toString() + '周', value: sum });
+      points.push({ label: resolveStr($r('app.string.chart_axis_week', (6 - i).toString())), value: sum });
     }
     return points;
   }
@@ -381,7 +382,7 @@ export class CarbonStore {
           sum += r.saved;
         }
       });
-      points.push({ label: (d.getMonth() + 1).toString() + '月', value: sum });
+      points.push({ label: resolveStr($r('app.string.chart_axis_month', (d.getMonth() + 1).toString())), value: sum });
     }
     return points;
   }

@@ -332,6 +332,9 @@
     { "name": "knowledge_k6_p3", "value": "The app ships a factor library for common actions" },
     { "name": "knowledge_k6_p4", "value": "Enter an amount to estimate savings automatically" },
     { "name": "knowledge_k6_fact_label", "value": "Example" },
-    { "name": "knowledge_k6_fact", "value": "Cycling 10 km × 0.17 = 1.70 kg CO₂e" }
+    { "name": "knowledge_k6_fact", "value": "Cycling 10 km × 0.17 = 1.70 kg CO₂e" },
+
+    { "name": "chart_axis_week", "value": "W%s" },
+    { "name": "chart_axis_month", "value": "M%s" }
   ]
 }
