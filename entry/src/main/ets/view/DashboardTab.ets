@@ -12,6 +12,7 @@ import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { AppButton } from '../components/AppButton';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
 
 @Component
 export struct DashboardTab {
@@ -284,7 +285,7 @@ export struct DashboardTab {
               ForEach(this.legendData, (c: CategoryStat) => {
                 Row({ space: AppSpacing.XS }) {
                   Circle({ width: 8, height: 8 }).fill(c.color);
-                  Text(c.category).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text(categoryRes(c.category)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }
               }, (c: CategoryStat) => c.category);
             }
@@ -300,9 +301,9 @@ export struct DashboardTab {
             } else {
               ForEach(this.recentList, (r: CarbonRecord) => {
                 Row() {
-                  Text(r.category).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_INVERSE)
+                  Text(categoryRes(r.category)).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_INVERSE)
                     .backgroundColor(CarbonFactors.categoryColor(r.category)).padding({ left: AppSpacing.SM, right: AppSpacing.SM, top: AppSpacing.XXS, bottom: AppSpacing.XXS }).borderRadius(AppRadius.SM);
-                  Text(r.name + ' ' + r.amount.toString() + r.unit).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1).margin({ left: AppSpacing.SM });
+                  Text(resolveStr(behaviorNameRes(r.behaviorKey, r.name)) + ' ' + r.amount.toString() + resolveStr(unitRes(r.unit))).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1).margin({ left: AppSpacing.SM });
                   Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
                 }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
               }, (r: CarbonRecord) => r.id);

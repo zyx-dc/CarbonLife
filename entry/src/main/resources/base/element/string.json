@@ -161,6 +161,27 @@
     { "name": "tab_dashboard", "value": "看板" },
     { "name": "tab_rewards", "value": "积分" },
     { "name": "tab_knowledge", "value": "科普" },
-    { "name": "splash_tagline", "value": "全民绿色生活 · 碳积分与减排指南" }
+    { "name": "splash_tagline", "value": "全民绿色生活 · 碳积分与减排指南" },
+
+    { "name": "category_travel", "value": "出行" },
+    { "name": "category_energy", "value": "节能" },
+    { "name": "category_recycle", "value": "回收" },
+    { "name": "category_food", "value": "餐饮" },
+    { "name": "unit_meal", "value": "餐" },
+    { "name": "unit_time", "value": "次" },
+
+    { "name": "behavior_walk", "value": "步行替代驾车" },
+    { "name": "behavior_bike", "value": "骑行替代驾车" },
+    { "name": "behavior_bus", "value": "公交替代驾车" },
+    { "name": "behavior_subway", "value": "地铁替代驾车" },
+    { "name": "behavior_save_power", "value": "节约用电" },
+    { "name": "behavior_save_water", "value": "节约用水" },
+    { "name": "behavior_recycle_paper", "value": "回收纸张" },
+    { "name": "behavior_recycle_plastic", "value": "回收塑料" },
+    { "name": "behavior_recycle_metal", "value": "回收金属" },
+    { "name": "behavior_recycle_clothes", "value": "旧衣回收" },
+    { "name": "behavior_clean_plate", "value": "光盘行动" },
+    { "name": "behavior_no_disposable", "value": "少用一次性餐具" },
+    { "name": "behavior_veg_meal", "value": "素食一餐" }
   ]
 }

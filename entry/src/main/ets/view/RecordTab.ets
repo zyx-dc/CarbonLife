@@ -8,6 +8,7 @@ import { VisionService, VisionResult } from '../model/VisionService';
 import { AppCard } from '../components/AppCard';
 import { AppButton } from '../components/AppButton';
 import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
+import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
 
 @Component
 export struct RecordTab {
@@ -119,7 +120,7 @@ export struct RecordTab {
             Text($r('app.string.record_category_title')).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
             Row({ space: AppSpacing.XS }) {
               ForEach(CarbonFactors.CATEGORIES, (cat: string) => {
-                Text(cat)
+                Text(categoryRes(cat))
                   .fontSize(AppTypography.BODY.size)
                   .fontColor(this.category === cat ? AppColor.ON_SIGNAL : AppColor.TEXT)
                   .backgroundColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_STRONG)
@@ -149,8 +150,8 @@ export struct RecordTab {
                   .height(24)
                   .fillColor(this.selectedKey === b.key ? AppColor.SIGNAL : AppColor.TEXT_SUB);
                 Column({ space: 2 }) {
-                  Text(b.name).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text($r('app.string.record_behavior_factor', b.unit, b.factor.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  Text(behaviorNameRes(b.key, b.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                  Text($r('app.string.record_behavior_factor', resolveStr(unitRes(b.unit)), b.factor.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                 Stack() {
                   Circle({ width: 22, height: 22 })
@@ -170,7 +171,7 @@ export struct RecordTab {
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 4}) {
           Column({ space: AppSpacing.SM }) {
-            Text($r('app.string.record_amount_title', this.currentBehavior().unit)).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
+            Text($r('app.string.record_amount_title', resolveStr(unitRes(this.currentBehavior().unit)))).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
             Row({ space: AppSpacing.SM }) {
               Button('−').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size)
                 .onClick(() => this.stepAmount(-1));
@@ -201,11 +202,11 @@ export struct RecordTab {
               ForEach(this.todayList, (r: CarbonRecord) => {
                 Row() {
                   Column({ space: 2 }) {
-                    Text(r.name + '  ' + r.amount.toString() + r.unit).fontSize(AppTypography.BODY_MEDIUM.size).fontColor(AppColor.TEXT);
+                    Text(resolveStr(behaviorNameRes(r.behaviorKey, r.name)) + '  ' + r.amount.toString() + resolveStr(unitRes(r.unit))).fontSize(AppTypography.BODY_MEDIUM.size).fontColor(AppColor.TEXT);
                     Text(DateUtil.formatTime(r.timestamp) + (r.note === '' ? '' : ' · ' + r.note)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                   Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
-                  Text($r('app.string.common_delete')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER).margin({ left: AppSpacing.MD }).onClick(() => this.confirmDelete(r.id, r.name));
+                  Text($r('app.string.common_delete')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER).margin({ left: AppSpacing.MD }).onClick(() => this.confirmDelete(r.id, resolveStr(behaviorNameRes(r.behaviorKey, r.name))));
                 }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
               }, (r: CarbonRecord) => r.id);
             }

@@ -161,6 +161,27 @@
     { "name": "tab_dashboard", "value": "Dashboard" },
     { "name": "tab_rewards", "value": "Rewards" },
     { "name": "tab_knowledge", "value": "Learn" },
-    { "name": "splash_tagline", "value": "Green living for everyone · Carbon points & reduction guide" }
+    { "name": "splash_tagline", "value": "Green living for everyone · Carbon points & reduction guide" },
+
+    { "name": "category_travel", "value": "Travel" },
+    { "name": "category_energy", "value": "Energy" },
+    { "name": "category_recycle", "value": "Recycle" },
+    { "name": "category_food", "value": "Dining" },
+    { "name": "unit_meal", "value": "meal" },
+    { "name": "unit_time", "value": "use" },
+
+    { "name": "behavior_walk", "value": "Walking instead of driving" },
+    { "name": "behavior_bike", "value": "Cycling instead of driving" },
+    { "name": "behavior_bus", "value": "Bus instead of driving" },
+    { "name": "behavior_subway", "value": "Subway instead of driving" },
+    { "name": "behavior_save_power", "value": "Save electricity" },
+    { "name": "behavior_save_water", "value": "Save water" },
+    { "name": "behavior_recycle_paper", "value": "Recycle paper" },
+    { "name": "behavior_recycle_plastic", "value": "Recycle plastic" },
+    { "name": "behavior_recycle_metal", "value": "Recycle metal" },
+    { "name": "behavior_recycle_clothes", "value": "Recycle old clothes" },
+    { "name": "behavior_clean_plate", "value": "Clean-plate action" },
+    { "name": "behavior_no_disposable", "value": "Skip disposable tableware" },
+    { "name": "behavior_veg_meal", "value": "One vegetarian meal" }
   ]
 }
