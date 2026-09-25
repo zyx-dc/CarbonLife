@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>CarbonLife 碳足迹 · 参赛设计文档</title>
+<style>
+  body { font-family: SimSun, "宋体", serif; font-size: 12pt; line-height: 1.5; color: #111; }
+  h1, h2, h3, h4 { font-family: "Microsoft YaHei", "微软雅黑", sans-serif; font-weight: bold; color: #0F3D2E; }
+  h2 { font-size: 16pt; border-bottom: 2px solid #B6FF2E; padding-bottom: 4px; margin-top: 22px; }
+  h3 { font-size: 13.5pt; margin-top: 16px; }
+  .cover { text-align: center; margin-top: 150px; }
+  .cover .title { font-size: 30pt; font-family: "Microsoft YaHei","微软雅黑",sans-serif; font-weight: bold; color: #0F3D2E; }
+  .cover .sub { font-size: 15pt; margin-top: 14px; color: #333; }
+  .cover .meta { margin-top: 60px; font-size: 12pt; color: #444; }
+  .cover .note { margin-top: 40px; font-size: 10.5pt; color: #666; }
+  .page-break { page-break-before: always; }
+  .toc li { line-height: 1.8; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #999; padding: 5px 8px; font-size: 10.5pt; vertical-align: top; }
+  th { background: #EAF7DC; font-family: "Microsoft YaHei","微软雅黑",sans-serif; }
+  .fig { text-align: center; margin: 12px 0; }
+  .fig img { width: 240px; border: 1px solid #ccc; border-radius: 6px; }
+  .cap { text-align: center; font-size: 10pt; color: #555; margin-top: 4px; }
+  .arch { border: 1px solid #0F3D2E; border-radius: 6px; padding: 8px 12px; margin: 6px 0; background: #F3FBEA; font-size: 10.5pt; }
+  .arch .t { font-family: "Microsoft YaHei","微软雅黑",sans-serif; font-weight: bold; color: #0F3D2E; }
+  .arrow { text-align: center; color: #3E8E1E; font-weight: bold; }
+  ul, ol { margin: 6px 0 6px 0; }
+  li { line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- ================= 封面 ================= -->
+<div class="cover">
+  <div class="title">CarbonLife 碳足迹</div>
+  <div class="sub">基于 HarmonyOS 的低碳生活记录与激励应用</div>
+  <div class="meta">
+    参赛设计文档<br>
+    2026 年 9 月
+  </div>
+  <div class="note">
+    说明：按大赛要求，本材料已去标识化，不体现团队、成员、指导老师及院校信息。
+  </div>
+</div>
+
+<!-- ================= 目录 ================= -->
+<div class="page-break"></div>
+<h2>目录</h2>
+<ol class="toc">
+  <li>项目概述与选题意义</li>
+  <li>需求分析</li>
+  <li>系统设计</li>
+  <li>核心功能详述</li>
+  <li>设计系统与视觉规范</li>
+  <li>隐私与权限</li>
+  <li>创新点与项目难点</li>
+  <li>测试与验证</li>
+  <li>总结与展望</li>
+</ol>
+
+<!-- ================= 1 ================= -->
+<div class="page-break"></div>
+<h2>1. 项目概述与选题意义</h2>
+
+<h3>1.1 项目简介</h3>
+<p>
+CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活记录与激励应用。用户完成步行、骑行、公交出行、节约用电用水、回收纸张 / 塑料 / 金属 / 旧衣、光盘行动等日常低碳行为后，应用按「活动量 × 排放因子」自动估算碳减排量，并折算为碳积分；积分可用于碳普惠权益兑换、解锁低碳徽章与植树证书，还可在同一账号的多设备间共享「家庭碳积分」。
+</p>
+
+<h3>1.2 选题背景</h3>
+<ul>
+  <li><b>国家「双碳」目标</b>：碳达峰、碳中和已成为国家战略，倡导全民参与绿色低碳生活。</li>
+  <li><b>鸿蒙生态</b>：HarmonyOS / OpenHarmony 具备端侧 AI、分布式数据、后台代理提醒等原生能力，适合落地绿色生活场景。</li>
+  <li><b>落地价值</b>：把抽象的「碳排放」转化为普通人看得懂、攒得着的「减排量与碳积分」，降低参与门槛，形成正向激励。</li>
+</ul>
+
+<h3>1.3 目标用户</h3>
+<p>
+关注环保与健康的城市居民、通勤人群与家庭用户；愿意通过日常小行为积累成就感、并希望与家人共同参与低碳生活的群体。
+</p>
+
+<h3>1.4 设计目标</h3>
+<ul>
+  <li>记录简单：3 步内完成一次低碳行为记录。</li>
+  <li>反馈即时：保存后首页与看板数据实时更新。</li>
+  <li>隐私优先：数据默认只存本机，不上云。</li>
+  <li>体验一致：浅色 / 深色双主题，全部走设计 token。</li>
+</ul>
+
+<!-- ================= 2 ================= -->
+<div class="page-break"></div>
+<h2>2. 需求分析</h2>
+
+<h3>2.1 用户痛点</h3>
+<table>
+  <tr><th>痛点</th><th>说明</th></tr>
+  <tr><td>行为与结果割裂</td><td>用户不知道「步行 1 公里」到底减了多少碳，缺乏正反馈。</td></tr>
+  <tr><td>记录门槛高</td><td>很多碳计算工具需要手工查表、换算，操作繁琐。</td></tr>
+  <tr><td>缺少激励</td><td>记录本身没有回报，难以长期坚持。</td></tr>
+  <tr><td>隐私顾虑</td><td>不愿把个人出行 / 生活数据上传到第三方。</td></tr>
+  <tr><td>家庭协同缺失</td><td>希望与家人共同记录，但缺少便捷的多设备共享方式。</td></tr>
+</table>
+
+<h3>2.2 功能需求列表</h3>
+<table>
+  <tr><th>编号</th><th>功能</th><th>说明</th></tr>
+  <tr><td>F1</td><td>低碳行为记录</td><td>出行 / 节能 / 回收 / 餐饮 4 大类共 13 种行为，按排放因子自动计算减排量与积分。</td></tr>
+  <tr><td>F2</td><td>端侧 AI 识图</td><td>选一张照片，端侧识别物体并推荐对应低碳行为。</td></tr>
+  <tr><td>F3</td><td>数据看板</td><td>日 / 周 / 月 / 年趋势（折线、柱状、饼图），最近记录，CSV / JSON 导出。</td></tr>
+  <tr><td>F4</td><td>积分与荣誉</td><td>碳积分累计、权益商城（模拟兑换码）、低碳徽章、植树证书、今日任务。</td></tr>
+  <tr><td>F5</td><td>家庭碳积分</td><td>生成 / 加入家庭码，同账号多设备共享减排量与积分，按成员展示。</td></tr>
+  <tr><td>F6</td><td>每日提醒</td><td>默认每天 20:00 提醒记录低碳行为，时间可调。</td></tr>
+  <tr><td>F7</td><td>双碳科普专栏</td><td>碳达峰 / 碳中和、绿色出行、家庭节能等科普内容与低碳指数自测。</td></tr>
+  <tr><td>F8</td><td>浅色 / 深色主题</td><td>跟随系统 colorMode 自动切换。</td></tr>
+</table>
+
+<h3>2.3 非功能需求</h3>
+<table>
+  <tr><th>类别</th><th>要求</th></tr>
+  <tr><td>性能</td><td>记录保存与页面切换流畅；图表入场动画受「减弱动效」控制。</td></tr>
+  <tr><td>隐私</td><td>记录仅本机存储；AI 识图本机完成；家庭同步不经第三方服务器。</td></tr>
+  <tr><td>可用性</td><td>深浅双主题；关键读数清晰；重要操作（删除 / 清空）二次确认。</td></tr>
+  <tr><td>可维护性</td><td>颜色 / 字号 / 间距 / 圆角统一走设计 token，禁止硬编码。</td></tr>
+  <tr><td>国际化</td><td>界面文案抽取为资源，提供中文 / 英文两套。</td></tr>
+</table>
+
+<!-- ================= 3 ================= -->
+<div class="page-break"></div>
+<h2>3. 系统设计</h2>
+
+<h3>3.1 技术栈</h3>
+<table>
+  <tr><th>层次</th><th>技术</th></tr>
+  <tr><td>开发语言</td><td>ArkTS</td></tr>
+  <tr><td>UI 框架</td><td>ArkUI 声明式 UI</td></tr>
+  <tr><td>应用模型</td><td>Stage 模型（UIAbility）</td></tr>
+  <tr><td>目标 SDK</td><td>HarmonyOS / OpenHarmony，compatibleSdkVersion 26.0.0</td></tr>
+  <tr><td>核心能力</td><td>@kit.ArkData（Preferences / DistributedDataObject）、@kit.CoreVisionKit（端侧物体检测）、@kit.BackgroundTasksKit（代理提醒）、@kit.MediaLibraryKit / @kit.ImageKit、@kit.CoreFileKit</td></tr>
+</table>
+
+<h3>3.2 总体架构</h3>
+<p>应用采用「页面 → 组件 → 数据与服务」的分层结构，入口为 UIAbility，主界面为 5 个 Tab。</p>
+
+<div class="arch"><span class="t">入口层</span>：EntryAbility（启动配置、深色模式跟随、权限申请）</div>
+<div class="arrow">↓</div>
+<div class="arch"><span class="t">页面层</span>：Splash 启动页 → Index 主框架（5 个 Tab：首页 / 记录 / 看板 / 积分 / 科普）</div>
+<div class="arrow">↓</div>
+<div class="arch"><span class="t">组件层</span>：AppCard 卡片 · AppButton 按钮 · Chart 图表（Canvas） · Badge 徽章 · TaskCard 任务卡 · AnimatedNumber 数字滚动</div>
+<div class="arrow">↓</div>
+<div class="arch"><span class="t">数据与服务层</span>：CarbonStore 数据单例 · CarbonFactors 行为因子 · FamilyService 家庭 · MallService 权益商城 · ReminderService 提醒 · VisionService 识图 · Rewards 积分 / 徽章 / 任务</div>
+<div class="arrow">↓</div>
+<div class="arch"><span class="t">能力与存储层</span>：Preferences 本机存储 · DistributedDataObject 分布式数据 · CoreVisionKit 端侧 AI · 后台代理提醒</div>
+
+<h3>3.3 数据存储设计</h3>
+<ul>
+  <li><b>本机优先</b>：记录、兑换、任务奖励等存入 Preferences（键值存储），App 冷启动即恢复。</li>
+  <li><b>数据同步</b>：UI 通过 AppStorage 的 <code>recordsVersion</code> / <code>familyVersion</code> 与变更监听器感知数据变化并刷新。</li>
+  <li><b>家庭数据</b>：基于 DistributedDataObject，以家庭码作为会话标识，在同账号设备间同步成员减排与积分。</li>
+  <li><b>导出</b>：支持 CSV（RFC 4180 转义 + UTF-8 BOM）与 JSON，便于备份与迁移。</li>
+</ul>
+
+<!-- ================= 4 ================= -->
+<div class="page-break"></div>
+<h2>4. 核心功能详述</h2>
+
+<h3>4.1 启动页与首页</h3>
+<p>启动页展示品牌标识与光晕动效；首页汇聚今日减排 / 积分、累计减排 / 种树、家庭碳积分、今日任务与智能建议，并提供「去记录低碳行为」与「生成成果卡片」两个主入口。</p>
+<div class="fig"><img src="qa:splash_new.jpeg"><div class="cap">图 1　启动页</div></div>
+<div class="fig"><img src="qa:app_home_new.jpeg"><div class="cap">图 2　首页（浅色）</div></div>
+
+<h3>4.2 低碳行为记录（F1）</h3>
+<p>提供出行、节能、回收、餐饮 4 大类共 13 种行为。选择类别与行为、填写数量后，应用按排放因子实时估算减排量与可获积分，支持数量步进与备注；保存后写入本机并更新今日记录与首页统计。</p>
+<div class="fig"><img src="qa:app_record_new2.jpeg"><div class="cap">图 3　记录页</div></div>
+<div class="fig"><img src="qa:app_recycle_v3.jpeg"><div class="cap">图 4　回收类行为</div></div>
+
+<h3>4.3 端侧 AI 识图（F2）</h3>
+<p>基于 CoreVisionKit 端侧物体检测：用户选择一张照片，模型在本机识别物体（如食物、车辆、植物、纸张等），据此推荐对应的低碳行为并自动定位到该行为，识别过程不上传图片。</p>
+<div class="fig"><img src="qa:app_food.jpeg"><div class="cap">图 5　AI 识图推荐低碳行为</div></div>
+
+<h3>4.4 数据看板（F3）</h3>
+<p>按日 / 周 / 月 / 年聚合减排量与积分，折线图展示趋势（数据点稀疏时改用柱状，避免误导），饼图展示类别占比；下方为最近记录，并提供本地数据管理（导出 CSV / JSON、导入、清空）。</p>
+<div class="fig"><img src="qa:qa_dash_day.jpeg"><div class="cap">图 6　看板 · 日</div></div>
+<div class="fig"><img src="qa:qa_dash_week.jpeg"><div class="cap">图 7　看板 · 周</div></div>
+<div class="fig"><img src="qa:qa_dash_month.jpeg"><div class="cap">图 8　看板 · 月</div></div>
+
+<h3>4.5 积分与荣誉（F4）</h3>
+<p>汇总可用碳积分、累计获得与已兑换；提供碳普惠权益商城（模拟兑换码）、植树证书（每减排 10 kg 折算 1 棵树）、低碳徽章（按减排 / 行为达成解锁）与今日任务（完成即发放积分，幂等）。</p>
+<div class="fig"><img src="qa:app_rewards_v4.jpeg"><div class="cap">图 9　积分与荣誉</div></div>
+<div class="fig"><img src="qa:qa_redeem.jpeg"><div class="cap">图 10　权益兑换</div></div>
+
+<h3>4.6 家庭碳积分（F5）</h3>
+<p>生成或加入家庭码后，可在同一华为账号的多设备间同步各自的减排量与积分，并以「家庭成员」列表按设备展示，实现家庭碳积分的合并统计。</p>
+<div class="fig"><img src="qa:app_home_new.jpeg"><div class="cap">图 11　家庭碳积分卡片（首页）</div></div>
+
+<h3>4.7 每日提醒与科普专栏（F6 / F7）</h3>
+<p>每日提醒默认 20:00，可在首页开启 / 关闭并调整时间，基于后台代理提醒发布；科普专栏提供碳达峰 / 碳中和、绿色出行、家庭节能等图文内容与低碳指数自测。</p>
+<div class="fig"><img src="qa:app_knowledge.jpeg"><div class="cap">图 12　双碳科普专栏</div></div>
+
+<h3>4.8 浅色 / 深色主题（F8）</h3>
+<p>所有色彩走动态设计 token，冷启动读取系统 colorMode，运行中实时跟随系统切换。</p>
+<div class="fig"><img src="qa:qa_dark_home.jpeg"><div class="cap">图 13　深色模式首页</div></div>
+
+<!-- ================= 5 ================= -->
+<div class="page-break"></div>
+<h2>5. 设计系统与视觉规范</h2>
+<p>项目以 <code>DESIGN.md</code> 作为设计唯一真相：机器可读的 YAML design tokens 与人类可读的章节说明，颜色 / 字号 / 间距 / 圆角统一引用 token，禁止硬编码。</p>
+<table>
+  <tr><th>要素</th><th>规范</th></tr>
+  <tr><td>主题</td><td>「夜行荧光」（深色）与「日光纸感」（浅色）双主题，跟随系统切换。</td></tr>
+  <tr><td>主色</td><td>品牌信号青柠 <code>#B6FF2E</code>（深色主题主色 / 信号色）；浅色下关键读数改用可读墨绿。</td></tr>
+  <tr><td>辅助色</td><td>青色 <code>#3DE0C8</code>（辅助）、苔绿 <code>#2E8B57</code>、品红 <code>#FF3D9A</code>（极少量点缀）。</td></tr>
+  <tr><td>圆角 / 间距 / 字号</td><td>统一走 <code>AppRadius.*</code> / <code>AppSpacing.*</code> / <code>AppTypography.*</code>。</td></tr>
+  <tr><td>动效</td><td>统一走 <code>AppMotion</code>，受「减弱动效」开关控制。</td></tr>
+</table>
+
+<!-- ================= 6 ================= -->
+<div class="page-break"></div>
+<h2>6. 隐私与权限</h2>
+<table>
+  <tr><th>权限</th><th>类型</th><th>用途</th></tr>
+  <tr><td><code>ohos.permission.DISTRIBUTED_DATASYNC</code></td><td>user_grant（运行时申请）</td><td>家庭碳积分多设备同步（首次使用会弹窗询问）</td></tr>
+  <tr><td><code>ohos.permission.PUBLISH_AGENT_REMINDER</code></td><td>system_grant</td><td>每日定时提醒</td></tr>
+</table>
+<ul>
+  <li>所有记录<b>只存在本机</b>，不上传云端。</li>
+  <li>家庭数据只在<b>同一华为账号的设备间</b>同步，不经过第三方服务器。</li>
+  <li>AI 识图<b>在本机完成</b>，不上传图片。</li>
+</ul>
+<div class="fig"><img src="qa:qa_perm.jpeg"><div class="cap">图 14　权限申请界面</div></div>
+
+<!-- ================= 7 ================= -->
+<div class="page-break"></div>
+<h2>7. 创新点与项目难点</h2>
+<h3>7.1 创新点</h3>
+<ul>
+  <li><b>端侧 AI 识图记录</b>：无需联网，在设备侧完成物体检测并推荐低碳行为，兼顾便捷与隐私。</li>
+  <li><b>家庭碳积分跨设备聚合</b>：基于分布式数据对象，在同一账号的多设备间合并家庭减排与积分。</li>
+  <li><b>无云本机存储</b>：数据默认仅存本机，配合 CSV / JSON 导出实现手动备份，隐私友好。</li>
+  <li><b>可被 AI Agent 消费的设计规范</b>：<code>DESIGN.md</code> 采用 YAML tokens + 章节规范，配合仓库内置的设备验证 Agent，形成可协作、可复现的研发流程。</li>
+</ul>
+<h3>7.2 项目难点</h3>
+<ul>
+  <li><b>数据变更驱动 UI 刷新</b>：以 AppStorage 版本号 + 变更监听统一驱动各 Tab 刷新，保证保存 / 删除后首页与看板实时同步。</li>
+  <li><b>图表动画与性能</b>：Canvas 手工绘制折线 / 柱状 / 饼图与入场动画，并对稀疏数据改用柱状以避免误导。</li>
+  <li><b>深浅主题一致性</b>：硬编码色值审计与 token 化，确保双主题下无残留。</li>
+  <li><b>国际化</b>：界面与数据文案抽取为资源并保持中英一致，同时不影响本机存储与导出格式。</li>
+</ul>
+
+<!-- ================= 8 ================= -->
+<div class="page-break"></div>
+<h2>8. 测试与验证</h2>
+<p>项目采用「写审分离」的协作方式：写代码与设备验证由不同 Agent 承担，验证 Agent 只读、不改源码，在模拟器上构建、安装、驱动 UI 并逐条核对验收清单，产出带证据（截图 / dump / 日志）的结论。</p>
+<table>
+  <tr><th>验证项</th><th>方法</th><th>结果</th></tr>
+  <tr><td>构建</td><td><code>scripts/run.ps1 -BuildOnly</code></td><td>BUILD SUCCESSFUL</td></tr>
+  <tr><td>深色模式</td><td>切换系统主题，观察 App 实时跟随</td><td>通过</td></tr>
+  <tr><td>清空数据</td><td>看板清空后核对积分非负、记录清空</td><td>通过</td></tr>
+  <tr><td>CSV 导出</td><td>含逗号备注导出，核对 BOM 与列不串位</td><td>通过</td></tr>
+  <tr><td>记录增删刷新</td><td>保存 / 删除后核对首页与列表实时更新</td><td>通过（数据层变更驱动刷新）</td></tr>
+  <tr><td>图表刷新</td><td>周期切换与新记录后图表更新</td><td>通过</td></tr>
+  <tr><td>家庭聚合</td><td>同账号双设备加入同一家庭码</td><td>单模拟器环境受限，需双真机复测</td></tr>
+</table>
+<p>此外，界面文案已抽取为资源并完成中 / 英双语；英文环境下遍历各页面确认无中文残留。</p>
+
+<!-- ================= 9 ================= -->
+<div class="page-break"></div>
+<h2>9. 总结与展望</h2>
+<h3>9.1 已完成</h3>
+<ul>
+  <li>完成低碳行为记录、端侧 AI 识图、数据看板、积分与荣誉、家庭碳积分、每日提醒、科普专栏、深浅主题等核心功能。</li>
+  <li>建立设计 token 体系与浅 / 深双主题，统一颜色、字号、间距、圆角。</li>
+  <li>数据默认本机存储，支持 CSV / JSON 导出；完成界面文案国际化（中 / 英）。</li>
+  <li>建立「AI 设备验证 Agent + 验收清单」的测试方法，产出带证据的验证报告。</li>
+  <li>完成正式应用图标与启动图。</li>
+</ul>
+<h3>9.2 展望</h3>
+<ul>
+  <li>对接真实城市碳普惠平台 API，替代本地模拟兑换码。</li>
+  <li>增加数据云备份与更完善的导入迁移能力。</li>
+  <li>接入系统无障碍设置，使「减弱动效」随系统联动。</li>
+  <li>平板多列布局适配。</li>
+  <li>补充单元测试与 UI 测试（@ohos/hypium）。</li>
+</ul>
+
+</body>
+</html>
