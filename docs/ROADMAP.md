@@ -59,6 +59,13 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 - 数据仅存本地 `preferences`（`records` / `redemptions` / `task_rewards`）。
 - 已支持导出/导入 CSV、JSON（手动备份）。
 
+> **进度（已实施）**：新增 `BackupService` + `CarbonStore.exportSnapshot()/importSnapshot()`——
+> 整包快照（`records` + `redemptions` + `taskRewards`，含 `version`/`updatedAt`）导出与去重合并恢复；
+> 看板「本地数据管理」新增「备份全部数据 / 从备份恢复」；导入 JSON 时自动识别快照对象。
+> `CloudBackupProvider` 接口预留 AGC Cloud DB / 城市碳普惠平台接入（未注入时云备份不可用，本地备份始终可用）。
+> **阶段 2 真云备份待 AGC 项目配置后接入。**
+
+
 ### 分阶段方案
 **阶段 1（已完成）**：本地导出/导入，作为手动备份与迁移手段。
 

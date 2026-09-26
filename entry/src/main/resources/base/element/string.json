@@ -143,6 +143,10 @@
     { "name": "dashboard_clear_message", "value": "确定要清空全部低碳记录与兑换记录吗？此操作不可恢复。" },
     { "name": "dashboard_clear_confirm", "value": "确定清空" },
     { "name": "dashboard_cleared", "value": "已清空" },
+    { "name": "dashboard_backup_all", "value": "备份全部数据" },
+    { "name": "dashboard_restore_all", "value": "从备份恢复" },
+    { "name": "dashboard_backup_done", "value": "已备份全部数据" },
+    { "name": "dashboard_restore_done", "value": "已从备份恢复 %s 项" },
     { "name": "chart_no_data", "value": "暂无数据" },
     { "name": "chart_kg_total", "value": "kg 合计" },
 

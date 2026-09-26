@@ -145,6 +145,10 @@
     { "name": "dashboard_clear_message", "value": "Clear all carbon records and redemption history? This cannot be undone." },
     { "name": "dashboard_clear_confirm", "value": "Clear" },
     { "name": "dashboard_cleared", "value": "Cleared" },
+    { "name": "dashboard_backup_all", "value": "Back up all" },
+    { "name": "dashboard_restore_all", "value": "Restore" },
+    { "name": "dashboard_backup_done", "value": "All data backed up" },
+    { "name": "dashboard_restore_done", "value": "Restored %s item(s)" },
     { "name": "chart_no_data", "value": "No data" },
     { "name": "chart_kg_total", "value": "kg total" },
 

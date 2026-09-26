@@ -97,3 +97,13 @@ export interface TaskRewardRecord {
   points: number;
   timestamp: number;
 }
+
+// 整包备份快照：记录 + 兑换 + 任务奖励（版本号用于后续迁移/云备份）
+export interface BackupSnapshot {
+  app: string;
+  version: number;
+  updatedAt: number;
+  records: CarbonRecord[];
+  redemptions: RedemptionRecord[];
+  taskRewards: TaskRewardRecord[];
+}

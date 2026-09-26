@@ -13,6 +13,7 @@ import { AnimatedNumber } from '../components/AnimatedNumber';
 import { AppButton } from '../components/AppButton';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
 import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
+import { BackupService } from '../model/BackupService';
 
 @Component
 export struct DashboardTab {
@@ -121,13 +122,72 @@ export struct DashboardTab {
       const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
       const trimmed = text.trim();
       const isJson = trimmed.startsWith('[') || trimmed.startsWith('{');
-      const added = isJson ? CarbonStore.get().importJson(text) : CarbonStore.get().importCsv(text);
+      const added = isJson
+        ? (trimmed.startsWith('{') ? CarbonStore.get().importSnapshot(text) : CarbonStore.get().importJson(text))
+        : CarbonStore.get().importCsv(text);
       if (added < 0) {
         this.promptAction.showToast({ message: $r('app.string.dashboard_import_bad_format') });
       } else if (added === 0) {
         this.promptAction.showToast({ message: $r('app.string.dashboard_import_none') });
       } else {
         this.promptAction.showToast({ message: $r('app.string.dashboard_imported', added.toString()) });
+        this.refreshData();
+      }
+    } catch (e) {
+      this.promptAction.showToast({ message: $r('app.string.dashboard_import_failed') });
+    } finally {
+      if (file !== null) {
+        try { fs.closeSync(file); } catch (err) { }
+      }
+    }
+  }
+
+  async backupAll(): Promise<void> {
+    let file: fs.File | null = null;
+    try {
+      const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
+      const content = BackupService.snapshot();
+      const docPicker = new picker.DocumentViewPicker(ctx);
+      const opt = new picker.DocumentSaveOptions();
+      opt.newFileNames = ['carbon_backup_' + Date.now().toString() + '.json'];
+      const uris = await docPicker.save(opt);
+      if (uris.length === 0) {
+        return;
+      }
+      file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
+      fs.writeSync(file.fd, content);
+      this.promptAction.showToast({ message: $r('app.string.dashboard_backup_done') });
+    } catch (e) {
+      this.promptAction.showToast({ message: $r('app.string.dashboard_export_failed') });
+    } finally {
+      if (file !== null) {
+        try { fs.closeSync(file); } catch (err) { }
+      }
+    }
+  }
+
+  async restoreAll(): Promise<void> {
+    let file: fs.File | null = null;
+    try {
+      const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
+      const docPicker = new picker.DocumentViewPicker(ctx);
+      const opt = new picker.DocumentSelectOptions();
+      opt.maxSelectNumber = 1;
+      const uris = await docPicker.select(opt);
+      if (uris.length === 0) {
+        return;
+      }
+      file = fs.openSync(uris[0], fs.OpenMode.READ_ONLY);
+      const stat = fs.statSync(file.fd);
+      const buf = new ArrayBuffer(stat.size);
+      const readLen = fs.readSync(file.fd, buf);
+      const bytes = new Uint8Array(buf.slice(0, readLen));
+      const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
+      const added = BackupService.restore(text);
+      if (added < 0) {
+        this.promptAction.showToast({ message: $r('app.string.dashboard_import_bad_format') });
+      } else {
+        this.promptAction.showToast({ message: $r('app.string.dashboard_restore_done', added.toString()) });
         this.refreshData();
       }
     } catch (e) {
@@ -319,6 +379,10 @@ export struct DashboardTab {
               AppButton({ text: $r('app.string.dashboard_export_json'), type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
             }.width('100%').margin({ top: AppSpacing.SM });
             AppButton({ text: $r('app.string.dashboard_import'), type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
+            Row({ space: AppSpacing.SM }) {
+              AppButton({ text: $r('app.string.dashboard_backup_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.backupAll());
+              AppButton({ text: $r('app.string.dashboard_restore_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.restoreAll());
+            }.width('100%').margin({ top: AppSpacing.SM });
             AppButton({ text: $r('app.string.dashboard_clear_all'), type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
           }
         }

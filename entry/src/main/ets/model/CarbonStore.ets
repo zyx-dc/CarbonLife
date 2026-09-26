@@ -1,7 +1,7 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord, TaskRewardRecord } from './CarbonTypes';
+import { CarbonRecord, BehaviorDef, CategoryStat, TrendPoint, RedemptionRecord, TaskRewardRecord, BackupSnapshot } from './CarbonTypes';
 import { CarbonFactors } from './CarbonFactors';
 import { AppConst, AppColor } from '../common/Constants';
 import { DateUtil } from '../common/DateUtil';
@@ -541,6 +541,59 @@ export class CarbonStore {
         });
       }
       return this.importRecords(list);
+    } catch (e) {
+      return -1;
+    }
+  }
+
+  // ---- 整包备份 / 恢复（记录 + 兑换 + 任务奖励；云备份的本地基础）----
+
+  exportSnapshot(): string {
+    const snap: BackupSnapshot = {
+      app: 'CarbonLife',
+      version: 1,
+      updatedAt: Date.now(),
+      records: this.records,
+      redemptions: this.redemptions,
+      taskRewards: this.taskRewards
+    };
+    return JSON.stringify(snap, null, 2);
+  }
+
+  // 合并恢复：按记录 id 与 (dateKey, taskKey) 去重。返回新增条数；解析失败返回 -1
+  importSnapshot(text: string): number {
+    try {
+      const snap = JSON.parse(text) as BackupSnapshot;
+      if (snap === null || snap === undefined || !Array.isArray(snap.records)) {
+        return -1;
+      }
+      let added = this.importRecords(snap.records);
+      const rIds: string[] = this.redemptions.map((r: RedemptionRecord) => r.id);
+      if (Array.isArray(snap.redemptions)) {
+        snap.redemptions.forEach((r: RedemptionRecord) => {
+          if (r.id !== '' && rIds.indexOf(r.id) < 0) {
+            this.redemptions.push(r);
+            rIds.push(r.id);
+            added += 1;
+          }
+        });
+      }
+      const tKeys: string[] = this.taskRewards.map((t: TaskRewardRecord) => t.dateKey + '|' + t.taskKey);
+      if (Array.isArray(snap.taskRewards)) {
+        snap.taskRewards.forEach((t: TaskRewardRecord) => {
+          const k = t.dateKey + '|' + t.taskKey;
+          if (tKeys.indexOf(k) < 0) {
+            this.taskRewards.push(t);
+            tKeys.push(k);
+            added += 1;
+          }
+        });
+      }
+      if (added > 0) {
+        this.persist();
+        this.notify();
+      }
+      return added;
     } catch (e) {
       return -1;
     }

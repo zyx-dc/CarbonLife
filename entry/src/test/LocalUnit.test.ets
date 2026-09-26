@@ -43,4 +43,16 @@ export default function localUnitTest() {
       expect(Rewards.treeCount(CarbonStore.get())).assertEqual(0);
     });
   });
+
+  describe('Backup', () => {
+    it('snapshot_contains_all_sections', 0, () => {
+      const text = CarbonStore.get().exportSnapshot();
+      expect(text.indexOf('"app"') >= 0).assertTrue();
+      expect(text.indexOf('CarbonLife') >= 0).assertTrue();
+      expect(text.indexOf('"version"') >= 0).assertTrue();
+      expect(text.indexOf('"records"') >= 0).assertTrue();
+      expect(text.indexOf('"redemptions"') >= 0).assertTrue();
+      expect(text.indexOf('"taskRewards"') >= 0).assertTrue();
+    });
+  });
 }
