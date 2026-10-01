@@ -5,6 +5,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { FamilyService } from '../model/FamilyService';
+import { BackupService } from '../model/BackupService';
+import { CloudStorageBackupProvider } from '../model/CloudBackup';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'CarbonLife';
@@ -39,7 +41,11 @@ export default class EntryAbility extends UIAbility {
         CarbonStore.get().init(this.context).then(async () => {
           await FamilyService.get().init(this.context);
           FamilyService.get().pushLocal();
-          hilog.info(DOMAIN, TAG, 'store ready');
+          // 注入云备份实现（AGC 云存储）；未开通/初始化失败时 isEnabled() 为 false
+          const cloud = new CloudStorageBackupProvider();
+          cloud.init(this.context);
+          BackupService.setCloudProvider(cloud);
+          hilog.info(DOMAIN, TAG, 'store ready; cloud backup enabled=%{public}s', cloud.isEnabled() ? 'true' : 'false');
         });
       });
     });

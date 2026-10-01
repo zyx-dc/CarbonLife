@@ -206,6 +206,29 @@ export struct DashboardTab {
     }
   }
 
+  async backupCloud(): Promise<void> {
+    if (!BackupService.isCloudEnabled()) {
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_unavailable'));
+      return;
+    }
+    const ok = await BackupService.backupToCloud();
+    ToastHelper.show(this.uiContext, ok ? $r('app.string.dashboard_cloud_done') : $r('app.string.dashboard_cloud_unavailable'));
+  }
+
+  async restoreCloud(): Promise<void> {
+    if (!BackupService.isCloudEnabled()) {
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_unavailable'));
+      return;
+    }
+    const added = await BackupService.restoreFromCloud();
+    if (added < 0) {
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_unavailable'));
+    } else {
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_restored', added.toString()));
+      this.refreshData();
+    }
+  }
+
   confirmClear(): void {
     this.uiContext.showAlertDialog({
       title: $r('app.string.dashboard_clear_title'),
@@ -343,6 +366,10 @@ export struct DashboardTab {
         Row({ space: AppSpacing.SM }) {
           AppButton({ text: $r('app.string.dashboard_backup_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.backupAll());
           AppButton({ text: $r('app.string.dashboard_restore_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.restoreAll());
+        }.width('100%').margin({ top: AppSpacing.SM });
+        Row({ space: AppSpacing.SM }) {
+          AppButton({ text: $r('app.string.dashboard_backup_cloud'), type: 'secondary' }).layoutWeight(1).onClick(() => this.backupCloud());
+          AppButton({ text: $r('app.string.dashboard_restore_cloud'), type: 'secondary' }).layoutWeight(1).onClick(() => this.restoreCloud());
         }.width('100%').margin({ top: AppSpacing.SM });
         AppButton({ text: $r('app.string.dashboard_clear_all'), type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
       }
