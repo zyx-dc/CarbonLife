@@ -33,6 +33,8 @@
     { "name": "family_join", "value": "加入" },
     { "name": "family_sync", "value": "同步我的数据" },
     { "name": "family_leave", "value": "退出家庭组" },
+{ "name": "family_leave_confirm_title", "value": "退出家庭组？" },
+{ "name": "family_leave_confirm_message", "value": "退出后家庭累计不再合并，你的个人记录不会被删除。" },
     { "name": "family_tip", "value": "在另一台登录同一华为账号的设备输入相同家庭码，即可合并统计家庭碳积分。" },
     { "name": "family_collapse", "value": "收起" },
     { "name": "family_manage", "value": "加入 / 管理家庭组" },
@@ -43,7 +45,7 @@
     { "name": "family_code_toast", "value": "家庭码：%s" },
 
     { "name": "reminder_title", "value": "每日低碳提醒" },
-    { "name": "reminder_subtitle", "value": "每天 %s 提醒记录低碳行为 · 点击修改时间" },
+    { "name": "reminder_subtitle", "value": "每天 %s 提醒记录低碳行为" },
     { "name": "reminder_on", "value": "已开启每日 %s 提醒" },
     { "name": "reminder_off", "value": "已关闭提醒" },
     { "name": "reminder_enable_failed", "value": "开启提醒失败" },

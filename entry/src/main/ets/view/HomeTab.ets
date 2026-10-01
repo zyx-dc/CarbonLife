@@ -113,6 +113,15 @@ export struct HomeTab {
     });
   }
 
+  confirmLeave(): void {
+    this.uiContext.showAlertDialog({
+      title: $r('app.string.family_leave_confirm_title'),
+      message: $r('app.string.family_leave_confirm_message'),
+      primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
+      secondaryButton: { value: $r('app.string.family_leave'), fontColor: AppColor.DANGER, action: () => { this.onLeave(); } }
+    });
+  }
+
   onSync(): void {
     FamilyService.get().pushLocal();
     this.refresh();
@@ -304,6 +313,16 @@ export struct HomeTab {
 
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
             Column({ space: AppSpacing.SM }) {
+              this.sectionTitle($r('app.string.home_tasks'));
+              ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
+                TaskCard({ task: task, done: this.taskStates[index] ?? false, index: index })
+                  .onClick(() => { if (!this.taskStates[index]) { this.controller.changeIndex(1); } });
+              }, (task: DailyTask) => task.key);
+            }
+          }
+
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
+            Column({ space: AppSpacing.SM }) {
               Row() {
                 this.sectionTitle($r('app.string.home_family_title'), $r('app.string.home_family_subtitle'));
                 Blank();
@@ -311,23 +330,26 @@ export struct HomeTab {
                   .fontSize(AppTypography.CAPTION.size)
                   .fontColor(AppColor.TEXT_SUB);
               }.width('100%');
-              Row() {
-                Column() {
-                  AnimatedNumber({ value: parseFloat(this.familySaved), decimals: 2, textSize: AppTypography.H4.size, textColor: AppColor.TEXT });
-                  Text($r('app.string.home_family_saved')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1);
-                Column() {
-                  AnimatedNumber({ value: parseFloat(this.familyPoints), textSize: AppTypography.H4.size, textColor: AppColor.ACCENT });
-                  Text($r('app.string.home_family_points')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1);
-              }.width('100%').margin({ top: AppSpacing.SM });
-              if (this.familyJoined && this.members.length > 0) {
-                Column({ space: AppSpacing.XS }) {
-                  this.sectionTitle($r('app.string.home_family_members'), this.members.length === 1 ? $r('app.string.home_family_person', this.members.length.toString()) : $r('app.string.home_family_people', this.members.length.toString()));
-                  ForEach(this.members, (m: MemberData) => {
-                    this.memberRow(m);
-                  }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
+              // 未加入家庭时不再重复展示本机数据（与「今日/累计」口径避免混淆）
+              if (this.familyJoined) {
+                Row() {
+                  Column() {
+                    AnimatedNumber({ value: parseFloat(this.familySaved), decimals: 2, textSize: AppTypography.H4.size, textColor: AppColor.TEXT });
+                    Text($r('app.string.home_family_saved')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                  }.layoutWeight(1);
+                  Column() {
+                    AnimatedNumber({ value: parseFloat(this.familyPoints), textSize: AppTypography.H4.size, textColor: AppColor.ACCENT });
+                    Text($r('app.string.home_family_points')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                  }.layoutWeight(1);
                 }.width('100%').margin({ top: AppSpacing.SM });
+                if (this.members.length >= 2) {
+                  Column({ space: AppSpacing.XS }) {
+                    this.sectionTitle($r('app.string.home_family_members'), $r('app.string.home_family_people', this.members.length.toString()));
+                    ForEach(this.members, (m: MemberData) => {
+                      this.memberRow(m);
+                    }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
+                  }.width('100%').margin({ top: AppSpacing.SM });
+                }
               }
               if (this.familyExpanded) {
                 TextInput({ text: this.familyName, placeholder: $r('app.string.family_nickname_hint') }).height(42)
@@ -347,9 +369,9 @@ export struct HomeTab {
                     .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
                     .onClick(() => this.onSync());
                   Text($r('app.string.family_leave'))
-                    .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                    .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER)
                     .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
-                    .onClick(() => this.onLeave());
+                    .onClick(() => this.confirmLeave());
                 }.width('100%').margin({ top: AppSpacing.XS });
                 Text($r('app.string.family_tip'))
                   .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
@@ -365,26 +387,20 @@ export struct HomeTab {
             }
           }
 
-          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 5 }) {
             Column({ space: AppSpacing.SM }) {
               Row() {
                 Column() {
                   Text($r('app.string.reminder_title')).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text($r('app.string.reminder_subtitle', this.timeText())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start)
-                .onClick(() => this.onPickTime());
-                Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
-              }.width('100%');
-            }
-          }
-
-          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 5 }) {
-            Column({ space: AppSpacing.SM }) {
-              this.sectionTitle($r('app.string.home_tasks'));
-              ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
-                TaskCard({ task: task, done: this.taskStates[index] ?? false, index: index })
-                  .onClick(() => { if (!this.taskStates[index]) { this.controller.changeIndex(1); } });
-              }, (task: DailyTask) => task.key);
+                  Text($r('app.string.reminder_subtitle', this.timeText())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                    .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis });
+                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+                Toggle({ type: ToggleType.Switch, isOn: this.reminderOn })
+                  .accessibilityText(resolveStr($r('app.string.reminder_title')))
+                  .onChange((isOn: boolean) => this.onReminderChange(isOn));
+              }
+              .width('100%')
+              .onClick(() => this.onPickTime());
             }
           }
 

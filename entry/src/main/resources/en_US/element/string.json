@@ -33,6 +33,8 @@
     { "name": "family_join", "value": "Join" },
     { "name": "family_sync", "value": "Sync my data" },
     { "name": "family_leave", "value": "Leave family" },
+{ "name": "family_leave_confirm_title", "value": "Leave family?" },
+{ "name": "family_leave_confirm_message", "value": "Family totals will no longer merge. Your personal records are not deleted." },
     { "name": "family_tip", "value": "Enter the same family code on another device signed in with the same HUAWEI ID to merge family carbon points." },
     { "name": "family_collapse", "value": "Collapse" },
     { "name": "family_manage", "value": "Join / Manage family" },
@@ -43,7 +45,7 @@
     { "name": "family_code_toast", "value": "Family code: %s" },
 
     { "name": "reminder_title", "value": "Daily reminder" },
-    { "name": "reminder_subtitle", "value": "Reminder at %s to log low-carbon actions · tap to change" },
+    { "name": "reminder_subtitle", "value": "Reminder at %s to log low-carbon actions" },
     { "name": "reminder_on", "value": "Daily reminder set for %s" },
     { "name": "reminder_off", "value": "Reminder turned off" },
     { "name": "reminder_enable_failed", "value": "Failed to enable reminder" },

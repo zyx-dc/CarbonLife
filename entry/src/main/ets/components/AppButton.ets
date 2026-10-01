@@ -13,12 +13,24 @@ export struct AppButton {
   @Prop btnHeight: number = 48;
   @State pressed: boolean = false;
 
+  private primaryFill(): string {
+    return Theme.isDark() ? AppColor.SIGNAL : AppColor.PRIMARY;
+  }
+
+  private primaryFillDeep(): string {
+    return Theme.isDark() ? AppColor.SIGNAL_DEEP : AppColor.PRIMARY_LIGHT;
+  }
+
+  private primaryText(): string {
+    return Theme.isDark() ? AppColor.ON_SIGNAL : AppColor.TEXT_INVERSE;
+  }
+
   private bgColor(): string {
     if (this.disabled) {
       return AppColor.DIVIDER;
     }
     if (this.type === 'primary') {
-      return AppColor.SIGNAL;
+      return this.primaryFill();
     }
     if (this.type === 'ghost') {
       return 'transparent';
@@ -31,7 +43,7 @@ export struct AppButton {
       return AppColor.TEXT_SUB;
     }
     if (this.type === 'primary') {
-      return AppColor.ON_SIGNAL;
+      return this.primaryText();
     }
     if (this.type === 'ghost') {
       return AppColor.PRIMARY;
@@ -66,7 +78,7 @@ export struct AppButton {
     .linearGradient({
       angle: 135,
       colors: (this.type === 'primary' && !this.disabled)
-        ? [[AppColor.SIGNAL, 0.0], [AppColor.SIGNAL_DEEP, 1.0]]
+        ? [[this.primaryFill(), 0.0], [this.primaryFillDeep(), 1.0]]
         : [[this.bgColor(), 0.0], [this.bgColor(), 1.0]]
     })
     .borderRadius(AppRadius.MD)

@@ -56,9 +56,9 @@ export class ThemeTokens {
   static readonly LIME: string = '#B6FF2E';
   static readonly LIME_DEEP: string = '#7FCB00';
 
-  // 强调：电青，只属于积分与成就
+  // 强调：电青，只属于积分与成就（浅色用加深版，保证正文 ≥4.5:1）
   static readonly CYAN: string = '#3DE0C8';
-  static readonly CYAN_DEEP: string = '#0E8F79';
+  static readonly CYAN_DEEP: string = '#0B7261';
 
   // 稀有高光：品红。仅作极少量点缀，制造「不和谐的秩序」
   static readonly MAGENTA: string = '#FF3D9A';
@@ -75,7 +75,7 @@ export class ThemeTokens {
 
   static readonly DANGER_DARK: string = '#FF5C5C';
   static readonly DANGER_LIGHT: string = '#E5484D';
-  static readonly SUCCESS_LIGHT: string = '#3E8E1E';
+  static readonly SUCCESS_LIGHT: string = '#2E7D14';
 
   // 启动页专用（保持原样，不参与夜行荧光升级）
   static readonly FOREST: string = '#0F3D2E';
