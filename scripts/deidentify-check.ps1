@@ -2,7 +2,7 @@
 <#
   deidentify-check.ps1 - competition-material de-identification check (issue #17)
 
-  Scans text files and Office (.docx) metadata under the given paths and reports
+  Scans text files and Office (.docx/.pptx) metadata under the given paths and reports
   any residual identifying info: school / college / teacher / team / lab names,
   or document author/company metadata.
 
@@ -71,11 +71,13 @@ function Scan-DocxMeta {
       $lastmod = ([regex]::Match($meta, "<cp:lastModifiedBy>(.*?)</cp:lastModifiedBy>")).Groups[1].Value
       $company = ([regex]::Match($meta, "<Company>(.*?)</Company>")).Groups[1].Value
       $title   = ([regex]::Match($meta, "<dc:title>(.*?)</dc:title>")).Groups[1].Value
-      $allow = @("html-to-docx", "")
+      # Allowed: generator tool, app name (not personal/team info), empty
+      $allow = @("html-to-docx", "CarbonLife", "")
       if ($allow -notcontains $creator) { $findings.Add(("META  creator='{0}'  {1}" -f $creator, $File)) }
       if ($allow -notcontains $lastmod) { $findings.Add(("META  lastModifiedBy='{0}'  {1}" -f $lastmod, $File)) }
       if ($company -ne "") { $findings.Add(("META  Company='{0}'  {1}" -f $company, $File)) }
-      if ($title -ne "") { $findings.Add(("META  title='{0}'  {1}" -f $title, $File)) }
+      # Title: allow empty, or titles starting with the project name
+      if ($title -ne "" -and $title -notmatch "^CarbonLife") { $findings.Add(("META  title='{0}'  {1}" -f $title, $File)) }
     }
   } finally {
     Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
@@ -92,8 +94,9 @@ foreach ($rel in $Path) {
   Write-Host ("  scan: {0}" -f $rel)
   $files = Get-ChildItem -LiteralPath $dir -Recurse -File -ErrorAction SilentlyContinue
   foreach ($f in $files) {
-    if ($textExt -contains $f.Extension.ToLower()) { Scan-TextFile -File $f.FullName }
-    elseif ($f.Extension.ToLower() -eq ".docx") { Scan-DocxMeta -File $f.FullName }
+    $ext = $f.Extension.ToLower()
+    if ($textExt -contains $ext) { Scan-TextFile -File $f.FullName }
+    elseif ($ext -eq ".docx" -or $ext -eq ".pptx") { Scan-DocxMeta -File $f.FullName }
   }
 }
 
