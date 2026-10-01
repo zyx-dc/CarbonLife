@@ -5,7 +5,7 @@ import { common } from '@kit.AbilityKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { CarbonFactors } from '../model/CarbonFactors';
 import { AppColor } from '../common/Constants';
-import { CategoryStat, CarbonRecord, TrendPoint } from '../model/CarbonTypes';
+import { CategoryStat, CarbonRecord, TaskRewardRecord, TrendPoint } from '../model/CarbonTypes';
 import { DateUtil } from '../common/DateUtil';
 import { BarChartView, LineChartView, PieChartView } from '../components/Chart';
 import { AppCard } from '../components/AppCard';
@@ -63,12 +63,19 @@ export struct DashboardTab {
     this.categoryColors = categoryStats.map((c: CategoryStat) => c.color);
     this.legendData = categoryStats.filter((c: CategoryStat) => c.saved > 0);
     // 汇总卡片随所选周期聚合（本日/本周/本月/本年），与图表口径一致
-    const recs: CarbonRecord[] = store.recordsInRange(this.periodStart(this.period), Date.now() + 1);
+    const periodStart = this.periodStart(this.period);
+    const recs: CarbonRecord[] = store.recordsInRange(periodStart, Date.now() + 1);
     let saved = 0;
     let points = 0;
     recs.forEach((r: CarbonRecord) => {
       saved += r.saved;
       points += r.points;
+    });
+    // 与首页「今日积分」口径一致：本周期内完成的任务奖励也应计入
+    store.getTaskRewards().forEach((t: TaskRewardRecord) => {
+      if (t.timestamp >= periodStart) {
+        points += t.points;
+      }
     });
     this.summarySaved = saved.toFixed(2);
     this.summaryPoints = points.toString();
