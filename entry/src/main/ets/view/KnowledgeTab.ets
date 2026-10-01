@@ -1,3 +1,4 @@
+import { UIContext } from '@kit.ArkUI';
 import { AppColor } from '../common/Constants';
 import { KnowledgeData, knowledgeCover, QuizData } from '../model/Rewards';
 import { KnowledgeItem, QuizQuestion, QuizOption } from '../model/CarbonTypes';
@@ -11,6 +12,14 @@ export struct KnowledgeTab {
   @State answers: number[] = [-1, -1, -1, -1, -1];
   @State step: number = 0;
   @State ready: boolean = false;
+  private uiContext: UIContext = this.getUIContext();
+
+  // #5 文本展开：文章展开/收起用动画过渡
+  private toggleArticle(id: string): void {
+    this.uiContext.animateTo({ duration: AppMotion.reduceMotion() ? 0 : 260, curve: Curve.EaseInOut }, () => {
+      this.expandedId = this.expandedId === id ? '' : id;
+    });
+  }
 
   aboutToAppear(): void {
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
@@ -350,7 +359,7 @@ export struct KnowledgeTab {
               }
             }
             .width('100%')
-            .onClick(() => { this.expandedId = this.expandedId === item.id ? '' : item.id; });
+            .onClick(() => { this.toggleArticle(item.id); });
           }
                   }, (item: KnowledgeItem) => item.id);
 

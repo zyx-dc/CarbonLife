@@ -21,6 +21,7 @@ export struct RecordTab {
   @State note: string = '';
   @State ready: boolean = false;
   @State todayList: CarbonRecord[] = [];
+  @State removingId: string = '';
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -67,10 +68,22 @@ export struct RecordTab {
       message: $r('app.string.record_delete_message', name),
       primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
       secondaryButton: { value: $r('app.string.common_delete'), fontColor: AppColor.DANGER, action: () => {
-        CarbonStore.get().deleteRecord(id);
-        ToastHelper.show(this.uiContext, $r('app.string.record_deleted'));
+        this.animateDelete(id);
       }}
     });
+  }
+
+  // #8 卡片曲线删除：沿弧线（右下 + 微旋转）缩放淡出，动画结束后再真正删除
+  private animateDelete(id: string): void {
+    const reduce = AppMotion.reduceMotion();
+    this.uiContext.animateTo({ duration: reduce ? 0 : 380, curve: Curve.EaseIn }, () => {
+      this.removingId = id;
+    });
+    setTimeout(() => {
+      CarbonStore.get().deleteRecord(id);
+      this.removingId = '';
+      ToastHelper.show(this.uiContext, $r('app.string.record_deleted'));
+    }, reduce ? 0 : 380);
   }
 
   onAiDetect(): void {
@@ -206,7 +219,12 @@ export struct RecordTab {
                   }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                   Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
                   Text($r('app.string.common_delete')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER).margin({ left: AppSpacing.MD }).onClick(() => this.confirmDelete(r.id, resolveStr(behaviorNameRes(r.behaviorKey, r.name))));
-                }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
+                }
+                .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                .translate({ x: this.removingId === r.id ? 52 : 0, y: this.removingId === r.id ? 30 : 0 })
+                .scale({ x: this.removingId === r.id ? 0.9 : 1, y: this.removingId === r.id ? 0.9 : 1 })
+                .rotate({ angle: this.removingId === r.id ? 4 : 0 })
+                .opacity(this.removingId === r.id ? 0 : 1);
               }, (r: CarbonRecord) => r.id);
             }
           }

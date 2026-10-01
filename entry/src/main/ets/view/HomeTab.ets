@@ -113,6 +113,13 @@ export struct HomeTab {
     });
   }
 
+  // #5 文本展开：家庭组展开/收起用动画过渡，避免直接显隐的跳动
+  private toggleFamily(open: boolean): void {
+    this.uiContext.animateTo({ duration: AppMotion.reduceMotion() ? 0 : 280, curve: Curve.EaseInOut }, () => {
+      this.familyExpanded = open;
+    });
+  }
+
   confirmLeave(): void {
     this.uiContext.showAlertDialog({
       title: $r('app.string.family_leave_confirm_title'),
@@ -378,11 +385,11 @@ export struct HomeTab {
                 Text($r('app.string.family_collapse'))
                   .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
                   .width('100%').textAlign(TextAlign.Center).padding({ top: AppSpacing.SM })
-                  .onClick(() => this.familyExpanded = false);
+                  .onClick(() => this.toggleFamily(false));
               } else {
                 AppButton({ text: $r('app.string.family_manage'), type: 'secondary', btnHeight: 44, fullWidth: true })
                   .margin({ top: AppSpacing.SM })
-                  .onClick(() => this.familyExpanded = true);
+                  .onClick(() => this.toggleFamily(true));
               }
             }
           }
@@ -400,7 +407,8 @@ export struct HomeTab {
                   .onChange((isOn: boolean) => this.onReminderChange(isOn));
               }
               .width('100%')
-              .onClick(() => this.onPickTime());
+              .onClick(() => this.onPickTime())
+              .clickEffect({ level: ClickEffectLevel.LIGHT });
             }
           }
 
