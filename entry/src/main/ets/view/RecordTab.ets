@@ -22,6 +22,7 @@ export struct RecordTab {
   @State ready: boolean = false;
   @State todayList: CarbonRecord[] = [];
   @State removingId: string = '';
+  @State amountPulse: boolean = false;
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -49,6 +50,15 @@ export struct RecordTab {
     let v = this.amountValue() + delta * step;
     if (v < 0) v = 0;
     this.amountText = v.toString();
+  }
+
+  private amountMax(): number {
+    const b: BehaviorDef = this.currentBehavior();
+    let slots = 20;
+    if (b.unit === '餐' || b.unit === '次') {
+      slots = 5;
+    }
+    return b.step * slots;
   }
 
   onSave(): void {
@@ -149,7 +159,7 @@ export struct RecordTab {
                   .onClick(() => {
                     this.category = cat;
                     const list = CarbonFactors.getByCategory(cat);
-                    if (list.length > 0) this.selectedKey = list[0].key;
+                    if (list.length > 0) { this.selectedKey = list[0].key; this.amountText = list[0].step.toString(); }
                   });
               }, (cat: string) => cat);
             }.width('100%').margin({ top: AppSpacing.XS });
@@ -180,7 +190,7 @@ export struct RecordTab {
                 }.width(22).height(22);
               }
               .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
-              .onClick(() => this.selectedKey = b.key);
+              .onClick(() => { this.selectedKey = b.key; this.amountText = b.step.toString(); });
             }, (b: BehaviorDef) => b.key);
           }
         }
@@ -188,17 +198,33 @@ export struct RecordTab {
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 4}) {
           Column({ space: AppSpacing.SM }) {
             Text($r('app.string.record_amount_title', resolveStr(unitRes(this.currentBehavior().unit)))).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
-            Row({ space: AppSpacing.SM }) {
-              Button('−').width(48).height(48).backgroundColor(AppColor.ELEVATED).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size).fontWeight(FontWeight.Medium)
-                .borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM)
-                .onClick(() => this.stepAmount(-1));
-              TextInput({ text: $$this.amountText }).type(InputType.Number).layoutWeight(1).height(48).textAlign(TextAlign.Center)
-                .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
-                .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM);
-              Button('+').width(48).height(48).backgroundColor(AppColor.ELEVATED).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size).fontWeight(FontWeight.Medium)
-                .borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM)
-                .onClick(() => this.stepAmount(1));
-            }.width('100%').margin({ top: AppSpacing.XS });
+            Row() {
+              Blank();
+              Text(this.amountText + ' ' + resolveStr(unitRes(this.currentBehavior().unit)))
+                .fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY)
+                .scale({ x: this.amountPulse ? 1.08 : 1, y: this.amountPulse ? 1.08 : 1 })
+                .animation({ duration: AppMotion.reduceMotion() ? 0 : 160, curve: Curve.Friction });
+            }.width('100%');
+            // #4 滑杆吸附：按行为步长（0.5 / 1 / 5）吸附，松手时读数轻微回弹
+            Slider({
+              value: this.amountValue(),
+              min: this.currentBehavior().step,
+              max: this.amountMax(),
+              step: this.currentBehavior().step,
+              style: SliderStyle.OutSet
+            })
+              .width('100%')
+              .blockColor(AppColor.PRIMARY)
+              .selectedColor(AppColor.PRIMARY)
+              .trackColor(AppColor.DIVIDER)
+              .onChange((value: number, mode: SliderChangeMode) => {
+                const changed = value !== this.amountValue();
+                this.amountText = value.toString();
+                if (mode === SliderChangeMode.End && changed && !AppMotion.reduceMotion()) {
+                  this.amountPulse = true;
+                  setTimeout(() => { this.amountPulse = false; }, 130);
+                }
+              });
             TextInput({ text: $$this.note, placeholder: $r('app.string.record_note_placeholder') }).height(44)
               .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
               .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM });
