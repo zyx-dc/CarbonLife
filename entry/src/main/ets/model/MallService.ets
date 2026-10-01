@@ -35,6 +35,11 @@ export class MallService {
     { id: 'm6', name: '城市碳普惠电子证书', desc: '碳普惠平台颁发的电子荣誉证书', cost: 800, icon: '🏆', category: '荣誉' }
   ];
 
+  /** 按所需积分升序：可兑换的（低价）靠前，其次是最接近可兑换的 */
+  static sorted(): RedeemItem[] {
+    return MallService.ITEMS.slice().sort((a: RedeemItem, b: RedeemItem) => a.cost - b.cost);
+  }
+
   private static api: CarbonExchangeApi = new LocalMockExchangeApi();
 
   /** 注入真实碳普惠平台实现（对接城市碳普惠开放接口后调用一次即可） */

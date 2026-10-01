@@ -29,6 +29,8 @@ export struct RewardsTab {
   @State taskStates: boolean[] = [];
   @State badgeUnlocked: boolean[] = [];
   @State unlockedCount: number = 0;
+  @State mallItems: RedeemItem[] = MallService.ITEMS;
+  @State nearestId: string = '';
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -53,6 +55,16 @@ export struct RewardsTab {
     this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
     this.badgeUnlocked = Rewards.BADGES.map((b: BadgeDef) => Rewards.isUnlocked(b, store));
     this.unlockedCount = this.badgeUnlocked.filter((v: boolean) => v).length;
+    // 商城按所需积分升序；标出「最接近可兑换」的一项
+    this.mallItems = MallService.sorted();
+    let nearest = '';
+    for (let i = 0; i < this.mallItems.length; i++) {
+      if (this.balance < this.mallItems[i].cost) {
+        nearest = this.mallItems[i].id;
+        break;
+      }
+    }
+    this.nearestId = nearest;
   }
 
   onRedeem(item: RedeemItem): void {
@@ -118,24 +130,43 @@ export struct RewardsTab {
               Text($r('app.string.rewards_mall_title')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
             }.width('100%');
-            ForEach(MallService.ITEMS, (item: RedeemItem, index: number) => {
+            ForEach(this.mallItems, (item: RedeemItem, index: number) => {
               Row({ space: AppSpacing.SM }) {
                 Image(redeemIcon(item.id))
                   .width(28)
                   .height(28)
-                  .fillColor(AppColor.TEXT_SUB);
+                  .fillColor(AppColor.TEXT);
                 Column({ space: AppSpacing.XXS }) {
-                  Text(mallNameRes(item.id, item.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                  Row({ space: AppSpacing.XS }) {
+                    Text(mallNameRes(item.id, item.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                    if (item.id === this.nearestId) {
+                      Text($r('app.string.rewards_mall_nearest'))
+                        .fontSize(AppTypography.SMALL.size)
+                        .fontColor(AppColor.PRIMARY)
+                        .backgroundColor(AppColor.PRIMARY_SOFT)
+                        .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
+                        .borderRadius(AppRadius.SM);
+                    }
+                  }.alignItems(VerticalAlign.Center);
                   Text(mallDescRes(item.id, item.desc)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  if (this.balance < item.cost) {
+                    // 已攒进度 + 还差多少：让「目标」可见，而不是只给一个差额
+                    Progress({ value: this.balance, total: item.cost, type: ProgressType.Linear })
+                      .width('100%')
+                      .height(6)
+                      .color(AppColor.PRIMARY)
+                      .backgroundColor(AppColor.DIVIDER)
+                      .margin({ top: AppSpacing.XS });
+                  }
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                 Text(this.balance >= item.cost ? $r('app.string.rewards_redeem') : $r('app.string.rewards_redeem_gap', (item.cost - this.balance).toString()))
                   .height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
                   .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
-                  .backgroundColor(this.balance >= item.cost ? AppColor.SIGNAL : AppColor.ELEVATED)
+                  .backgroundColor(this.balance >= item.cost ? AppColor.PRIMARY : AppColor.ELEVATED)
                   .borderWidth(this.balance >= item.cost ? 0 : 1)
                   .borderColor(AppColor.BORDER)
-                  .fontColor(this.balance >= item.cost ? AppColor.ON_SIGNAL : AppColor.TEXT_SUB)
+                  .fontColor(this.balance >= item.cost ? AppColor.TEXT_INVERSE : AppColor.TEXT_SUB)
                   .borderRadius(AppRadius.SM)
                   .onClick(() => this.onRedeem(item));
               }
