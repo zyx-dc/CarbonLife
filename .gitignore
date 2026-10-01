@@ -25,3 +25,6 @@
 /.claude/skills/
 /.opencode/skills/
 /.opencode/opencode.json
+
+# Impeccable 设计评审本地产物
+/.impeccable/
