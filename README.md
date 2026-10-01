@@ -151,7 +151,7 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 - [ ] 数据**云备份**（AGC）与冲突合并策略
 - [ ] 接入系统无障碍设置，真正启用「减弱动效」
 - [ ] 平板多列布局适配
-- [ ] 补充 UI 测试（单元测试已覆盖 DateUtil / 排放因子 / 快照结构，基于 `@ohos/hypium`）
+- [x] 补充 UI 测试（**设备端冒烟**：`scripts/ui-smoke.ps1`，用 `devecocli ui` 驱动真机/模拟器逐页断言；**单元测试**：DateUtil / 排放因子 / 快照结构，基于 `@ohos/hypium`）
 
 ## 贡献
 
