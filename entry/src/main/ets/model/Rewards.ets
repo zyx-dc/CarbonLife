@@ -52,10 +52,21 @@ export class Rewards {
     return Math.floor(store.totalSaved() / AppConst.TREE_PER_KG);
   }
 
+  // 当日 0 点时间戳按天缓存：taskDone 会被高频调用，避免反复 new Date()
+  private static dayStartKey: string = '';
+  private static dayStartTs: number = 0;
+
+  private static todayStart(): number {
+    const key = DateUtil.dayKey(Date.now());
+    if (key !== Rewards.dayStartKey) {
+      Rewards.dayStartKey = key;
+      Rewards.dayStartTs = DateUtil.startOfDay(Date.now());
+    }
+    return Rewards.dayStartTs;
+  }
+
   static taskDone(taskKey: string, store: CarbonStore): boolean {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const list = store.recordsInRange(start.getTime(), Date.now() + 1);
+    const list = store.recordsInRange(Rewards.todayStart(), Date.now() + 1);
     if (taskKey === 't1') {
       return list.some((r: CarbonRecord) => r.category === '出行');
     } else if (taskKey === 't2') {

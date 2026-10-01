@@ -290,7 +290,7 @@ export class AppMotion {
 }
 
 export class ToastHelper {
-  static show(ctx: UIContext, message: string): void {
+  static show(ctx: UIContext, message: ResourceStr): void {
     try {
       ctx.getPromptAction().showToast({ message, duration: 2000 });
     } catch (e) {

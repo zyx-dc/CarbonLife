@@ -49,7 +49,11 @@ struct Splash {
   }
 
   goHome(): void {
-    this.uiContext.getRouter().replaceUrl({ url: 'pages/Index' });
+    try {
+      this.uiContext.getRouter().replaceUrl({ url: 'pages/Index' });
+    } catch (e) {
+      console.error('replaceUrl failed: ' + JSON.stringify(e));
+    }
   }
 
   build() {

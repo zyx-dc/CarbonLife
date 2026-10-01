@@ -1,4 +1,4 @@
-import { PromptAction, UIContext } from '@kit.ArkUI';
+import { UIContext } from '@kit.ArkUI';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
@@ -11,7 +11,7 @@ import { BarChartView, LineChartView, PieChartView } from '../components/Chart';
 import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { AppButton } from '../components/AppButton';
-import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
 import { BackupService } from '../model/BackupService';
 
@@ -33,7 +33,6 @@ export struct DashboardTab {
   @State recentList: CarbonRecord[] = [];
   @State ready: boolean = false;
   private uiContext: UIContext = this.getUIContext();
-  private promptAction: PromptAction = this.uiContext.getPromptAction();
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -93,9 +92,9 @@ export struct DashboardTab {
       }
       file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
       fs.writeSync(file.fd, content);
-      this.promptAction.showToast({ message: $r('app.string.dashboard_exported') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_exported'));
     } catch (e) {
-      this.promptAction.showToast({ message: $r('app.string.dashboard_export_failed') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_export_failed'));
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -126,15 +125,15 @@ export struct DashboardTab {
         ? (trimmed.startsWith('{') ? CarbonStore.get().importSnapshot(text) : CarbonStore.get().importJson(text))
         : CarbonStore.get().importCsv(text);
       if (added < 0) {
-        this.promptAction.showToast({ message: $r('app.string.dashboard_import_bad_format') });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_bad_format'));
       } else if (added === 0) {
-        this.promptAction.showToast({ message: $r('app.string.dashboard_import_none') });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_none'));
       } else {
-        this.promptAction.showToast({ message: $r('app.string.dashboard_imported', added.toString()) });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_imported', added.toString()));
         this.refreshData();
       }
     } catch (e) {
-      this.promptAction.showToast({ message: $r('app.string.dashboard_import_failed') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_failed'));
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -156,9 +155,9 @@ export struct DashboardTab {
       }
       file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
       fs.writeSync(file.fd, content);
-      this.promptAction.showToast({ message: $r('app.string.dashboard_backup_done') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_backup_done'));
     } catch (e) {
-      this.promptAction.showToast({ message: $r('app.string.dashboard_export_failed') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_export_failed'));
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -185,13 +184,13 @@ export struct DashboardTab {
       const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
       const added = BackupService.restore(text);
       if (added < 0) {
-        this.promptAction.showToast({ message: $r('app.string.dashboard_import_bad_format') });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_bad_format'));
       } else {
-        this.promptAction.showToast({ message: $r('app.string.dashboard_restore_done', added.toString()) });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_restore_done', added.toString()));
         this.refreshData();
       }
     } catch (e) {
-      this.promptAction.showToast({ message: $r('app.string.dashboard_import_failed') });
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_failed'));
     } finally {
       if (file !== null) {
         try { fs.closeSync(file); } catch (err) { }
@@ -206,7 +205,7 @@ export struct DashboardTab {
       primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
       secondaryButton: { value: $r('app.string.dashboard_clear_confirm'), fontColor: AppColor.DANGER, action: () => {
         CarbonStore.get().clearAll();
-        this.promptAction.showToast({ message: $r('app.string.dashboard_cleared') });
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_cleared'));
       }}
     });
   }

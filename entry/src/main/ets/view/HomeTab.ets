@@ -1,4 +1,4 @@
-import { PromptAction, UIContext } from '@kit.ArkUI';
+import { UIContext } from '@kit.ArkUI';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
@@ -10,7 +10,7 @@ import { AppButton } from '../components/AppButton';
 import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
-import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { resolveStr } from '../common/Localize';
 
 @Component
@@ -19,7 +19,6 @@ export struct HomeTab {
   @StorageLink('recordsVersion') version: number = 0;
   @StorageLink('familyVersion') familyVersion: number = 0;
   private uiContext: UIContext = this.getUIContext();
-  private promptAction: PromptAction = this.uiContext.getPromptAction();
   private onChange: () => void = () => { this.refresh(); };
   private onStoreChange: () => void = () => { FamilyService.get().pushLocal(); this.refresh(); };
   @State showShare: boolean = false;
@@ -93,32 +92,32 @@ export struct HomeTab {
     FamilyService.get().genSession().then((code: string) => {
       this.familyCode = code;
       this.refresh();
-      this.promptAction.showToast({ message: $r('app.string.family_code_toast', code) });
+      ToastHelper.show(this.uiContext, $r('app.string.family_code_toast', code));
     });
   }
 
   onJoin(): void {
     if (this.familyCode === '') {
-      this.promptAction.showToast({ message: $r('app.string.family_need_code') });
+      ToastHelper.show(this.uiContext, $r('app.string.family_need_code'));
       return;
     }
     FamilyService.get().joinSession(this.familyCode).then(() => {
       this.refresh();
-      this.promptAction.showToast({ message: $r('app.string.family_joined') });
+      ToastHelper.show(this.uiContext, $r('app.string.family_joined'));
     });
   }
 
   onLeave(): void {
     FamilyService.get().leaveSession().then(() => {
       this.refresh();
-      this.promptAction.showToast({ message: $r('app.string.family_left') });
+      ToastHelper.show(this.uiContext, $r('app.string.family_left'));
     });
   }
 
   onSync(): void {
     FamilyService.get().pushLocal();
     this.refresh();
-    this.promptAction.showToast({ message: $r('app.string.family_synced') });
+    ToastHelper.show(this.uiContext, $r('app.string.family_synced'));
   }
 
   timeText(): string {
@@ -142,10 +141,10 @@ export struct HomeTab {
         ReminderService.setTime(value.hour, value.minute).then(() => {
           if (this.reminderOn) {
             ReminderService.enable().then(() => {
-              this.promptAction.showToast({ message: $r('app.string.reminder_time_updated', this.timeText()) });
+              ToastHelper.show(this.uiContext, $r('app.string.reminder_time_updated', this.timeText()));
             });
           } else {
-            this.promptAction.showToast({ message: $r('app.string.reminder_time_set', this.timeText()) });
+            ToastHelper.show(this.uiContext, $r('app.string.reminder_time_set', this.timeText()));
           }
         });
       }
@@ -156,14 +155,14 @@ export struct HomeTab {
     this.reminderOn = isOn;
     if (isOn) {
       ReminderService.enable().then(() => {
-        this.promptAction.showToast({ message: $r('app.string.reminder_on', this.timeText()) });
+        ToastHelper.show(this.uiContext, $r('app.string.reminder_on', this.timeText()));
       }).catch(() => {
         this.reminderOn = false;
-        this.promptAction.showToast({ message: $r('app.string.reminder_enable_failed') });
+        ToastHelper.show(this.uiContext, $r('app.string.reminder_enable_failed'));
       });
     } else {
       ReminderService.disable().then(() => {
-        this.promptAction.showToast({ message: $r('app.string.reminder_off') });
+        ToastHelper.show(this.uiContext, $r('app.string.reminder_off'));
       });
     }
   }
@@ -235,7 +234,7 @@ export struct HomeTab {
       AppButton({ text: $r('app.string.share_copy'), type: 'primary', fullWidth: true }).onClick(() => {
         const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
         pasteboard.getSystemPasteboard().setData(data).then(() => {
-          this.promptAction.showToast({ message: $r('app.string.share_copied') });
+          ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
           this.showShare = false;
         });
       });

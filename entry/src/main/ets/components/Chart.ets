@@ -436,7 +436,9 @@ export struct PieChartView {
       this.ctx.fillStyle = AppColor.TEXT_SUB;
       this.ctx.font = FONT_SUB;
       this.ctx.textAlign = 'center';
-      this.ctx.fillText(getContext(this).resourceManager.getStringSync($r('app.string.chart_no_data')), cx, cy + 4);
+      const host = this.getUIContext().getHostContext();
+      const noData: string = host !== undefined ? host.resourceManager.getStringSync($r('app.string.chart_no_data').id) : '';
+      this.ctx.fillText(noData, cx, cy + 4);
       return;
     }
     const gap: number = 0.03;
@@ -481,6 +483,8 @@ export struct PieChartView {
     this.ctx.fillText(sum.toFixed(1), cx, cy + 2);
     this.ctx.fillStyle = AppColor.TEXT_SUB;
     this.ctx.font = FONT_TICK;
-    this.ctx.fillText(getContext(this).resourceManager.getStringSync($r('app.string.chart_kg_total')), cx, cy + 18);
+    const hostTotal = this.getUIContext().getHostContext();
+    const kgTotal: string = hostTotal !== undefined ? hostTotal.resourceManager.getStringSync($r('app.string.chart_kg_total').id) : '';
+    this.ctx.fillText(kgTotal, cx, cy + 18);
   }
 }

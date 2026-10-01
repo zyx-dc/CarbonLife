@@ -1,4 +1,4 @@
-import { PromptAction, UIContext } from '@kit.ArkUI';
+import { UIContext } from '@kit.ArkUI';
 import { CarbonStore } from '../model/CarbonStore';
 import { behaviorIcon, CarbonFactors } from '../model/CarbonFactors';
 import { AppColor, AppConst } from '../common/Constants';
@@ -7,7 +7,7 @@ import { DateUtil } from '../common/DateUtil';
 import { VisionService, VisionResult } from '../model/VisionService';
 import { AppCard } from '../components/AppCard';
 import { AppButton } from '../components/AppButton';
-import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
 
 @Component
@@ -15,7 +15,6 @@ export struct RecordTab {
   @StorageLink('recordsVersion') version: number = 0;
   private onChange: () => void = () => { this.todayList = this.todayRecords(); };
   private uiContext: UIContext = this.getUIContext();
-  private promptAction: PromptAction = this.uiContext.getPromptAction();
   @State category: string = '出行';
   @State selectedKey: string = 'walk';
   @State amountText: string = '1';
@@ -53,11 +52,11 @@ export struct RecordTab {
 
   onSave(): void {
     if (this.amountValue() <= 0) {
-      this.promptAction.showToast({ message: $r('app.string.record_err_amount') });
+      ToastHelper.show(this.uiContext, $r('app.string.record_err_amount'));
       return;
     }
     CarbonStore.get().addRecord(this.currentBehavior(), this.amountValue(), this.note);
-    this.promptAction.showToast({ message: $r('app.string.record_saved_toast', this.savedValue().toFixed(2)) });
+    ToastHelper.show(this.uiContext, $r('app.string.record_saved_toast', this.savedValue().toFixed(2)));
     this.amountText = '1';
     this.note = '';
   }
@@ -69,7 +68,7 @@ export struct RecordTab {
       primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
       secondaryButton: { value: $r('app.string.common_delete'), fontColor: AppColor.DANGER, action: () => {
         CarbonStore.get().deleteRecord(id);
-        this.promptAction.showToast({ message: $r('app.string.record_deleted') });
+        ToastHelper.show(this.uiContext, $r('app.string.record_deleted'));
       }}
     });
   }
@@ -81,7 +80,7 @@ export struct RecordTab {
         this.category = b.category;
         this.selectedKey = b.key;
       }
-      this.promptAction.showToast({ message: res.message });
+      ToastHelper.show(this.uiContext, res.message);
     });
   }
 

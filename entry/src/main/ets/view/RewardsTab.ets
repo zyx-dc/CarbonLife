@@ -1,4 +1,4 @@
-import { PromptAction, UIContext } from '@kit.ArkUI';
+import { UIContext } from '@kit.ArkUI';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
 import { MallService, redeemIcon, RedeemResult } from '../model/MallService';
@@ -10,14 +10,13 @@ import { BadgeItem } from '../components/Badge';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
 import { AppButton } from '../components/AppButton';
-import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography } from '../common/Theme';
+import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { mallNameRes, mallDescRes } from '../common/Localize';
 
 @Component
 export struct RewardsTab {
   @StorageLink('recordsVersion') version: number = 0;
   private uiContext: UIContext = this.getUIContext();
-  private promptAction: PromptAction = this.uiContext.getPromptAction();
   private onChange: () => void = () => { this.refresh(); };
   @State ready: boolean = false;
 
@@ -60,9 +59,9 @@ export struct RewardsTab {
     MallService.redeem(item).then((res: RedeemResult) => {
       if (res.ok) {
         this.refresh();
-        this.promptAction.showToast({ message: $r('app.string.rewards_redeem_success', res.code) });
+        ToastHelper.show(this.uiContext, $r('app.string.rewards_redeem_success', res.code));
       } else {
-        this.promptAction.showToast({ message: res.message });
+        ToastHelper.show(this.uiContext, res.message);
       }
     });
   }
