@@ -25,7 +25,6 @@ export struct HomeTab {
   @State reminderOn: boolean = false;
   @State reminderHour: number = 20;
   @State reminderMinute: number = 0;
-  @StorageLink('reduceMotion') reduceMotion: boolean = false;
   @State familyExpanded: boolean = false;
   @State familyName: string = '';
   @State familyCode: string = '';
@@ -375,15 +374,6 @@ export struct HomeTab {
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start)
                 .onClick(() => this.onPickTime());
                 Toggle({ type: ToggleType.Switch, isOn: this.reminderOn }).onChange((isOn: boolean) => this.onReminderChange(isOn));
-              }.width('100%');
-              Divider().color(AppColor.DIVIDER);
-              Row() {
-                Column() {
-                  Text($r('app.string.a11y_reduce_motion')).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-                  Text($r('app.string.a11y_reduce_motion_desc')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-                Toggle({ type: ToggleType.Switch, isOn: this.reduceMotion })
-                  .onChange((isOn: boolean) => { this.reduceMotion = isOn; });
               }.width('100%');
             }
           }

@@ -137,6 +137,8 @@ struct Index {
       .barWidth(this.isWide ? 88 : '100%')
       .barHeight(this.isWide ? '100%' : 64)
       .padding({ top: this.topInsetVp() })
+      .barBackgroundColor(AppColor.GLASS_STRONG)
+      .divider({ strokeWidth: 1, color: AppColor.DIVIDER, startMargin: 0, endMargin: 0 })
       .scrollable(false)
       .animationDuration(AppMotion.reduceMotion() ? 0 : 280)
       .backgroundColor(Color.Transparent)
