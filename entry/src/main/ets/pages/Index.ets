@@ -1,3 +1,4 @@
+import { display } from '@kit.ArkUI';
 import { AppColor } from '../common/Constants';
 import { HomeTab } from '../view/HomeTab';
 import { RecordTab } from '../view/RecordTab';
@@ -17,10 +18,29 @@ struct Index {
   @State themeKey: number = 0;
   // 背景光斑缓慢漂移（呼吸感），受 reduceMotion 控制
   @State drift: boolean = false;
+  // 宽屏断点（平板/折叠/大屏）：宽度 ≥840vp 启用左侧导航 + 多列内容
+  @StorageLink('isWide') isWide: boolean = false;
+  // 沉浸式下状态栏高度（px），用于把内容顶部内缩，避免被状态栏遮挡
+  @StorageLink('statusBarPx') statusBarPx: number = 0;
+
+  private topInsetVp(): number {
+    return this.statusBarPx > 0 ? px2vp(this.statusBarPx) : 0;
+  }
+
+  // 用 display 的物理宽换算 vp 判断宽屏；比 mediaquery 的字符串条件更可靠
+  private computeWide(): boolean {
+    try {
+      const d = display.getDefaultDisplaySync();
+      return px2vp(d.width) >= 840;
+    } catch (e) {
+      return false;
+    }
+  }
 
   aboutToAppear(): void {
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 50);
     setTimeout(() => this.drift = true, AppMotion.reduceMotion() ? 0 : 120);
+    this.isWide = this.computeWide();
   }
 
   onColorMode(): void {
@@ -105,15 +125,18 @@ struct Index {
       .width('100%')
       .height('100%')
 
-      Tabs({ barPosition: BarPosition.End, controller: this.controller }) {
+      Tabs({ barPosition: this.isWide ? BarPosition.Start : BarPosition.End, controller: this.controller }) {
         TabContent() { HomeTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), $r('app.string.tab_home'), 0))
         TabContent() { RecordTab() }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
         TabContent() { DashboardTab() }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), $r('app.string.tab_dashboard'), 2))
         TabContent() { RewardsTab() }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), $r('app.string.tab_rewards'), 3))
         TabContent() { KnowledgeTab() }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), $r('app.string.tab_knowledge'), 4))
       }
+      .vertical(this.isWide)
       .barMode(BarMode.Fixed)
-      .barHeight(64)
+      .barWidth(this.isWide ? 88 : '100%')
+      .barHeight(this.isWide ? '100%' : 64)
+      .padding({ top: this.topInsetVp() })
       .scrollable(false)
       .animationDuration(AppMotion.reduceMotion() ? 0 : 280)
       .backgroundColor(Color.Transparent)
@@ -124,7 +147,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(AppColor.BG)
+    .backgroundColor(AppColor.BG_WASH_TOP)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }

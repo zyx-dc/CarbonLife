@@ -32,6 +32,8 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       hilog.info(DOMAIN, TAG, 'loadContent succeeded');
+      // 沉浸式：内容铺满状态栏/导航栏，消除系统底条的突兀色带
+      this.applyImmersiveBars(windowStage);
       // 窗口内容就绪后再申请权限，避免弹窗创建失败（12100009）
       this.requestDistributedPermission().then(() => {
         CarbonStore.get().init(this.context).then(async () => {
@@ -63,8 +65,62 @@ export default class EntryAbility extends UIAbility {
   private applyConfiguration(config: Configuration): void {
     const isDark = config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
     AppStorage.setOrCreate('colorMode', isDark ? 'dark' : 'light');
+    // 同步系统栏图标颜色，保证深/浅色下都清晰
+    this.updateBarContentColor(isDark);
     // 注意：不要在此覆盖 reduceMotion——它由用户在「首页 → 减弱动效」自行控制，
     // 若每次系统配置变化都写回 false，会静默清掉用户的选择。
+  }
+
+  /** 沉浸式：布局全屏并把状态栏/导航栏设为透明，让应用背景渐变铺满安全区。 */
+  private applyImmersiveBars(windowStage: window.WindowStage): void {
+    try {
+      const win = windowStage.getMainWindowSync();
+      win.setWindowLayoutFullScreen(true).then(() => {
+        try {
+          // 全屏后读取状态栏高度，供页面顶部内缩（背景铺满、内容避开状态栏）
+          const area = win.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
+          AppStorage.setOrCreate('statusBarPx', area.topRect.height);
+        } catch (e) {
+          hilog.warn(DOMAIN, TAG, 'getWindowAvoidArea failed: %{public}s', JSON.stringify(e));
+        }
+      }).catch((e: BusinessError) => {
+        hilog.warn(DOMAIN, TAG, 'setWindowLayoutFullScreen failed: %{public}s', JSON.stringify(e));
+      });
+      const isDark = this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+      const content: string = isDark ? '#FFFFFF' : '#1A1C18';
+      win.setWindowSystemBarProperties({
+        statusBarColor: '#00000000',
+        navigationBarColor: '#00000000',
+        statusBarContentColor: content,
+        navigationBarContentColor: content
+      }).catch((e: BusinessError) => {
+        hilog.warn(DOMAIN, TAG, 'setWindowSystemBarProperties failed: %{public}s', JSON.stringify(e));
+      });
+    } catch (e) {
+      hilog.error(DOMAIN, TAG, 'immersive bars setup failed: %{public}s', JSON.stringify(e));
+    }
+  }
+
+  private updateBarContentColor(isDark: boolean): void {
+    try {
+      const win = window.getLastWindow(this.context);
+      const run = (w: window.Window): void => {
+        const content: string = isDark ? '#FFFFFF' : '#1A1C18';
+        w.setWindowSystemBarProperties({
+          statusBarColor: '#00000000',
+          navigationBarColor: '#00000000',
+          statusBarContentColor: content,
+          navigationBarContentColor: content
+        }).catch((e: BusinessError) => {
+          hilog.warn(DOMAIN, TAG, 'update bar color failed: %{public}s', JSON.stringify(e));
+        });
+      };
+      win.then(run).catch((e: BusinessError) => {
+        hilog.warn(DOMAIN, TAG, 'getLastWindow failed: %{public}s', JSON.stringify(e));
+      });
+    } catch (e) {
+      hilog.error(DOMAIN, TAG, 'updateBarContentColor failed: %{public}s', JSON.stringify(e));
+    }
   }
 
   /**

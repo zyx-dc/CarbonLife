@@ -32,6 +32,7 @@ export struct DashboardTab {
   @State trendNonZero: number = 0;
   @State recentList: CarbonRecord[] = [];
   @State ready: boolean = false;
+  @StorageLink('isWide') isWide: boolean = false;
   private uiContext: UIContext = this.getUIContext();
 
   aboutToAppear(): void {
@@ -274,6 +275,80 @@ export struct DashboardTab {
     .justifyContent(FlexAlign.Center);
   }
 
+  // ---- 宽屏（平板 ≥840vp）双列排布的卡片，窄屏时按原顺序纵向堆叠 ----
+  @Builder trendCard() {
+    AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
+      Column({ space: AppSpacing.SM }) {
+        Text(this.trendTitle(this.period)).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+        if (this.summaryCount === '0') {
+          this.emptyState($r('app.string.dashboard_empty'));
+        } else if (this.trendNonZero < 2) {
+          // 稀疏数据用柱状更诚实（折线连接零点会制造「长期无排放」错觉）
+          BarChartView({ data: this.trendValues, labels: this.trendLabels, barColor: AppColor.CHART_LINE }).margin({ top: AppSpacing.SM });
+          Text($r('app.string.dashboard_sparse')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%');
+        } else {
+          LineChartView({ data: this.trendValues, labels: this.trendLabels }).margin({ top: AppSpacing.SM });
+        }
+      }
+    }
+  }
+
+  @Builder pieCard() {
+    AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
+      Column({ space: AppSpacing.SM }) {
+        Text($r('app.string.dashboard_category_pie')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+        PieChartView({ data: this.categoryValues, colors: this.categoryColors }).margin({ top: AppSpacing.SM });
+        Row({ space: AppSpacing.MD }) {
+          ForEach(this.legendData, (c: CategoryStat) => {
+            Row({ space: AppSpacing.XS }) {
+              Circle({ width: 8, height: 8 }).fill(c.color);
+              Text(categoryRes(c.category)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+            }
+          }, (c: CategoryStat) => c.category);
+        }
+        .width('100%').justifyContent(FlexAlign.Center).margin({ top: AppSpacing.SM });
+      }
+    }
+  }
+
+  @Builder recentCard() {
+    AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 6 }) {
+      Column({ space: AppSpacing.SM }) {
+        Text($r('app.string.dashboard_recent')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+        if (this.recentList.length === 0) {
+          Text($r('app.string.dashboard_no_records')).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.SM });
+        } else {
+          ForEach(this.recentList, (r: CarbonRecord) => {
+            Row() {
+              Text(categoryRes(r.category)).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_INVERSE)
+                .backgroundColor(CarbonFactors.categoryColor(r.category)).padding({ left: AppSpacing.SM, right: AppSpacing.SM, top: AppSpacing.XXS, bottom: AppSpacing.XXS }).borderRadius(AppRadius.SM);
+              Text(resolveStr(behaviorNameRes(r.behaviorKey, r.name)) + ' ' + r.amount.toString() + resolveStr(unitRes(r.unit))).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1).margin({ left: AppSpacing.SM });
+              Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
+            }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
+          }, (r: CarbonRecord) => r.id);
+        }
+      }
+    }
+  }
+
+  @Builder dataCard() {
+    AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 7, marginBottom: AppSpacing.LG }) {
+      Column({ space: AppSpacing.SM }) {
+        Text($r('app.string.dashboard_data_mgmt')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
+        Row({ space: AppSpacing.SM }) {
+          AppButton({ text: $r('app.string.dashboard_export_csv'), type: 'primary' }).layoutWeight(1).onClick(() => this.exportFile('csv'));
+          AppButton({ text: $r('app.string.dashboard_export_json'), type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
+        }.width('100%').margin({ top: AppSpacing.SM });
+        AppButton({ text: $r('app.string.dashboard_import'), type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
+        Row({ space: AppSpacing.SM }) {
+          AppButton({ text: $r('app.string.dashboard_backup_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.backupAll());
+          AppButton({ text: $r('app.string.dashboard_restore_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.restoreAll());
+        }.width('100%').margin({ top: AppSpacing.SM });
+        AppButton({ text: $r('app.string.dashboard_clear_all'), type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
+      }
+    }
+  }
+
   build() {
     Scroll() {
       Column({ space: AppSpacing.MD }) {
@@ -328,69 +403,21 @@ export struct DashboardTab {
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 })
         .animation({ duration: AppMotion.reduceMotion() ? 0 : 500, curve: AppMotion.EASE, delay: AppMotion.staggerDelay(2) });
 
-                  AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 3}) {
-          Column({ space: AppSpacing.SM }) {
-            Text(this.trendTitle(this.period)).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-            if (this.summaryCount === '0') {
-              this.emptyState($r('app.string.dashboard_empty'));
-            } else if (this.trendNonZero < 2) {
-              // 稀疏数据用柱状更诚实（折线连接零点会制造「长期无排放」错觉）
-              BarChartView({ data: this.trendValues, labels: this.trendLabels, barColor: AppColor.CHART_LINE }).margin({ top: AppSpacing.SM });
-              Text($r('app.string.dashboard_sparse')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%');
-            } else {
-              LineChartView({ data: this.trendValues, labels: this.trendLabels }).margin({ top: AppSpacing.SM });
-            }
-          }
-        }
+        if (this.isWide) {
+          Row({ space: AppSpacing.MD }) {
+            Column() { this.trendCard() }.layoutWeight(1)
+            Column() { this.pieCard() }.layoutWeight(1)
+          }.width('100%').alignItems(VerticalAlign.Top)
 
-                  AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 4}) {
-          Column({ space: AppSpacing.SM }) {
-            Text($r('app.string.dashboard_category_pie')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-            PieChartView({ data: this.categoryValues, colors: this.categoryColors }).margin({ top: AppSpacing.SM });
-            Row({ space: AppSpacing.MD }) {
-              ForEach(this.legendData, (c: CategoryStat) => {
-                Row({ space: AppSpacing.XS }) {
-                  Circle({ width: 8, height: 8 }).fill(c.color);
-                  Text(categoryRes(c.category)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-                }
-              }, (c: CategoryStat) => c.category);
-            }
-            .width('100%').justifyContent(FlexAlign.Center).margin({ top: AppSpacing.SM });
-          }
-        }
-
-                  AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 6}) {
-          Column({ space: AppSpacing.SM }) {
-            Text($r('app.string.dashboard_recent')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-            if (this.recentList.length === 0) {
-              Text($r('app.string.dashboard_no_records')).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.SM });
-            } else {
-              ForEach(this.recentList, (r: CarbonRecord) => {
-                Row() {
-                  Text(categoryRes(r.category)).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_INVERSE)
-                    .backgroundColor(CarbonFactors.categoryColor(r.category)).padding({ left: AppSpacing.SM, right: AppSpacing.SM, top: AppSpacing.XXS, bottom: AppSpacing.XXS }).borderRadius(AppRadius.SM);
-                  Text(resolveStr(behaviorNameRes(r.behaviorKey, r.name)) + ' ' + r.amount.toString() + resolveStr(unitRes(r.unit))).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1).margin({ left: AppSpacing.SM });
-                  Text(r.saved.toFixed(2) + ' kg').fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
-                }.width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM });
-              }, (r: CarbonRecord) => r.id);
-            }
-          }
-        }
-
-                  AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 7, marginBottom: AppSpacing.LG}) {
-          Column({ space: AppSpacing.SM }) {
-            Text($r('app.string.dashboard_data_mgmt')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-            Row({ space: AppSpacing.SM }) {
-              AppButton({ text: $r('app.string.dashboard_export_csv'), type: 'primary' }).layoutWeight(1).onClick(() => this.exportFile('csv'));
-              AppButton({ text: $r('app.string.dashboard_export_json'), type: 'secondary' }).layoutWeight(1).onClick(() => this.exportFile('json'));
-            }.width('100%').margin({ top: AppSpacing.SM });
-            AppButton({ text: $r('app.string.dashboard_import'), type: 'secondary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.importFile());
-            Row({ space: AppSpacing.SM }) {
-              AppButton({ text: $r('app.string.dashboard_backup_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.backupAll());
-              AppButton({ text: $r('app.string.dashboard_restore_all'), type: 'secondary' }).layoutWeight(1).onClick(() => this.restoreAll());
-            }.width('100%').margin({ top: AppSpacing.SM });
-            AppButton({ text: $r('app.string.dashboard_clear_all'), type: 'ghost', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.confirmClear());
-          }
+          Row({ space: AppSpacing.MD }) {
+            Column() { this.recentCard() }.layoutWeight(1)
+            Column() { this.dataCard() }.layoutWeight(1)
+          }.width('100%').alignItems(VerticalAlign.Top)
+        } else {
+          this.trendCard()
+          this.pieCard()
+          this.recentCard()
+          this.dataCard()
         }
       }
       .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
