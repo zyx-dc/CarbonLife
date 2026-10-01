@@ -294,7 +294,7 @@ export struct DashboardTab {
       Text(hint).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
     }
     .width('100%')
-    .height(150)
+    .height(120)
     .justifyContent(FlexAlign.Center);
   }
 

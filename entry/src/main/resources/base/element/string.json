@@ -99,6 +99,8 @@
     { "name": "rewards_redeem", "value": "兑换" },
     { "name": "rewards_redeem_gap", "value": "差 %s 分" },
 { "name": "rewards_mall_nearest", "value": "最接近" },
+{ "name": "rewards_mall_expand", "value": "展开全部" },
+{ "name": "rewards_mall_collapse", "value": "收起" },
     { "name": "rewards_redeem_success", "value": "兑换成功，兑换码 %s" },
     { "name": "rewards_redemptions", "value": "兑换记录" },
     { "name": "rewards_tasks", "value": "今日任务" },

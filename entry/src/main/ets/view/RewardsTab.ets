@@ -31,6 +31,7 @@ export struct RewardsTab {
   @State unlockedCount: number = 0;
   @State mallItems: RedeemItem[] = MallService.ITEMS;
   @State nearestId: string = '';
+  @State mallExpanded: boolean = false;
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -130,7 +131,7 @@ export struct RewardsTab {
               Text($r('app.string.rewards_mall_title')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT);
               Blank();
             }.width('100%');
-            ForEach(this.mallItems, (item: RedeemItem, index: number) => {
+            ForEach(this.mallExpanded ? this.mallItems : this.mallItems.slice(0, 3), (item: RedeemItem, index: number) => {
               Row({ space: AppSpacing.SM }) {
                 Image(redeemIcon(item.id))
                   .width(28)
@@ -174,6 +175,16 @@ export struct RewardsTab {
               .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 16 })
               .animation({ duration: AppMotion.reduceMotion() ? 0 : 400, curve: AppMotion.EASE, delay: AppMotion.staggerDelay(index) });
             }, (item: RedeemItem) => item.id);
+            if (this.mallItems.length > 3) {
+              Text(this.mallExpanded ? $r('app.string.rewards_mall_collapse') : $r('app.string.rewards_mall_expand'))
+                .fontSize(AppTypography.SMALL.size)
+                .fontColor(AppColor.PRIMARY)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .padding({ top: AppSpacing.SM })
+                .onClick(() => this.mallExpanded = !this.mallExpanded);
+            }
           }
         }
 

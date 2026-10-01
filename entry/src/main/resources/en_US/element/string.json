@@ -101,6 +101,8 @@
     { "name": "rewards_redeem", "value": "Redeem" },
     { "name": "rewards_redeem_gap", "value": "Need %s" },
 { "name": "rewards_mall_nearest", "value": "Closest" },
+{ "name": "rewards_mall_expand", "value": "Show all" },
+{ "name": "rewards_mall_collapse", "value": "Show less" },
     { "name": "rewards_redeem_success", "value": "Redeemed. Code: %s" },
     { "name": "rewards_redemptions", "value": "Redemption history" },
     { "name": "rewards_tasks", "value": "Today's tasks" },

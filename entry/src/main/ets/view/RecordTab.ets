@@ -91,7 +91,8 @@ export struct RecordTab {
   }
 
   build() {
-    Scroll() {
+    Stack({ alignContent: Alignment.Bottom }) {
+      Scroll() {
       Column({ space: AppSpacing.MD }) {
         Column({ space: AppSpacing.XS }) {
           Text('RECORD').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
@@ -175,23 +176,19 @@ export struct RecordTab {
           Column({ space: AppSpacing.SM }) {
             Text($r('app.string.record_amount_title', resolveStr(unitRes(this.currentBehavior().unit)))).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
             Row({ space: AppSpacing.SM }) {
-              Button('−').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size)
+              Button('−').width(48).height(48).backgroundColor(AppColor.ELEVATED).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size).fontWeight(FontWeight.Medium)
+                .borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM)
                 .onClick(() => this.stepAmount(-1));
-              TextInput({ text: $$this.amountText }).type(InputType.Number).layoutWeight(1).height(44).textAlign(TextAlign.Center)
+              TextInput({ text: $$this.amountText }).type(InputType.Number).layoutWeight(1).height(48).textAlign(TextAlign.Center)
                 .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
                 .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM);
-              Button('+').width(44).height(44).backgroundColor(AppColor.BG).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size)
+              Button('+').width(48).height(48).backgroundColor(AppColor.ELEVATED).fontColor(AppColor.TEXT).fontSize(AppTypography.H3.size).fontWeight(FontWeight.Medium)
+                .borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM)
                 .onClick(() => this.stepAmount(1));
             }.width('100%').margin({ top: AppSpacing.XS });
             TextInput({ text: $$this.note, placeholder: $r('app.string.record_note_placeholder') }).height(44)
               .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
               .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM });
-            Row() {
-              Text($r('app.string.record_estimated', this.savedValue().toFixed(2))).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT);
-              Blank();
-              Text(this.pointsValue() === 1 ? $r('app.string.record_points_one', this.pointsValue().toString()) : $r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.BODY.size).fontColor(AppColor.ACCENT);
-            }.width('100%').margin({ top: AppSpacing.SM });
-            AppButton({ text: $r('app.string.record_save'), type: 'primary', fullWidth: true }).margin({ top: AppSpacing.SM }).onClick(() => this.onSave());
           }
         }
 
@@ -215,8 +212,26 @@ export struct RecordTab {
           }
         }
       }
-      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
+      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 170 })
+      }
+      .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
+
+      // 吸底操作条：保存与预计减排始终在拇指区
+      Column({ space: AppSpacing.XS }) {
+        Row() {
+          Text($r('app.string.record_estimated', this.savedValue().toFixed(2))).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+          Blank();
+          Text(this.pointsValue() === 1 ? $r('app.string.record_points_one', this.pointsValue().toString()) : $r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT);
+        }.width('100%');
+        AppButton({ text: $r('app.string.record_save'), type: 'primary', fullWidth: true }).onClick(() => this.onSave());
+      }
+      .width('100%')
+      .padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.SM, bottom: AppSpacing.SM })
+      .backgroundColor(AppColor.GLASS_STRONG)
+      .backdropBlur(24)
+      .borderWidth({ top: 1 })
+      .borderColor(AppColor.DIVIDER);
     }
-    .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
+    .width('100%').height('100%');
   }
 }
