@@ -19,3 +19,8 @@
 # 构建产物与签名材料（绝不入库）
 /dist/
 *.hap
+
+# Agent / 工具链的本机安装产物（skills 由 skills-lock.json 锁定，安装内容不入库）
+/.agents/skills/
+/.claude/skills/
+/.opencode/opencode.json
