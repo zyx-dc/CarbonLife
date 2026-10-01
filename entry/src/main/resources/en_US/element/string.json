@@ -166,6 +166,9 @@
     { "name": "knowledge_quiz_progress", "value": "%s / %s answered" },
     { "name": "knowledge_quiz_result", "value": "Your low-carbon index" },
     { "name": "knowledge_quiz_retry", "value": "Retake quiz" },
+{ "name": "knowledge_quiz_prev", "value": "Previous" },
+{ "name": "knowledge_quiz_next", "value": "Next" },
+{ "name": "knowledge_quiz_see_result", "value": "See result" },
     { "name": "knowledge_disclaimer_title", "value": "Note" },
     { "name": "knowledge_disclaimer", "value": "Reference material. Carbon factors are common estimates and may vary by region and methodology." },
 

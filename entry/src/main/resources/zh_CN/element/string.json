@@ -164,6 +164,9 @@
     { "name": "knowledge_quiz_progress", "value": "已答 %s / %s" },
     { "name": "knowledge_quiz_result", "value": "你的低碳指数" },
     { "name": "knowledge_quiz_retry", "value": "重新测一次" },
+{ "name": "knowledge_quiz_prev", "value": "上一题" },
+{ "name": "knowledge_quiz_next", "value": "下一题" },
+{ "name": "knowledge_quiz_see_result", "value": "查看结果" },
     { "name": "knowledge_disclaimer_title", "value": "温馨提示" },
     { "name": "knowledge_disclaimer", "value": "科普资料，碳排放因子为常用参考值，实际因地区与统计口径略有差异。" },
 

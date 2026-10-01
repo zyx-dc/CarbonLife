@@ -2,16 +2,42 @@ import { AppColor } from '../common/Constants';
 import { KnowledgeData, knowledgeCover, QuizData } from '../model/Rewards';
 import { KnowledgeItem, QuizQuestion, QuizOption } from '../model/CarbonTypes';
 import { AppCard } from '../components/AppCard';
+import { AppButton } from '../components/AppButton';
 import { AppMotion, AppRadius, AppSpacing, AppTypography } from '../common/Theme';
 
 @Component
 export struct KnowledgeTab {
   @State expandedId: string = '';
   @State answers: number[] = [-1, -1, -1, -1, -1];
+  @State step: number = 0;
   @State ready: boolean = false;
 
   aboutToAppear(): void {
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
+  }
+
+  private total(): number {
+    return QuizData.QUESTIONS.length;
+  }
+
+  private isDone(): boolean {
+    return this.step >= this.total();
+  }
+
+  private next(): void {
+    if (this.step < this.total()) {
+      this.step += 1;
+    }
+  }
+
+  private back(): void {
+    if (this.step > 0) {
+      this.step -= 1;
+    }
+  }
+
+  private canAdvance(): boolean {
+    return !this.isDone() && this.answers[this.step] >= 0;
   }
 
   private quizScore(): number {
@@ -43,6 +69,7 @@ export struct KnowledgeTab {
 
   private resetQuiz(): void {
     this.answers = [-1, -1, -1, -1, -1];
+    this.step = 0;
   }
 
   // 封面压暗：仅保留底部渐变（去掉右下角水印标识），统一图片调性
@@ -60,9 +87,11 @@ export struct KnowledgeTab {
       ForEach([0, 1, 2, 3, 4], (i: number) => {
         Row()
           .layoutWeight(1)
-          .height(6)
-          .borderRadius(3)
-          .backgroundColor(this.answers[i] >= 0 ? AppColor.SIGNAL : AppColor.BORDER);
+          .height(!this.isDone() && i === this.step ? 8 : 6)
+          .borderRadius(4)
+          .backgroundColor(i < this.step || this.isDone() ? AppColor.PRIMARY : (i === this.step ? AppColor.PRIMARY : AppColor.BORDER))
+          .opacity(i === this.step && !this.isDone() ? 1 : (i < this.step ? 0.55 : 1))
+          .animation({ duration: AppMotion.reduceMotion() ? 0 : 300, curve: Curve.Friction });
       }, (i: number) => i.toString());
     }
     .width('100%');
@@ -92,7 +121,7 @@ export struct KnowledgeTab {
           Text($r('app.string.knowledge_quiz_title')).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);
           Text($r('app.string.knowledge_quiz_subtitle')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
         }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-        Text($r('app.string.knowledge_quiz_progress', this.answeredCount().toString(), QuizData.QUESTIONS.length.toString()))
+        Text($r('app.string.knowledge_quiz_progress', this.answeredCount().toString(), this.total().toString()))
           .fontSize(AppTypography.CAPTION_MEDIUM.size)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppColor.TEXT_SUB)
@@ -105,11 +134,23 @@ export struct KnowledgeTab {
 
       this.progressSegments();
 
-      ForEach(QuizData.QUESTIONS, (q: QuizQuestion, qi: number) => {
+      if (!this.isDone()) {
+        // 一题一屏：减少同时可见选项，降低认知负荷
         Column({ space: AppSpacing.SM }) {
           Row({ space: AppSpacing.SM }) {
-            this.qIndex(qi + 1);
-            Text(q.q)
+            Text((this.step + 1).toString())
+              .width(22)
+              .height(22)
+              .lineHeight(22)
+              .textAlign(TextAlign.Center)
+              .fontSize(AppTypography.SMALL.size)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppColor.TEXT)
+              .backgroundColor(AppColor.ELEVATED)
+              .borderWidth(1)
+              .borderColor(AppColor.BORDER)
+              .borderRadius(AppRadius.FULL);
+            Text(QuizData.QUESTIONS[this.step].q)
               .fontSize(AppTypography.BODY_MEDIUM.size)
               .fontColor(AppColor.TEXT)
               .layoutWeight(1);
@@ -117,34 +158,50 @@ export struct KnowledgeTab {
           .width('100%')
           .alignItems(VerticalAlign.Center);
           Flex({ wrap: FlexWrap.Wrap }) {
-            ForEach(q.options, (opt: QuizOption, oi: number) => {
+            ForEach(QuizData.QUESTIONS[this.step].options, (opt: QuizOption, oi: number) => {
               Text(opt.label)
                 .fontSize(AppTypography.SMALL.size)
-                .fontWeight(this.answers[qi] === oi ? FontWeight.Medium : FontWeight.Regular)
-                .fontColor(this.answers[qi] === oi ? AppColor.ON_SIGNAL : AppColor.TEXT)
-                .backgroundColor(this.answers[qi] === oi ? AppColor.SIGNAL : AppColor.GLASS_STRONG)
+                .fontWeight(this.answers[this.step] === oi ? FontWeight.Medium : FontWeight.Regular)
+                .fontColor(this.answers[this.step] === oi ? AppColor.TEXT_INVERSE : AppColor.TEXT)
+                .backgroundColor(this.answers[this.step] === oi ? AppColor.PRIMARY : AppColor.GLASS_STRONG)
                 .borderWidth(1)
-                .borderColor(this.answers[qi] === oi ? AppColor.SIGNAL : AppColor.BORDER)
+                .borderColor(this.answers[this.step] === oi ? AppColor.PRIMARY : AppColor.BORDER)
                 .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
                 .height(44)
                 .textAlign(TextAlign.Center)
                 .borderRadius(AppRadius.FULL)
                 .margin({ right: AppSpacing.SM, bottom: AppSpacing.SM })
-                .onClick(() => this.pick(qi, oi));
-            }, (opt: QuizOption, oi: number) => oi.toString());
+                .onClick(() => this.pick(this.step, oi));
+            }, (opt: QuizOption, oi: number) => this.step.toString() + '-' + oi.toString());
           }
           .width('100%');
         }
-        .width('100%');
-      }, (q: QuizQuestion) => q.id);
+        .width('100%')
+        .id('quiz-q-' + this.step);
 
-      if (this.answeredCount() === QuizData.QUESTIONS.length) {
+        Row({ space: AppSpacing.SM }) {
+          if (this.step > 0) {
+            AppButton({ text: $r('app.string.knowledge_quiz_prev'), type: 'secondary', btnHeight: 44 })
+              .layoutWeight(1)
+              .onClick(() => this.back());
+          }
+          AppButton({
+            text: this.step === this.total() - 1 ? $r('app.string.knowledge_quiz_see_result') : $r('app.string.knowledge_quiz_next'),
+            type: 'primary',
+            btnHeight: 44,
+            disabled: !this.canAdvance()
+          })
+            .layoutWeight(1)
+            .onClick(() => this.next());
+        }
+        .width('100%');
+      } else {
         Row() {
           Column()
             .width(3)
             .height(38)
             .borderRadius(2)
-            .backgroundColor(AppColor.SIGNAL);
+            .backgroundColor(AppColor.PRIMARY);
           Column({ space: AppSpacing.XXS }) {
             Row({ space: AppSpacing.SM }) {
               Text($r('app.string.knowledge_quiz_result')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
