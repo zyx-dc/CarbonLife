@@ -101,17 +101,19 @@ export struct RecordTab {
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 1}) {
-          Row({ space: AppSpacing.SM }) {
-            Image($r('app.media.ic_ai_scan'))
-              .width(40)
-              .height(40)
-              .fillColor(AppColor.TEXT_SUB);
-            Column() {
-              Text($r('app.string.record_ai_title')).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
-              Text($r('app.string.record_ai_desc')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).margin({ top: AppSpacing.XS }).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis });
-            }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-            AppButton({ text: $r('app.string.record_ai_button'), type: 'secondary', btnHeight: 44, fullWidth: false }).onClick(() => this.onAiDetect());
-          }.width('100%');
+          Column({ space: AppSpacing.SM }) {
+            Row({ space: AppSpacing.SM }) {
+              Image($r('app.media.ic_ai_scan'))
+                .width(40)
+                .height(40)
+                .fillColor(AppColor.PRIMARY);
+              Column({ space: AppSpacing.XXS }) {
+                Text($r('app.string.record_ai_title')).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT).maxLines(2);
+                Text($r('app.string.record_ai_desc')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis });
+              }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+            }.width('100%').alignItems(VerticalAlign.Center);
+            AppButton({ text: $r('app.string.record_ai_button'), type: 'secondary', btnHeight: 44, fullWidth: true }).onClick(() => this.onAiDetect());
+          }
         }
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 2}) {
@@ -121,10 +123,10 @@ export struct RecordTab {
               ForEach(CarbonFactors.CATEGORIES, (cat: string) => {
                 Text(categoryRes(cat))
                   .fontSize(AppTypography.SMALL.size)
-                  .fontColor(this.category === cat ? AppColor.ON_SIGNAL : AppColor.TEXT)
-                  .backgroundColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_STRONG)
+                  .fontColor(this.category === cat ? AppColor.TEXT_INVERSE : AppColor.TEXT)
+                  .backgroundColor(this.category === cat ? AppColor.PRIMARY : AppColor.GLASS_STRONG)
                   .borderWidth(1)
-                  .borderColor(this.category === cat ? AppColor.SIGNAL : AppColor.GLASS_BORDER)
+                  .borderColor(this.category === cat ? AppColor.PRIMARY : AppColor.GLASS_BORDER)
                   .padding({ left: AppSpacing.SM, right: AppSpacing.SM })
                   .height(38)
                   .layoutWeight(1)
@@ -148,7 +150,7 @@ export struct RecordTab {
                 Image(behaviorIcon(b.key))
                   .width(24)
                   .height(24)
-                  .fillColor(this.selectedKey === b.key ? AppColor.SIGNAL : AppColor.TEXT_SUB);
+                  .fillColor(this.selectedKey === b.key ? AppColor.PRIMARY : AppColor.TEXT_SUB);
                 Column({ space: 2 }) {
                   Text(behaviorNameRes(b.key, b.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
                   Text($r('app.string.record_behavior_factor', resolveStr(unitRes(b.unit)), b.factor.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
@@ -156,10 +158,10 @@ export struct RecordTab {
                 Stack() {
                   Circle({ width: 22, height: 22 })
                     .fill(Color.Transparent)
-                    .stroke(this.selectedKey === b.key ? AppColor.SIGNAL : AppColor.BORDER)
+                    .stroke(this.selectedKey === b.key ? AppColor.PRIMARY : AppColor.BORDER)
                     .strokeWidth(1.5);
                   if (this.selectedKey === b.key) {
-                    Circle({ width: 11, height: 11 }).fill(AppColor.SIGNAL);
+                    Circle({ width: 11, height: 11 }).fill(AppColor.PRIMARY);
                   }
                 }.width(22).height(22);
               }
