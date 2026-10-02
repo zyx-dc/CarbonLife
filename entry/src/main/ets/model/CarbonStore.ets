@@ -169,6 +169,11 @@ export class CarbonStore {
     this.notify();
   }
 
+  findRecord(id: string): CarbonRecord | null {
+    const hit = this.records.filter((r: CarbonRecord) => r.id === id);
+    return hit.length > 0 ? hit[0] : null;
+  }
+
   clearAll(): void {
     this.records = [];
     this.redemptions = [];

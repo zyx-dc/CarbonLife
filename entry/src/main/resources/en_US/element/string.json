@@ -103,6 +103,8 @@
     { "name": "rewards_redeem", "value": "Redeem" },
     { "name": "rewards_redeem_gap", "value": "Need %s" },
 { "name": "rewards_mall_nearest", "value": "Closest" },
+{ "name": "rewards_mall_owned", "value": "Owned" },
+{ "name": "record_delete_message_over", "value": "After deleting, total points fall below what you have spent, so available becomes 0. Delete anyway?" },
 { "name": "rewards_mall_expand", "value": "Show all" },
 { "name": "rewards_redeem_success_title", "value": "Redeemed!" },
 { "name": "rewards_mall_collapse", "value": "Show less" },

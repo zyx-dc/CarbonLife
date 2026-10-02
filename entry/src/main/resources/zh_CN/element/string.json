@@ -101,6 +101,8 @@
     { "name": "rewards_redeem", "value": "兑换" },
     { "name": "rewards_redeem_gap", "value": "差 %s 分" },
 { "name": "rewards_mall_nearest", "value": "最接近" },
+{ "name": "rewards_mall_owned", "value": "已拥有" },
+{ "name": "record_delete_message_over", "value": "删除后「累计获得」将低于「已兑换」，可用积分计为 0。仍要删除吗？" },
 { "name": "rewards_mall_expand", "value": "展开全部" },
 { "name": "rewards_redeem_success_title", "value": "兑换成功" },
 { "name": "rewards_mall_collapse", "value": "收起" },

@@ -93,9 +93,13 @@ export struct RecordTab {
   }
 
   confirmDelete(id: string, name: string): void {
+    const store = CarbonStore.get();
+    const rec = store.findRecord(id);
+    const afterTotal = rec !== null ? store.totalPoints() - rec.points : store.totalPoints();
+    const over = afterTotal < store.spentPoints();
     this.uiContext.showAlertDialog({
       title: $r('app.string.record_delete_title'),
-      message: $r('app.string.record_delete_message', name),
+      message: over ? $r('app.string.record_delete_message_over') : $r('app.string.record_delete_message', name),
       primaryButton: { value: $r('app.string.common_cancel'), action: () => {} },
       secondaryButton: { value: $r('app.string.common_delete'), fontColor: AppColor.DANGER, action: () => {
         this.animateDelete(id);

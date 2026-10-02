@@ -163,6 +163,14 @@ export struct RewardsTab {
                         .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
                         .borderRadius(AppRadius.SM);
                     }
+                    if (this.redemptions.some((rd: RedemptionRecord) => rd.itemId === item.id)) {
+                      Text($r('app.string.rewards_mall_owned'))
+                        .fontSize(AppTypography.SMALL.size)
+                        .fontColor(AppColor.TEXT_SUB)
+                        .backgroundColor(AppColor.ELEVATED)
+                        .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
+                        .borderRadius(AppRadius.SM);
+                    }
                   }.alignItems(VerticalAlign.Center);
                   Text(mallDescRes(item.id, item.desc)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
                   if (this.balance < item.cost) {

@@ -27,7 +27,7 @@ class LocalMockExchangeApi implements CarbonExchangeApi {
 
 export class MallService {
   static readonly ITEMS: RedeemItem[] = [
-    { id: 'm1', name: '低碳徽章·青铜', desc: '虚拟荣誉徽章，点亮你的荣誉墙', cost: 100, icon: '🥉', category: '荣誉' },
+    { id: 'm1', name: '低碳徽章·青铜', desc: '虚拟荣誉徽章：可在成果卡片上展示（不改变成就徽章墙）', cost: 100, icon: '🥉', category: '荣誉' },
     { id: 'm2', name: '共享单车骑行券', desc: '碳普惠权益：1 次免费骑行', cost: 200, icon: '🚲', category: '出行' },
     { id: 'm3', name: '地铁 9 折券', desc: '碳普惠权益：地铁乘车优惠', cost: 300, icon: '🚇', category: '出行' },
     { id: 'm4', name: '环保购物袋', desc: '碳普惠权益：可降解环保袋', cost: 150, icon: '🛍️', category: '生活' },
