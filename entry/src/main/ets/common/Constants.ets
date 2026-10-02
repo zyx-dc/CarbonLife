@@ -66,6 +66,8 @@ export class AppConst {
   static readonly KEY_REMINDER_HOUR: string = 'reminder_hour';
   static readonly KEY_REMINDER_MINUTE: string = 'reminder_minute';
   static readonly POINTS_PER_KG: number = 100;
+  // 单条记录的最低积分：极小减排（如节水 1L）也有感知，避免「做了事只得 1 分」的沮丧
+  static readonly MIN_RECORD_POINTS: number = 5;
   static readonly TREE_PER_KG: number = 10;
   // 每日「记录积分」上限，抑制极小减排的重复刷分
   static readonly DAILY_RECORD_POINTS_CAP: number = 300;

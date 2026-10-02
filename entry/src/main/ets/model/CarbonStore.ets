@@ -138,7 +138,7 @@ export class CarbonStore {
 
   addRecord(behavior: BehaviorDef, amount: number, note: string): CarbonRecord {
     const saved = behavior.factor * amount;
-    let points = saved > 0 ? Math.max(1, Math.round(saved * AppConst.POINTS_PER_KG)) : 0;
+    let points = saved > 0 ? Math.max(AppConst.MIN_RECORD_POINTS, Math.round(saved * AppConst.POINTS_PER_KG)) : 0;
     // 每日「记录积分」封顶，抑制极小减排的重复刷分
     const remaining = AppConst.DAILY_RECORD_POINTS_CAP - this.recordPointsToday();
     points = remaining <= 0 ? 0 : Math.min(points, remaining);

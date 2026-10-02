@@ -53,7 +53,13 @@ export struct RecordTab {
 
   savedValue(): number { return this.currentBehavior().factor * this.amountValue(); }
 
-  pointsValue(): number { return Math.max(1, Math.round(this.savedValue() * AppConst.POINTS_PER_KG)); }
+  pointsValue(): number {
+    // 与 CarbonStore.addRecord 口径一致：最低 MIN_RECORD_POINTS，并受当日记录积分上限约束
+    const saved = this.savedValue();
+    const base = saved > 0 ? Math.max(AppConst.MIN_RECORD_POINTS, Math.round(saved * AppConst.POINTS_PER_KG)) : 0;
+    const remaining = AppConst.DAILY_RECORD_POINTS_CAP - this.todayRecordPoints;
+    return remaining <= 0 ? 0 : Math.min(base, remaining);
+  }
 
   stepAmount(delta: number): void {
     const step = this.currentBehavior().step;
