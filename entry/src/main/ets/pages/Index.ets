@@ -12,6 +12,8 @@ import { AppMotion, AppTypography } from '../common/Theme';
 struct Index {
   private controller: TabsController = new TabsController();
   @State currentIndex: number = 0;
+  // 克制的切 Tab 过渡：仅内容区淡入（导航栏不动）
+  @State contentFade: boolean = true;
   @State ready: boolean = false;
   // 深浅模式跟随系统：colorMode 变化时重建 Tabs 子树，令全部 AppColor.* 重新求值
   @StorageLink('colorMode') @Watch('onColorMode') colorMode: string = 'dark';
@@ -126,11 +128,11 @@ struct Index {
       .height('100%')
 
       Tabs({ barPosition: this.isWide ? BarPosition.Start : BarPosition.End, controller: this.controller }) {
-        TabContent() { HomeTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), $r('app.string.tab_home'), 0))
-        TabContent() { RecordTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
-        TabContent() { DashboardTab() }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), $r('app.string.tab_dashboard'), 2))
-        TabContent() { RewardsTab() }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), $r('app.string.tab_rewards'), 3))
-        TabContent() { KnowledgeTab() }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), $r('app.string.tab_knowledge'), 4))
+        TabContent() { Column() { HomeTab({ controller: this.controller }) }.width('100%').height('100%').opacity(this.contentFade ? 1 : 0).animation({ duration: AppMotion.reduceMotion() ? 0 : 180, curve: Curve.EaseOut }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), $r('app.string.tab_home'), 0))
+        TabContent() { Column() { RecordTab({ controller: this.controller }) }.width('100%').height('100%').opacity(this.contentFade ? 1 : 0).animation({ duration: AppMotion.reduceMotion() ? 0 : 180, curve: Curve.EaseOut }) }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
+        TabContent() { Column() { DashboardTab() }.width('100%').height('100%').opacity(this.contentFade ? 1 : 0).animation({ duration: AppMotion.reduceMotion() ? 0 : 180, curve: Curve.EaseOut }) }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), $r('app.string.tab_dashboard'), 2))
+        TabContent() { Column() { RewardsTab() }.width('100%').height('100%').opacity(this.contentFade ? 1 : 0).animation({ duration: AppMotion.reduceMotion() ? 0 : 180, curve: Curve.EaseOut }) }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), $r('app.string.tab_rewards'), 3))
+        TabContent() { Column() { KnowledgeTab() }.width('100%').height('100%').opacity(this.contentFade ? 1 : 0).animation({ duration: AppMotion.reduceMotion() ? 0 : 180, curve: Curve.EaseOut }) }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), $r('app.string.tab_knowledge'), 4))
       }
       .vertical(this.isWide)
       .barMode(BarMode.Fixed)
@@ -143,7 +145,12 @@ struct Index {
       .animationDuration(AppMotion.reduceMotion() ? 0 : 280)
       .backgroundColor(Color.Transparent)
       .id('carbonlife-tabs-' + this.themeKey)
-      .onChange((index: number) => { this.currentIndex = index; })
+      .onChange((index: number) => {
+        this.currentIndex = index;
+        // 内容区快速淡入（不上移），保留即时切换的手感
+        this.contentFade = false;
+        setTimeout(() => { this.contentFade = true; }, 16);
+      })
       .opacity(this.ready ? 1 : 0)
       .animation({ duration: AppMotion.reduceMotion() ? 0 : 400, curve: AppMotion.EASE });
     }
