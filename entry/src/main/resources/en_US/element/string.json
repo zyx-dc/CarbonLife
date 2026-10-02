@@ -77,6 +77,8 @@
     { "name": "record_amount_title", "value": "Amount (%s)" },
     { "name": "record_note_placeholder", "value": "Note (optional)" },
     { "name": "record_estimated", "value": "Estimated saving %s kg CO₂e" },
+{ "name": "record_points_progress", "value": "Today's record points %s / %s" },
+{ "name": "record_cap_reached", "value": "Daily record-points cap reached (%s). Come back tomorrow." },
     { "name": "record_points", "value": "+%s points" },
     { "name": "record_points_one", "value": "+%s point" },
     { "name": "record_save", "value": "Save record" },

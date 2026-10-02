@@ -77,6 +77,8 @@
     { "name": "record_amount_title", "value": "数量（%s）" },
     { "name": "record_note_placeholder", "value": "备注（可选）" },
     { "name": "record_estimated", "value": "预计减排 %s kg CO₂e" },
+{ "name": "record_points_progress", "value": "今日记录积分 %s / %s" },
+{ "name": "record_cap_reached", "value": "今日记录积分已达上限（%s 分），明天继续" },
     { "name": "record_points", "value": "+%s 积分" },
     { "name": "record_save", "value": "保存记录" },
     { "name": "record_today_title", "value": "今日记录" },

@@ -13,7 +13,7 @@ import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Loc
 @Component
 export struct RecordTab {
   @StorageLink('recordsVersion') version: number = 0;
-  private onChange: () => void = () => { this.todayList = this.todayRecords(); };
+  private onChange: () => void = () => { this.todayList = this.todayRecords(); this.todayRecordPoints = CarbonStore.get().recordPointsToday(); };
   private uiContext: UIContext = this.getUIContext();
   controller: TabsController = new TabsController();
   @State category: string = '出行';
@@ -29,12 +29,14 @@ export struct RecordTab {
     setTimeout(() => { this.ready = true; }, 32);
   }
   @State todayList: CarbonRecord[] = [];
+  @State todayRecordPoints: number = 0;
   @State removingId: string = '';
   @State amountPulse: boolean = false;
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
     this.todayList = this.todayRecords();
+    this.todayRecordPoints = CarbonStore.get().recordPointsToday();
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
   }
 
@@ -237,6 +239,13 @@ export struct RecordTab {
                   setTimeout(() => { this.amountPulse = false; }, 130);
                 }
               });
+            Text(this.todayRecordPoints >= AppConst.DAILY_RECORD_POINTS_CAP
+              ? $r('app.string.record_cap_reached', AppConst.DAILY_RECORD_POINTS_CAP.toString())
+              : $r('app.string.record_points_progress', this.todayRecordPoints.toString(), AppConst.DAILY_RECORD_POINTS_CAP.toString()))
+              .fontSize(AppTypography.SMALL.size)
+              .fontColor(this.todayRecordPoints >= AppConst.DAILY_RECORD_POINTS_CAP ? AppColor.DANGER : AppColor.TEXT_SUB)
+              .width('100%')
+              .margin({ top: AppSpacing.XS });
             TextInput({ text: $$this.note, placeholder: $r('app.string.record_note_placeholder') }).height(44)
               .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
               .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM });
