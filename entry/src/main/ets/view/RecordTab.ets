@@ -21,13 +21,6 @@ export struct RecordTab {
   @State amountText: string = '1';
   @State note: string = '';
   @State ready: boolean = false;
-  @StorageLink('tabPulse') @Watch('onTabPulse') tabPulse: number = 0;
-
-  // 切 Tab 时重播入场过渡（淡入 + 上移）
-  onTabPulse(): void {
-    this.ready = false;
-    setTimeout(() => { this.ready = true; }, 32);
-  }
   @State todayList: CarbonRecord[] = [];
   @State todayRecordPoints: number = 0;
   @State removingId: string = '';

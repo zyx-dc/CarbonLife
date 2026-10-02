@@ -143,11 +143,7 @@ struct Index {
       .animationDuration(AppMotion.reduceMotion() ? 0 : 280)
       .backgroundColor(Color.Transparent)
       .id('carbonlife-tabs-' + this.themeKey)
-      .onChange((index: number) => {
-        this.currentIndex = index;
-        // 切 Tab 时通知各页重播入场过渡（内容淡入 + 上移）
-        AppStorage.setOrCreate('tabPulse', (AppStorage.get<number>('tabPulse') ?? 0) + 1);
-      })
+      .onChange((index: number) => { this.currentIndex = index; })
       .opacity(this.ready ? 1 : 0)
       .animation({ duration: AppMotion.reduceMotion() ? 0 : 400, curve: AppMotion.EASE });
     }

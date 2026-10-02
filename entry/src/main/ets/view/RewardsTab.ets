@@ -19,13 +19,6 @@ export struct RewardsTab {
   private uiContext: UIContext = this.getUIContext();
   private onChange: () => void = () => { this.refresh(); };
   @State ready: boolean = false;
-  @StorageLink('tabPulse') @Watch('onTabPulse') tabPulse: number = 0;
-
-  // 切 Tab 时重播入场过渡（淡入 + 上移）
-  onTabPulse(): void {
-    this.ready = false;
-    setTimeout(() => { this.ready = true; }, 32);
-  }
 
   @State balance: number = 0;
   @State totalPoints: number = 0;
