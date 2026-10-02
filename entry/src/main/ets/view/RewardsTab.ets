@@ -19,6 +19,13 @@ export struct RewardsTab {
   private uiContext: UIContext = this.getUIContext();
   private onChange: () => void = () => { this.refresh(); };
   @State ready: boolean = false;
+  @StorageLink('tabPulse') @Watch('onTabPulse') tabPulse: number = 0;
+
+  // 切 Tab 时重播入场过渡（淡入 + 上移）
+  onTabPulse(): void {
+    this.ready = false;
+    setTimeout(() => { this.ready = true; }, 32);
+  }
 
   @State balance: number = 0;
   @State totalPoints: number = 0;
@@ -32,6 +39,9 @@ export struct RewardsTab {
   @State mallItems: RedeemItem[] = MallService.ITEMS;
   @State nearestId: string = '';
   @State mallExpanded: boolean = false;
+  @State celebrate: boolean = false;
+  @State celebrateId: string = '';
+  @State celebrateCode: string = '';
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
@@ -72,7 +82,11 @@ export struct RewardsTab {
     MallService.redeem(item).then((res: RedeemResult) => {
       if (res.ok) {
         this.refresh();
-        ToastHelper.show(this.uiContext, $r('app.string.rewards_redeem_success', res.code));
+        // #3 兑换成功庆祝：卡片放大浮现，自动收起
+        this.celebrateId = item.id;
+        this.celebrateCode = res.code;
+        this.celebrate = true;
+        setTimeout(() => { this.celebrate = false; }, AppMotion.reduceMotion() ? 900 : 1800);
       } else {
         ToastHelper.show(this.uiContext, res.message);
       }
@@ -80,7 +94,8 @@ export struct RewardsTab {
   }
 
   build() {
-    Scroll() {
+    Stack({ alignContent: Alignment.Center }) {
+      Scroll() {
       Column({ space: AppSpacing.MD }) {
         Column({ space: AppSpacing.XS }) {
           Text('REWARDS').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
@@ -231,7 +246,30 @@ export struct RewardsTab {
         }
       }
       .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
+      }
+      .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
+
+      // #3 兑换成功庆祝浮层
+      if (this.celebrate) {
+        Column() {
+          Column({ space: AppSpacing.SM }) {
+            Image(redeemIcon(this.celebrateId)).width(56).height(56).fillColor(AppColor.PRIMARY);
+            Text($r('app.string.rewards_redeem_success_title')).fontSize(AppTypography.H3.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);
+            Text(this.celebrateCode).fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
+          }
+          .padding(AppSpacing.XL)
+          .backgroundColor(AppColor.CARD)
+          .borderRadius(AppRadius.LG)
+          .shadow(AppShadow.glow())
+          .transition(TransitionEffect.scale({ x: 0.8, y: 0.8 }).animation({ duration: AppMotion.reduceMotion() ? 0 : 260, curve: Curve.Friction })
+            .combine(TransitionEffect.OPACITY.animation({ duration: AppMotion.reduceMotion() ? 0 : 200 })));
+        }
+        .width('100%').height('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(AppColor.OVERLAY)
+        .onClick(() => this.celebrate = false);
+      }
     }
-    .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
+    .width('100%').height('100%');
   }
 }

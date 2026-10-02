@@ -12,6 +12,13 @@ export struct KnowledgeTab {
   @State answers: number[] = [-1, -1, -1, -1, -1];
   @State step: number = 0;
   @State ready: boolean = false;
+  @StorageLink('tabPulse') @Watch('onTabPulse') tabPulse: number = 0;
+
+  // 切 Tab 时重播入场过渡（淡入 + 上移）
+  onTabPulse(): void {
+    this.ready = false;
+    setTimeout(() => { this.ready = true; }, 32);
+  }
   private uiContext: UIContext = this.getUIContext();
 
   // #5 文本展开：文章展开/收起用动画过渡

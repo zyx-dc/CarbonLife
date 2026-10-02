@@ -15,11 +15,19 @@ export struct RecordTab {
   @StorageLink('recordsVersion') version: number = 0;
   private onChange: () => void = () => { this.todayList = this.todayRecords(); };
   private uiContext: UIContext = this.getUIContext();
+  controller: TabsController = new TabsController();
   @State category: string = '出行';
   @State selectedKey: string = 'walk';
   @State amountText: string = '1';
   @State note: string = '';
   @State ready: boolean = false;
+  @StorageLink('tabPulse') @Watch('onTabPulse') tabPulse: number = 0;
+
+  // 切 Tab 时重播入场过渡（淡入 + 上移）
+  onTabPulse(): void {
+    this.ready = false;
+    setTimeout(() => { this.ready = true; }, 32);
+  }
   @State todayList: CarbonRecord[] = [];
   @State removingId: string = '';
   @State amountPulse: boolean = false;
@@ -68,8 +76,12 @@ export struct RecordTab {
     }
     CarbonStore.get().addRecord(this.currentBehavior(), this.amountValue(), this.note);
     ToastHelper.show(this.uiContext, $r('app.string.record_saved_toast', this.savedValue().toFixed(2)));
-    this.amountText = '1';
+    this.amountText = this.currentBehavior().step.toString();
     this.note = '';
+    // #5 页面转场：保存后回到首页，由「切 Tab 重播入场」承接过渡
+    if (!AppMotion.reduceMotion()) {
+      setTimeout(() => this.controller.changeIndex(0), 240);
+    }
   }
 
   confirmDelete(id: string, name: string): void {
@@ -247,6 +259,8 @@ export struct RecordTab {
                   Text($r('app.string.common_delete')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER).margin({ left: AppSpacing.MD }).onClick(() => this.confirmDelete(r.id, resolveStr(behaviorNameRes(r.behaviorKey, r.name))));
                 }
                 .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                .clip(true)
+                .constraintSize({ maxHeight: this.removingId === r.id ? 0 : 1000 })
                 .translate({ x: this.removingId === r.id ? 52 : 0, y: this.removingId === r.id ? 30 : 0 })
                 .scale({ x: this.removingId === r.id ? 0.9 : 1, y: this.removingId === r.id ? 0.9 : 1 })
                 .rotate({ angle: this.removingId === r.id ? 4 : 0 })

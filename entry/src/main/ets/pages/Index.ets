@@ -127,7 +127,7 @@ struct Index {
 
       Tabs({ barPosition: this.isWide ? BarPosition.Start : BarPosition.End, controller: this.controller }) {
         TabContent() { HomeTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_home'), $r('app.string.tab_home'), 0))
-        TabContent() { RecordTab() }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
+        TabContent() { RecordTab({ controller: this.controller }) }.tabBar(this.tabItem($r('app.media.ic_nav_record'), $r('app.string.tab_record'), 1))
         TabContent() { DashboardTab() }.tabBar(this.tabItem($r('app.media.ic_nav_dashboard'), $r('app.string.tab_dashboard'), 2))
         TabContent() { RewardsTab() }.tabBar(this.tabItem($r('app.media.ic_nav_rewards'), $r('app.string.tab_rewards'), 3))
         TabContent() { KnowledgeTab() }.tabBar(this.tabItem($r('app.media.ic_nav_knowledge'), $r('app.string.tab_knowledge'), 4))
@@ -143,7 +143,11 @@ struct Index {
       .animationDuration(AppMotion.reduceMotion() ? 0 : 280)
       .backgroundColor(Color.Transparent)
       .id('carbonlife-tabs-' + this.themeKey)
-      .onChange((index: number) => { this.currentIndex = index; })
+      .onChange((index: number) => {
+        this.currentIndex = index;
+        // 切 Tab 时通知各页重播入场过渡（内容淡入 + 上移）
+        AppStorage.setOrCreate('tabPulse', (AppStorage.get<number>('tabPulse') ?? 0) + 1);
+      })
       .opacity(this.ready ? 1 : 0)
       .animation({ duration: AppMotion.reduceMotion() ? 0 : 400, curve: AppMotion.EASE });
     }
