@@ -42,7 +42,17 @@ export function resolveStr(v: ResourceStr): string {
     return v;
   }
   const ctx = getContext();
-  return ctx ? ctx.resourceManager.getStringSync(v) : '';
+  if (!ctx) {
+    return '';
+  }
+  // 注意：getStringSync(Resource) 不会代入 $r(id, ...args) 的占位符参数，
+  // 必须把参数显式透传，否则会原样显示 "%s"。
+  const res: Resource = v as Resource;
+  const params: Array<string | number> | undefined = res.params as Array<string | number> | undefined;
+  if (params !== undefined && params.length > 0) {
+    return ctx.resourceManager.getStringSync(res.id, ...params);
+  }
+  return ctx.resourceManager.getStringSync(res.id);
 }
 
 export function badgeNameRes(key: string, fallback: string): ResourceStr {
