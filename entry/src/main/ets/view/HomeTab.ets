@@ -359,33 +359,38 @@ export struct HomeTab {
                 }
               }
               if (this.familyExpanded) {
-                TextInput({ text: this.familyName, placeholder: $r('app.string.family_nickname_hint') }).height(42)
-                  .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
-                  .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM })
-                  .onChange((v: string) => { this.familyName = v; FamilyService.get().setNickname(v); });
-                TextInput({ text: $$this.familyCode, placeholder: $r('app.string.family_code_hint') }).height(42)
-                  .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
-                  .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.XS });
-                Row({ space: AppSpacing.XS }) {
-                  AppButton({ text: $r('app.string.family_gen_code'), type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onGenCode());
-                  AppButton({ text: $r('app.string.family_join'), type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onJoin());
-                }.width('100%').margin({ top: AppSpacing.XS });
-                Row({ space: AppSpacing.XS }) {
-                  Text($r('app.string.family_sync'))
+                Column() {
+                  TextInput({ text: this.familyName, placeholder: $r('app.string.family_nickname_hint') }).height(42)
+                    .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+                    .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.SM })
+                    .onChange((v: string) => { this.familyName = v; FamilyService.get().setNickname(v); });
+                  TextInput({ text: $$this.familyCode, placeholder: $r('app.string.family_code_hint') }).height(42)
+                    .fontColor(AppColor.TEXT).placeholderColor(AppColor.TEXT_SUB)
+                    .backgroundColor(AppColor.ELEVATED).borderWidth(1).borderColor(AppColor.BORDER).borderRadius(AppRadius.SM).margin({ top: AppSpacing.XS });
+                  Row({ space: AppSpacing.XS }) {
+                    AppButton({ text: $r('app.string.family_gen_code'), type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onGenCode());
+                    AppButton({ text: $r('app.string.family_join'), type: 'secondary', btnHeight: 44 }).layoutWeight(1).onClick(() => this.onJoin());
+                  }.width('100%').margin({ top: AppSpacing.XS });
+                  Row({ space: AppSpacing.XS }) {
+                    Text($r('app.string.family_sync'))
+                      .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
+                      .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                      .onClick(() => this.onSync());
+                    Text($r('app.string.family_leave'))
+                      .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER)
+                      .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+                      .onClick(() => this.confirmLeave());
+                  }.width('100%').margin({ top: AppSpacing.XS });
+                  Text($r('app.string.family_tip'))
+                    .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
+                  Text($r('app.string.family_collapse'))
                     .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
-                    .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
-                    .onClick(() => this.onSync());
-                  Text($r('app.string.family_leave'))
-                    .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.DANGER)
-                    .layoutWeight(1).textAlign(TextAlign.Center).padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
-                    .onClick(() => this.confirmLeave());
-                }.width('100%').margin({ top: AppSpacing.XS });
-                Text($r('app.string.family_tip'))
-                  .fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB).width('100%').margin({ top: AppSpacing.XS });
-                Text($r('app.string.family_collapse'))
-                  .fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB)
-                  .width('100%').textAlign(TextAlign.Center).padding({ top: AppSpacing.SM })
-                  .onClick(() => this.toggleFamily(false));
+                    .width('100%').textAlign(TextAlign.Center).padding({ top: AppSpacing.SM })
+                    .onClick(() => this.toggleFamily(false));
+                }
+                .width('100%')
+                .transition(TransitionEffect.OPACITY.animation({ duration: AppMotion.reduceMotion() ? 0 : 240, curve: Curve.EaseOut })
+                  .combine(TransitionEffect.translate({ y: -12 })));
               } else {
                 AppButton({ text: $r('app.string.family_manage'), type: 'secondary', btnHeight: 44, fullWidth: true })
                   .margin({ top: AppSpacing.SM })

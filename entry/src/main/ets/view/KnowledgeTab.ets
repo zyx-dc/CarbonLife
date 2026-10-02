@@ -349,7 +349,8 @@ export struct KnowledgeTab {
                   .borderRadius(AppRadius.MD);
                 }
                 .width('100%')
-                .animation({ duration: AppMotion.reduceMotion() ? 0 : 250, curve: AppMotion.EASE });
+                .transition(TransitionEffect.OPACITY.animation({ duration: AppMotion.reduceMotion() ? 0 : 240, curve: Curve.EaseOut })
+                  .combine(TransitionEffect.translate({ y: -8 })));
               } else {
                 Text(item.summary)
                   .fontSize(AppTypography.CAPTION.size)
