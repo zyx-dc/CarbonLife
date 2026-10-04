@@ -52,8 +52,6 @@
     { "name": "reminder_time_set", "value": "提醒时间已设置为 %s" },
     { "name": "reminder_time_updated", "value": "提醒时间已更新为 %s" },
 
-    { "name": "a11y_reduce_motion", "value": "减弱动效" },
-    { "name": "a11y_reduce_motion_desc", "value": "关闭入场/图表/背景动效" },
 
     { "name": "share_title", "value": "我的减排成果" },
     { "name": "share_brand", "value": "CarbonLife · 低碳生活" },
@@ -106,7 +104,6 @@
 { "name": "rewards_mall_expand", "value": "展开全部" },
 { "name": "rewards_redeem_success_title", "value": "兑换成功" },
 { "name": "rewards_mall_collapse", "value": "收起" },
-    { "name": "rewards_redeem_success", "value": "兑换成功，兑换码 %s" },
     { "name": "rewards_redemptions", "value": "兑换记录" },
     { "name": "rewards_tasks", "value": "今日任务" },
     { "name": "rewards_badges", "value": "低碳徽章" },
@@ -362,8 +359,6 @@
     { "name": "home_share_text", "value": "我在「CarbonLife」App 已累计减排 %s kg CO₂e，获得 %s 积分，种下 %s 棵树。一起加入低碳生活吧！" },
     { "name": "home_family_points_suffix", "value": "%s 分" },
     { "name": "home_family_people", "value": "%s 人" },
-    { "name": "home_family_person", "value": "%s 人" },
-    { "name": "rewards_tree_count_one", "value": "%s 棵" },
-    { "name": "record_points_one", "value": "+%s 积分" }
+    { "name": "rewards_tree_count_one", "value": "%s 棵" }
   ]
 }

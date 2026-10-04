@@ -35,6 +35,9 @@ export class VisionService {
 
   static async pickAndDetect(): Promise<VisionResult> {
     let file: fs.File | null = null;
+    let source: image.ImageSource | null = null;
+    let pixelMap: image.PixelMap | null = null;
+    let detector: objectDetection.ObjectDetector | null = null;
     try {
       const picker = new photoAccessHelper.PhotoViewPicker();
       const options = new photoAccessHelper.PhotoSelectOptions();
@@ -46,30 +49,31 @@ export class VisionService {
       }
       const uri = picked.photoUris[0];
       file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
-      const source = image.createImageSource(file.fd);
-      const pixelMap = await source.createPixelMap();
+      source = image.createImageSource(file.fd);
+      pixelMap = await source.createPixelMap();
 
-      const detector = await objectDetection.ObjectDetector.create();
+      detector = await objectDetection.ObjectDetector.create();
       const req = new visionBase.Request();
       const imgData: visionBase.ImageData = { pixelMap: pixelMap };
       req.inputData = imgData;
       const resp = await detector.process(req);
-
-      // 解码完成后再释放 fd，避免个别机型在识别阶段仍依赖文件句柄
-      fs.closeSync(file);
-      file = null;
-
-      const result = VisionService.mapObjects(resp.objects);
-      pixelMap.release();
-      return result;
+      return VisionService.mapObjects(resp.objects);
     } catch (e) {
-      if (file !== null) {
-        try {
-          fs.closeSync(file);
-        } catch (err) {
-        }
-      }
       return { ok: false, label: '', behaviorKey: '', score: 0, message: $r('app.string.vision_failed') };
+    } finally {
+      // 统一释放，失败路径也不泄漏：检测器进程 / 像素图 / 图片源 / 文件句柄
+      if (detector !== null) {
+        try { await detector.destroy(); } catch (e) { }
+      }
+      if (pixelMap !== null) {
+        try { pixelMap.release(); } catch (e) { }
+      }
+      if (source !== null) {
+        try { source.release(); } catch (e) { }
+      }
+      if (file !== null) {
+        try { fs.closeSync(file); } catch (e) { }
+      }
     }
   }
 

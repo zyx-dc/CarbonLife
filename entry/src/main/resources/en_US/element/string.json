@@ -52,8 +52,6 @@
     { "name": "reminder_time_set", "value": "Reminder time set to %s" },
     { "name": "reminder_time_updated", "value": "Reminder time updated to %s" },
 
-    { "name": "a11y_reduce_motion", "value": "Reduce motion" },
-    { "name": "a11y_reduce_motion_desc", "value": "Disable entrance / chart / background motion" },
 
     { "name": "share_title", "value": "My results" },
     { "name": "share_brand", "value": "CarbonLife · Low-carbon living" },
@@ -80,7 +78,6 @@
 { "name": "record_points_progress", "value": "Today's record points %s / %s" },
 { "name": "record_cap_reached", "value": "Daily record-points cap reached (%s). Come back tomorrow." },
     { "name": "record_points", "value": "+%s points" },
-    { "name": "record_points_one", "value": "+%s point" },
     { "name": "record_save", "value": "Save record" },
     { "name": "record_today_title", "value": "Today's records" },
     { "name": "record_empty", "value": "No records yet today" },
@@ -108,7 +105,6 @@
 { "name": "rewards_mall_expand", "value": "Show all" },
 { "name": "rewards_redeem_success_title", "value": "Redeemed!" },
 { "name": "rewards_mall_collapse", "value": "Show less" },
-    { "name": "rewards_redeem_success", "value": "Redeemed. Code: %s" },
     { "name": "rewards_redemptions", "value": "Redemption history" },
     { "name": "rewards_tasks", "value": "Today's tasks" },
     { "name": "rewards_badges", "value": "Low-carbon badges" },
@@ -363,7 +359,6 @@
 
     { "name": "home_share_text", "value": "On CarbonLife I've saved %s kg CO₂e, earned %s points and planted %s tree(s). Join the low-carbon life!" },
     { "name": "home_family_points_suffix", "value": "%s pts" },
-    { "name": "home_family_people", "value": "%s people" },
-    { "name": "home_family_person", "value": "%s person" }
+    { "name": "home_family_people", "value": "%s people" }
   ]
 }

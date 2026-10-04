@@ -54,13 +54,6 @@ export struct RecordTab {
     return remaining <= 0 ? 0 : Math.min(base, remaining);
   }
 
-  stepAmount(delta: number): void {
-    const step = this.currentBehavior().step;
-    let v = this.amountValue() + delta * step;
-    if (v < 0) v = 0;
-    this.amountText = v.toString();
-  }
-
   private amountMax(): number {
     const b: BehaviorDef = this.currentBehavior();
     let slots = 20;
@@ -291,7 +284,7 @@ export struct RecordTab {
         Row() {
           Text($r('app.string.record_estimated', this.savedValue().toFixed(2))).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
           Blank();
-          Text(this.pointsValue() === 1 ? $r('app.string.record_points_one', this.pointsValue().toString()) : $r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT);
+          Text($r('app.string.record_points', this.pointsValue().toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT);
         }.width('100%');
         AppButton({ text: $r('app.string.record_save'), type: 'primary', fullWidth: true }).onClick(() => this.onSave());
       }

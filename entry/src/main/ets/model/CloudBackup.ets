@@ -17,6 +17,7 @@ const OBJECT_PATH: string = 'backup/snapshot.json';
 const CACHE_NAME: string = 'carbon_backup_cloud.json';
 
 export class CloudStorageBackupProvider implements CloudBackupProvider {
+  private static readonly TASK_TIMEOUT_MS: number = 30000;
   private ctx: common.Context | null = null;
   private bucket: cloudStorage.StorageBucket | null = null;
   private enabled: boolean = false;
@@ -81,14 +82,29 @@ export class CloudStorageBackupProvider implements CloudBackupProvider {
     }
   }
 
-  // 上传/下载为任务式接口：start() 只启动任务，需等 completed/failed 事件才知结果
+  // 上传/下载为任务式接口：start() 只启动任务，需等 completed/failed 事件才知结果；
+  // 加超时兜底，避免任务卡住时 Promise 永不结算（UI 会一直「无响应」）
   private static waitTask(task: request.agent.Task): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (e: Error) => void) => {
-      task.on('completed', () => { resolve(); });
-      task.on('failed', () => { reject(new Error('cloud task failed')); });
+      let settled = false;
+      const finish = (ok: boolean): void => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        if (ok) {
+          resolve();
+        } else {
+          reject(new Error('cloud task failed'));
+        }
+      };
+      const timeoutId = setTimeout(() => finish(false), CloudStorageBackupProvider.TASK_TIMEOUT_MS);
+      task.on('completed', () => { clearTimeout(timeoutId); finish(true); });
+      task.on('failed', () => { clearTimeout(timeoutId); finish(false); });
       task.start((err: Error) => {
         if (err) {
-          reject(err);
+          clearTimeout(timeoutId);
+          finish(false);
         }
       });
     });
