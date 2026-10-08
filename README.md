@@ -52,9 +52,9 @@
 |:---:|:---:|:---:|
 | <img src="screen3.jpeg" width="220"> | <img src="app_home_new.jpeg" width="220"> | <img src="app_record_new2.jpeg" width="220"> |
 
-| 积分与荣誉 | 双碳科普 |
-|:---:|:---:|
-| <img src="app_rewards_v4.jpeg" width="220"> | <img src="app_knowledge.jpeg" width="220"> |
+| 数据看板 | 积分与荣誉 | 双碳科普 |
+|:---:|:---:|:---:|
+| <img src="app_dashboard.jpeg" width="220"> | <img src="app_rewards_v4.jpeg" width="220"> | <img src="app_knowledge.jpeg" width="220"> |
 
 ## 技术栈
 
