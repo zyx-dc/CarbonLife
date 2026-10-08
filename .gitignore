@@ -28,3 +28,10 @@
 
 # Impeccable 设计评审本地产物
 /.impeccable/
+
+# README 演示截图（需入库，覆盖上面的 *.jpeg 忽略）
+!/screen3.jpeg
+!/app_home_new.jpeg
+!/app_record_new2.jpeg
+!/app_rewards_v4.jpeg
+!/app_knowledge.jpeg
