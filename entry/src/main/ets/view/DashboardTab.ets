@@ -59,13 +59,22 @@ export struct DashboardTab {
       }
     });
     this.trendNonZero = nonZero;
-    const categoryStats: CategoryStat[] = store.savedByCategory();
+    // 汇总卡片、趋势与类别占比统一随所选周期聚合（本日/本周/本月/本年）
+    const periodStart = this.periodStart(this.period);
+    const recs: CarbonRecord[] = store.recordsInRange(periodStart, Date.now() + 1);
+    // 类别占比此前为「全部累计」，与汇总/趋势口径不一致；改为跟随所选周期
+    const categoryStats: CategoryStat[] = CarbonFactors.CATEGORIES.map((cat: string) => {
+      let sum = 0;
+      recs.forEach((r: CarbonRecord) => {
+        if (r.category === cat) {
+          sum += r.saved;
+        }
+      });
+      return { category: cat, saved: sum, color: CarbonFactors.categoryColor(cat) } as CategoryStat;
+    });
     this.categoryValues = categoryStats.map((c: CategoryStat) => c.saved);
     this.categoryColors = categoryStats.map((c: CategoryStat) => c.color);
     this.legendData = categoryStats.filter((c: CategoryStat) => c.saved > 0);
-    // 汇总卡片随所选周期聚合（本日/本周/本月/本年），与图表口径一致
-    const periodStart = this.periodStart(this.period);
-    const recs: CarbonRecord[] = store.recordsInRange(periodStart, Date.now() + 1);
     let saved = 0;
     let points = 0;
     recs.forEach((r: CarbonRecord) => {
