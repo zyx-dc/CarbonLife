@@ -7,7 +7,9 @@ import { CarbonFactors } from '../model/CarbonFactors';
 import { AppColor } from '../common/Constants';
 import { CategoryStat, CarbonRecord, TaskRewardRecord, TrendPoint } from '../model/CarbonTypes';
 import { DateUtil } from '../common/DateUtil';
-import { BarChartView, LineChartView, PieChartView } from '../components/Chart';
+import { BarChartView } from '../components/chart/BarChartView';
+import { LineChartView } from '../components/chart/LineChartView';
+import { PieChartView } from '../components/chart/PieChartView';
 import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { AppButton } from '../components/AppButton';
@@ -93,33 +95,28 @@ export struct DashboardTab {
     this.recentList = store.recentRecords(10);
   }
 
-  async exportFile(kind: string): Promise<void> {
+  /** 通过系统文档选择器把文本写入用户可访问的位置；用户取消返回 false。 */
+  private async saveTextFile(fileName: string, content: string): Promise<boolean> {
     let file: fs.File | null = null;
     try {
       const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
-      const ext = kind === 'csv' ? '.csv' : '.json';
-      const content = kind === 'csv' ? CarbonStore.get().exportCsv() : CarbonStore.get().exportJson();
-      // 用系统文档选择器保存到用户可访问的位置（而非沙箱 filesDir）
       const docPicker = new picker.DocumentViewPicker(ctx);
       const opt = new picker.DocumentSaveOptions();
-      opt.newFileNames = ['carbon_export_' + Date.now().toString() + ext];
+      opt.newFileNames = [fileName];
       const uris = await docPicker.save(opt);
       if (uris.length === 0) {
-        return;
+        return false;
       }
       file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
       fs.writeSync(file.fd, content);
-      ToastHelper.show(this.uiContext, $r('app.string.dashboard_exported'));
-    } catch (e) {
-      ToastHelper.show(this.uiContext, $r('app.string.dashboard_export_failed'));
+      return true;
     } finally {
-      if (file !== null) {
-        try { fs.closeSync(file); } catch (err) { }
-      }
+      this.closeQuietly(file);
     }
   }
 
-  async importFile(): Promise<void> {
+  /** 通过系统文档选择器把一个文件读成 UTF-8 文本；用户取消返回 null。 */
+  private async pickTextFile(): Promise<string | null> {
     let file: fs.File | null = null;
     try {
       const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -128,14 +125,44 @@ export struct DashboardTab {
       opt.maxSelectNumber = 1;
       const uris = await docPicker.select(opt);
       if (uris.length === 0) {
-        return;
+        return null;
       }
       file = fs.openSync(uris[0], fs.OpenMode.READ_ONLY);
       const stat = fs.statSync(file.fd);
       const buf = new ArrayBuffer(stat.size);
       const readLen = fs.readSync(file.fd, buf);
       const bytes = new Uint8Array(buf.slice(0, readLen));
-      const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
+      return util.TextDecoder.create('utf-8').decodeToString(bytes);
+    } finally {
+      this.closeQuietly(file);
+    }
+  }
+
+  private closeQuietly(file: fs.File | null): void {
+    if (file !== null) {
+      try { fs.closeSync(file); } catch (err) { }
+    }
+  }
+
+  async exportFile(kind: string): Promise<void> {
+    try {
+      const ext = kind === 'csv' ? '.csv' : '.json';
+      const content = kind === 'csv' ? CarbonStore.get().exportCsv() : CarbonStore.get().exportJson();
+      const ok = await this.saveTextFile('carbon_export_' + Date.now().toString() + ext, content);
+      if (ok) {
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_exported'));
+      }
+    } catch (e) {
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_export_failed'));
+    }
+  }
+
+  async importFile(): Promise<void> {
+    try {
+      const text = await this.pickTextFile();
+      if (text === null) {
+        return;
+      }
       const trimmed = text.trim();
       const isJson = trimmed.startsWith('[') || trimmed.startsWith('{');
       const added = isJson
@@ -151,54 +178,27 @@ export struct DashboardTab {
       }
     } catch (e) {
       ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_failed'));
-    } finally {
-      if (file !== null) {
-        try { fs.closeSync(file); } catch (err) { }
-      }
     }
   }
 
   async backupAll(): Promise<void> {
-    let file: fs.File | null = null;
     try {
-      const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
       const content = BackupService.snapshot();
-      const docPicker = new picker.DocumentViewPicker(ctx);
-      const opt = new picker.DocumentSaveOptions();
-      opt.newFileNames = ['carbon_backup_' + Date.now().toString() + '.json'];
-      const uris = await docPicker.save(opt);
-      if (uris.length === 0) {
-        return;
+      const ok = await this.saveTextFile('carbon_backup_' + Date.now().toString() + '.json', content);
+      if (ok) {
+        ToastHelper.show(this.uiContext, $r('app.string.dashboard_backup_done'));
       }
-      file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
-      fs.writeSync(file.fd, content);
-      ToastHelper.show(this.uiContext, $r('app.string.dashboard_backup_done'));
     } catch (e) {
       ToastHelper.show(this.uiContext, $r('app.string.dashboard_export_failed'));
-    } finally {
-      if (file !== null) {
-        try { fs.closeSync(file); } catch (err) { }
-      }
     }
   }
 
   async restoreAll(): Promise<void> {
-    let file: fs.File | null = null;
     try {
-      const ctx = this.uiContext.getHostContext() as common.UIAbilityContext;
-      const docPicker = new picker.DocumentViewPicker(ctx);
-      const opt = new picker.DocumentSelectOptions();
-      opt.maxSelectNumber = 1;
-      const uris = await docPicker.select(opt);
-      if (uris.length === 0) {
+      const text = await this.pickTextFile();
+      if (text === null) {
         return;
       }
-      file = fs.openSync(uris[0], fs.OpenMode.READ_ONLY);
-      const stat = fs.statSync(file.fd);
-      const buf = new ArrayBuffer(stat.size);
-      const readLen = fs.readSync(file.fd, buf);
-      const bytes = new Uint8Array(buf.slice(0, readLen));
-      const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
       const added = BackupService.restore(text);
       if (added < 0) {
         ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_bad_format'));
@@ -208,10 +208,6 @@ export struct DashboardTab {
       }
     } catch (e) {
       ToastHelper.show(this.uiContext, $r('app.string.dashboard_import_failed'));
-    } finally {
-      if (file !== null) {
-        try { fs.closeSync(file); } catch (err) { }
-      }
     }
   }
 
