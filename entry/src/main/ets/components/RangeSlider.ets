@@ -73,11 +73,16 @@ export struct RangeSlider {
         .borderRadius(this.trackHeight / 2)
         .backgroundColor(AppColor.DIVIDER)
         .offset({ y: (this.blockSize - this.trackHeight) / 2 });
-      // 已选段
+      // 已选段：左端圆角、右端直角 —— 与圆形滑块贴合，避免交界处露出轨道底色
       Row()
         .width(this.fillW())
         .height(this.trackHeight)
-        .borderRadius(this.trackHeight / 2)
+        .borderRadius({
+          topLeft: this.trackHeight / 2,
+          bottomLeft: this.trackHeight / 2,
+          topRight: 0,
+          bottomRight: 0
+        })
         .backgroundColor(AppColor.PRIMARY)
         .offset({ y: (this.blockSize - this.trackHeight) / 2 });
       // 滑块：底色描边让它从轨道上「浮」起来
