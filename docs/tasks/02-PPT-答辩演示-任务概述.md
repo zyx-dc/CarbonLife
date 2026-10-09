@@ -1,6 +1,9 @@
 # 任务概述 · PPT 组：制作《CarbonLife 碳足迹》答辩 PPT
 
 > 给非技术同学看的任务说明。你要做的是把项目「讲清楚、讲好看」，不需要懂代码。
+>
+> **状态（2026-10-08）**：✅ 已交付——`docs/tasks/ppt/CarbonLife-答辩PPT.pptx`（15 页）、同目录 `.pdf` 与 `讲稿要点.md`。
+> 本文件保留为**任务说明与验收标准**；重制流程见下方「6.1 PPT 构建方式」。
 
 ---
 
@@ -65,21 +68,48 @@
 | 功能/卖点文字 | `README.md` |
 | 配色与视觉规范 | `DESIGN.md` |
 | 验收结论 | `HANDOFF.md`、`QA_REPORT.md` |
-| **截图（都用这个目录）** | `docs/qa/` |
+| **成品 PPT / PDF / 讲稿** | `docs/tasks/ppt/` |
+| **PPT 构建工程（脚本 + 素材）** | `ppt_tasks/carbonlife-defense/` |
 
-**推荐截图**（在 `docs/qa/`）：
-- 首页 `app_home_new.jpeg`（放封面或功能总览）
-- 记录页 `app_record_new2.jpeg`、AI 识图 `app_food.jpeg`
-- 看板 `qa_dash_week.jpeg`、`qa_dash_month.jpeg`
-- 积分 `app_rewards_v4.jpeg`、兑换 `qa_redeem.jpeg`
-- 科普 `app_knowledge.jpeg`
-- 深色对比 `qa_dark_home.jpeg`
+**推荐截图**（最新一轮已统一重截并放在仓库根目录，480px、JPEG）：
 - 启动页 `screen3.jpeg`
+- 首页 `app_home_new.jpeg`
+- 记录页 `app_record_new2.jpeg`（含端侧 AI 识图卡片）
+- 看板 `app_dashboard.jpeg`（日周期，汇总 + 趋势 + 类别占比）
+- 积分 `app_rewards_v4.jpeg`
+- 科普 `app_knowledge.jpeg`
+
+> 上述截图对应 2026-10 最新 UI（墨绿选中态、吸底保存、商城可达性、看板口径修正等）。
+> 历史取证截图仍在 `docs/qa/`，仅作归档，**不建议**再用于答辩演示。
+
+### 6.1 PPT 构建方式（可复现）
+
+答辩 PPT 使用 `ppt-design-skill`（`pptx-designer`）的 Build Mode 生成，不是一个手工文件：
+
+```powershell
+# 1) 生成 .pptx（输出到 ppt_tasks/carbonlife-defense/output/）
+python ppt_tasks\carbonlife-defense\build_deck.py
+# 2) 渲染 PDF + 逐页 PNG 用于视觉复核
+powershell -ExecutionPolicy Bypass -File "<ppt-design-skill>\scripts\render_pptx.ps1" `
+  -InFile ppt_tasks\carbonlife-defense\output\CarbonLife-答辩PPT.pptx `
+  -OutDir ppt_tasks\carbonlife-defense\output\rendered
+# 3) 缩略图总览（可选）
+python ppt_tasks\carbonlife-defense\contact_sheet.py
+```
+
+生成后把 `output/CarbonLife-答辩PPT.pptx` 与 `output/rendered/CarbonLife-答辩PPT.pdf`
+复制到 `docs/tasks/ppt/`（交付目录），`output/CarbonLife-答辩PPT-讲稿要点.md` → `docs/tasks/ppt/讲稿要点.md`。
+
+- 设计方向与 token：见 `ppt_tasks/carbonlife-defense/theme-lock.yaml`、`visual-direction.md`（浅色统一「日光纸感」，全篇无深色页）
+- 截图素材：`ppt_tasks/carbonlife-defense/assets/*.jpg`（**当前 UI** 的 1200px 实机截图，已裁掉系统状态栏；构建不依赖未入库的 `docs/qa/`）
+- 页级方案 / 复核记录：`page-plan.md`、`brief.md`、`visual-review.md`、`acceptance-contract.md`
+- `output/` 为生成产物（已 gitignore），脚本 + 素材 + 任务记录入库即可复现
+
 
 ## 7. 硬性要求与红线
 
 - **不许编造**：用户量、下载量、获奖、合作机构等一律不写；只讲真实功能。
-- **未完成功能**（「减弱动效」开关、平板多列）不能放进「亮点」，只能放「展望」页。
+- **未完成的能力**要如实标注：跨设备家庭聚合受 DDO 对象级同步限制仍在打磨；云备份需 AGC 环境与签名构建；「减弱动效」目前是 App 内开关、尚未接入系统无障碍。这些只能放「验证与质量」的「已知边界」或「展望」页，不能当作已完成宣传。
 - 每页文字尽量 ≤ 40 字个正文行；演讲细节放进「讲稿要点」而不是 PPT 上。
 
 ## 8. 验收标准（做完自查）

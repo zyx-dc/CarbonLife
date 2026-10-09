@@ -1,0 +1,37 @@
+version: 2
+status: LOCKED
+user_confirmed_at: "2026-10-08"
+visual_thesis: >-
+  「日光纸感」浅色统一——暖白 #F5F7F5 纸感底，深林绿 #0F3D2E 为品牌/标题，
+  琥珀金 #E8A317 为强调，正文 #14201A；全篇不出现深色页。实机演示截图统一使用
+  浅色版 App 界面，以真实截图作为核心视觉锚点。
+  （App 支持跟随系统的浅/深主题，但本 PPT 只呈现浅色版。）
+audience_promise: >-
+  评委在 5–8 分钟内看清：这是一个真实、完整、可验证的鸿蒙低碳应用，而非概念稿。
+style_input: "custom brand theme derived from CarbonLife DESIGN.md (light paper)"
+theme_dark:
+  background: "#0A0A0A"
+  surface: "#121712"
+  ink: "#E9F7E0"
+  muted: "#82917B"
+  signal: "#B6FF2E"
+  accent: "#3DE0C8"
+  border: "#2A352A"
+theme_light:
+  background: "#F5F7F5"
+  surface: "#FFFFFF"
+  ink: "#14201A"
+  primary: "#0F3D2E"
+  accent: "#E8A317"
+  border: "#DCE4D8"
+typography:
+  heading: "Microsoft YaHei"
+  body: "Microsoft YaHei"
+  cjk_fallback: "Microsoft YaHei"
+density_dials: { variance: 6, motion: 2, density: 6 }
+forbidden:
+  - 编造用户量/下载量/获奖/合作机构
+  - 未完成功能当作已完成宣传
+  - 出现团队/成员/院校信息
+  - 把青柠当大面积底漆
+  - 正文 < 12pt

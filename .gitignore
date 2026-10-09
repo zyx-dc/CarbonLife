@@ -26,13 +26,20 @@
 /.opencode/skills/
 /.opencode/opencode.json
 
-# Impeccable ������󱾵ز���
+# Impeccable 设计规范本机缓存（安装内容不入库）
 /.impeccable/
 
-# README ��ʾ��ͼ������⣬��������� *.jpeg ���ԣ�
+# Python 缓存
+__pycache__/
+
+# README 演示截图（需入库，覆盖上面的 *.jpeg 忽略）
 !/screen3.jpeg
 !/app_home_new.jpeg
 !/app_record_new2.jpeg
 !/app_rewards_v4.jpeg
 !/app_knowledge.jpeg
 !/app_dashboard.jpeg
+
+# 答辩 PPT 构建工程：脚本与素材入库（可复现），生成产物 / 渲染结果不入库
+!/ppt_tasks/carbonlife-defense/assets/*.jpg
+/ppt_tasks/carbonlife-defense/output/

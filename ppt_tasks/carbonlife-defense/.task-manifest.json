@@ -1,0 +1,10 @@
+{
+  "task_id": "61081edf-c2db-498d-bb6d-a4e2898384d3",
+  "task_name": "carbonlife-defense",
+  "skill": "ppt-design-skill",
+  "skill_version": "1.5",
+  "template_source": "skill/templates/task-init",
+  "project_root": "C:\\Users\\39748\\Documents\\Default Project\\CarbonLife",
+  "task_root": "C:\\Users\\39748\\Documents\\Default Project\\CarbonLife\\ppt_tasks\\carbonlife-defense",
+  "created_at": "2026-10-08T12:30:07.684352+00:00"
+}
