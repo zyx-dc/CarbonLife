@@ -35,15 +35,17 @@
 
 ## 功能特性
 
-- 📝 **低碳行为记录** — 出行 / 节能 / 回收 / 餐饮四大类共 **13 种**低碳行为，按排放因子自动计算减排量与积分
+- 📝 **低碳行为记录** — 出行 / 节能 / 回收 / 餐饮四大类共 **13 种**低碳行为，按排放因子自动计算减排量与积分（单条不低于 5 分，每日记录积分上限 300 分且在界面可见）
 - 🤖 **端侧 AI 识图** — 基于 CoreVisionKit 端侧物体检测，选图后自动推荐对应低碳行为
-- 📊 **数据看板** — 日/周/月/年趋势折线图、柱状图、类别占比饼图；最近记录与 **CSV / JSON 导出**（含 RFC 4180 转义 + BOM）
+- 📊 **数据看板** — 日/周/月/年趋势折线图、柱状图、类别占比饼图（**各图表与汇总卡片统一跟随所选周期**）；最近记录与 **CSV / JSON 导出**（含 RFC 4180 转义 + BOM）
 - 🏅 **积分与荣誉** — 碳积分累计、碳普惠权益商城（模拟兑换码）、低碳徽章、植树证书、今日任务
 - 👨‍👩‍👧 **家庭碳积分** — 基于分布式数据对象（DistributedDataObject），生成/加入家庭码，按设备聚合成员减排与积分
+- ☁️ **本地 + 云备份** — 整包快照（记录 + 兑换 + 任务奖励）导出 / 去重合并恢复；AGC 云存储备份可开关，未开启时与纯本地应用一致
 - ⏰ **每日提醒** — 基于后台代理提醒，默认每天 20:00 提醒记录
 - 📚 **双碳科普专栏** — 碳达峰/碳中和、绿色出行、家庭节能等科普内容
 - 🌗 **浅色 / 深色主题** — 全部色彩走动态设计 token，**跟随系统 `colorMode`**（冷启动读取系统配置，运行中实时切换）
-- ✨ **动效语言** — 关键读数数字滚动、图表绘制入场（折线揭示 / 柱图生长 / 饼图扫入）、背景光斑呼吸、启动页光晕与环轨、Tab 切换；少量品红「不和谐的秩序」活点
+- ✨ **动效语言** — 关键读数数字滚动、图表绘制入场（折线揭示 / 柱图生长 / 饼图扫入）、背景光斑呼吸、启动页光晕与环轨、Tab 淡入；曲率滑杆吸附、文字揭示、水波纹点击、曲线卡片删除等细节交互；少量品红「不和谐的秩序」活点
+- 📱 **大屏适配** — 数据看板在平板上切换为多列布局，手机端保持单列信息流
 - ♿ **无障碍** — 首页「减弱动效」开关，统一降级进入 / 图表 / 背景动效（`AppMotion` 读取 `reduceMotion`）
 
 ## 截图
@@ -55,6 +57,8 @@
 | 数据看板 | 积分与荣誉 | 双碳科普 |
 |:---:|:---:|:---:|
 | <img src="app_dashboard.jpeg" width="220"> | <img src="app_rewards_v4.jpeg" width="220"> | <img src="app_knowledge.jpeg" width="220"> |
+
+> 以上为 2026-10 最新 UI；答辩用的 PPT / PDF / 讲稿见 [`docs/tasks/ppt/`](docs/tasks/ppt/)。
 
 ## 技术栈
 
@@ -75,14 +79,18 @@ CarbonLife/
 ├── AppScope/                         # 应用级配置与图标
 ├── entry/src/main/
 │   ├── ets/
-│   │   ├── common/                   # Constants(AppColor/AppConst) · Theme(tokens/动效) · DateUtil
-│   │   ├── components/               # AppCard · AppButton · Badge · TaskCard · Chart(Canvas 图表)
-│   │   ├── model/                    # CarbonStore · CarbonFactors · FamilyService · MallService · ReminderService · VisionService · Rewards
+│   │   ├── common/                   # Constants(AppColor/AppConst) · Theme(tokens/动效) · DateUtil · Localize
+│   │   ├── components/               # AppCard · AppButton · Badge · TaskCard · AnimatedNumber · Chart(Canvas 图表)
+│   │   ├── model/                    # CarbonStore · CarbonFactors · FamilyService · MallService · ReminderService · VisionService · CloudBackup · Rewards
 │   │   ├── pages/                    # Splash · Index(5 Tab)
 │   │   └── view/                     # HomeTab · RecordTab · DashboardTab · RewardsTab · KnowledgeTab
 │   ├── resources/                    # 字符串/颜色/SVG 图标
 │   └── module.json5                  # 模块与权限声明
 ├── scripts/run.ps1                   # 构建 + 安装 + 启动封装
+├── scripts/ui-smoke.ps1              # 设备端 UI 冒烟测试（devecocli ui 驱动，逐页断言）
+├── scripts/build-signed.ps1          # 签名构建（真机 / 云备份端到端验证用）
+├── ppt_tasks/carbonlife-defense/     # 答辩 PPT 构建工程（脚本 + 素材 + 设计锁）
+├── docs/tasks/ppt/                   # 答辩 PPT / PDF / 讲稿要点
 ├── DESIGN.md                         # 设计系统（YAML tokens + 9 章节）
 ├── AGENTS.md                         # 面向 AI Agent 的仓库上下文
 └── build-profile.json5
@@ -147,11 +155,14 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 
 - [x] 支持自定义每日提醒时间；任务完成后自动发放额外积分
 - [x] CSV / JSON 数据**导入**，以及本地整包备份 / 恢复（记录 + 兑换 + 任务奖励）
+- [x] 数据**云备份**：接入 AGC 云存储的整包快照（可开关）；本地备份/恢复始终可用
+- [x] 补充 UI 测试（**设备端冒烟**：`scripts/ui-smoke.ps1`，用 `devecocli ui` 驱动真机/模拟器逐页断言，20/20 通过；**单元测试**：DateUtil / 排放因子 / 快照结构，基于 `@ohos/hypium`）
+- [x] 一轮完整的 UI 设计评审与动效升级（首页信息架构、粘性保存、商城可达性、看板口径一致、列表折叠等）
+- [ ] 云备份**冲突合并策略**，并完成签名构建下的端到端验证
 - [ ] 对接真实城市碳普惠平台 API，替代本地模拟兑换码
-- [ ] 数据**云备份**（AGC）与冲突合并策略
-- [ ] 接入系统无障碍设置，真正启用「减弱动效」
-- [ ] 平板多列布局适配
-- [x] 补充 UI 测试（**设备端冒烟**：`scripts/ui-smoke.ps1`，用 `devecocli ui` 驱动真机/模拟器逐页断言；**单元测试**：DateUtil / 排放因子 / 快照结构，基于 `@ohos/hypium`）
+- [ ] 家庭碳积分改用分布式 KV（见 `docs/ROADMAP.md` #2），实现跨设备多成员并集
+- [ ] 平板其余页面补齐多列布局（数据看板已完成）
+- [ ] 接入系统无障碍设置，真正启用「减弱动效」（App 内开关已就绪）
 
 ## 贡献
 

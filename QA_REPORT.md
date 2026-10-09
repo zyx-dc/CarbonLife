@@ -165,3 +165,25 @@
 ### 构建与静态检查
 - `devecocli build` → `BUILD SUCCESSFUL`；ArkTS 告警由一批降至 5 条（均为 `getStringSync` 软废弃提示 + resource 调用可能抛异常）。
 - `devecocli check lint`：3 → 1 条（剩余 `AppCard` 的「自定义组件」性能建议，属有意设计）。
+
+---
+
+## 2026-10-08 现状摘要（本轮口径）
+
+> 本报告正文（9/22 与 10/01 两节）是**历史取证**，保留原样。以下是当前状态，便于快速判断。
+
+| # | 验证项 | 当前状态 | 说明 |
+|---|--------|---------|------|
+| 1 | 深色模式 | **PASS** | 跟随系统 `colorMode`，冷启动与运行中均实时切换；本轮已重截深色首页 / 看板 |
+| 2 | 分布式权限弹窗 | **BLOCKED（环境受限）** | `12100009` 已消除；模拟器不弹动态授权框，需真机复测 |
+| 3 | 家庭聚合 | **本地 PASS / 跨设备待复测** | 单机家庭码 + 成员列表正常；跨设备并集受 DDO 对象级同步限制 |
+| 4 | 清空数据 | **PASS** | — |
+| 5 | CSV 导出 | **PASS** | 含 BOM 与 RFC 4180 转义 |
+| 6 | 图表刷新 | **PASS** | 周期切换与新增记录均实时刷新；**类别占比已改为跟随所选周期**（本轮修复） |
+| 7 | 记录增删 | **PASS** | 保存 / 删除后记录页与首页实时同步，无需重启 |
+| 8 | 设备端 UI 冒烟 | **PASS 20/20** | `scripts/ui-smoke.ps1`（`devecocli ui` 驱动，逐页断言） |
+| 9 | 云备份（AGC） | **可用（待签名构建端到端）** | `model/CloudBackup.ets` + AGC 云存储；模拟器为 unsigned 构建 |
+| 10 | 平板多列 | **部分完成** | 数据看板已多列，其余 4 个 Tab 待补齐 |
+
+**演示素材（2026-10 最新）**：仓库根目录 `screen3.jpeg` / `app_home_new.jpeg` / `app_record_new2.jpeg` /
+`app_dashboard.jpeg` / `app_rewards_v4.jpeg` / `app_knowledge.jpeg`；答辩 PPT / PDF / 讲稿见 `docs/tasks/ppt/`。

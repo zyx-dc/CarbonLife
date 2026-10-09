@@ -12,6 +12,7 @@
 - `FamilyService` 使用 `@kit.ArkData` 的 `distributedDataObject`。
 - 每台设备 `create(ctx, FamilyData{members: MemberData[]})`，再 `setSessionId(同一家庭码)`。
 - 本机成员写入 `members` 数组（已改为整体赋值），`getSaved()/getPoints()` 对 `members` 求和。
+- **2026-10-01 复测**：单机生成家庭码后状态由「未加入」→「等待对方」，并出现「家庭成员 1 人 · 我」；跨设备并集仍受限（下方根因），故本条保持 open。
 
 ### 根因
 DistributedDataObject 的同步粒度是**对象级**（同名对象字段以 last-write-wins 覆盖），
@@ -59,11 +60,10 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 - 数据仅存本地 `preferences`（`records` / `redemptions` / `task_rewards`）。
 - 已支持导出/导入 CSV、JSON（手动备份）。
 
-> **进度（已实施）**：新增 `BackupService` + `CarbonStore.exportSnapshot()/importSnapshot()`——
-> 整包快照（`records` + `redemptions` + `taskRewards`，含 `version`/`updatedAt`）导出与去重合并恢复；
-> 看板「本地数据管理」新增「备份全部数据 / 从备份恢复」；导入 JSON 时自动识别快照对象。
-> `CloudBackupProvider` 接口预留 AGC Cloud DB / 城市碳普惠平台接入（未注入时云备份不可用，本地备份始终可用）。
-> **阶段 2 真云备份待 AGC 项目配置后接入。**
+> **进度（2026-10 更新）**：
+> - 阶段 1（已实施）：`CarbonStore.exportSnapshot()/importSnapshot()` —— 整包快照（`records` + `redemptions` + `taskRewards`，含 `version`/`updatedAt`）导出与去重合并恢复；看板「本地数据管理」新增「备份全部数据 / 从备份恢复」；导入 JSON 时自动识别快照对象。
+> - 阶段 2（已实施）：`model/CloudBackup.ets` 接入 **AGC 云存储**（bucket `carbonlife-z58pd`，数据区中国）；`waitTask` 30s 超时；未启用时自动回退本地，本地备份始终可用。
+> - 待办：冲突合并策略（`updatedAt` 取新 / 按 `record.id` 并集）与**签名构建下的端到端验证**（模拟器只能验证到「可用」层级）。
 
 
 ### 分阶段方案
@@ -97,9 +97,8 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 
 ## 3. #7 正式应用图标与启动图
 
-### 现状
-`AppScope/resources/base/media/app_icon.png`、`entry/.../media/app_icon.png`、`startIcon.png`
-仍为模板占位资源。
+### 现状（2026-10 更新：已完成）
+`AppScope/resources/base/media/app_icon.png`、`entry/.../media/app_icon.png`、`startIcon.png` **已替换为品牌图标**（叶片 + 品牌深绿），并已在模拟器桌面、任务卡与启动页实机核对通过；`ic_walk.svg` 亦重绘为清晰的行走人形。历史「模板占位」描述作废。
 
 ### 规格
 | 资源 | 位置 | 建议规格 |
@@ -128,9 +127,10 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 
 ## 4. #10 多语言本地化（完整 i18n）
 
-### 现状
-- `resources/base|en_US|zh_CN/element/string.json` 仅含 `module_desc`、`EntryAbility_*`、`perm_*`。
-- 界面文案（各 Tab 标题、按钮、Toast）**硬编码**在 `.ets` 中。
+### 现状（2026-10 更新：基础已完成）
+- `resources/base|en_US|zh_CN/element/string.json` 已承载界面文案；`common/Localize.ets` 的 `resolveStr()` 统一读取资源。
+- 修复了一个真实 bug：`resolveStr()` 此前未把 `$r(id, ...args)` 的实参透传给 `getStringSync`，导致图表轴标签渲染成 `%s`；现已透传。
+- 仍可继续完善：个别动态拼接文案可进一步改为占位符/资源键。
 
 ### 目标
 主要界面文案从资源读取；英文环境下无中文残留。

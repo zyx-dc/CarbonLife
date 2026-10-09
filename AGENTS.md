@@ -3,7 +3,7 @@
 任何 agent 进入本仓库前请先读本文件。
 
 ## 项目
-- 路径：`C:\Users\oscar\Documents\Default Project\CarbonLife`
+- 路径：`C:\Users\39748\Documents\Default Project\CarbonLife`（以仓库根目录为准，避免写死用户名）
 - 类型：HarmonyOS / OpenHarmony 原生应用（ArkTS + ArkUI 声明式 UI，stage 模型）
 - 包名：`com.example.carbonlife` · 入口 Ability：`EntryAbility` · 启动流程 `pages/Splash` → `pages/Index`
 - 目标 SDK：26.0.0（见 `build-profile.json5`）；`deviceTypes: phone, tablet`
@@ -12,13 +12,31 @@
 ## 目录结构
 ```
 entry/src/main/ets/
-├── common/       Constants.ets(AppColor/AppConst) · Theme.ets(tokens/AppMotion) · DateUtil.ets
-├── components/   AppCard · AppButton · Badge · TaskCard · Chart(Canvas)
-├── model/        CarbonStore · CarbonFactors · CarbonTypes · Rewards · FamilyService · MallService · ReminderService · VisionService
+├── common/       Constants.ets(AppColor/AppConst) · Theme.ets(tokens/AppMotion) · DateUtil.ets · Localize.ets
+├── components/   AppCard · AppButton · Badge · TaskCard · AnimatedNumber · Chart(Canvas)
+├── model/        CarbonStore · CarbonFactors · CarbonTypes · Rewards · FamilyService · MallService · ReminderService · VisionService · CloudBackup
 ├── pages/        Splash · Index(5 Tab)
 └── view/         HomeTab · RecordTab · DashboardTab · RewardsTab · KnowledgeTab
 scripts/run.ps1   构建(+可选安装启动)封装脚本
+scripts/ui-smoke.ps1  设备端 UI 冒烟（devecocli ui 驱动，逐页断言）
+ppt_tasks/        答辩 PPT 构建工程（pptx-designer Build Mode）
+docs/tasks/ppt/   答辩 PPT / PDF / 讲稿要点
 ```
+
+## 构建 / 部署（首选 devecocli）
+```powershell
+$cli = "C:\Users\39748\AppData\Roaming\npm\devecocli.cmd"
+& $cli build                                            # 仅构建
+& $cli run --device "Mate 90 Pro" --ability EntryAbility # 构建 + 安装 + 启动（--uninstall 先清数据）
+& $cli ui screenshot --device "Mate 90 Pro" --path out.png
+& $cli ui click --device "Mate 90 Pro" <x> <y>
+& $cli ui layout  --device "Mate 90 Pro" --format json --mode simplified
+& $cli log --device "Mate 90 Pro" --bundle-name com.example.carbonlife --tail 200
+```
+- 模拟器：`Mate 90 Pro`（`127.0.0.1:5555`，手机）、`MatePad Pro 13`（`127.0.0.1:5557`，平板）；`devecocli emulator start <name>` 启动。
+- 也可用 `scripts/run.ps1 -AllowUnsigned` / `-BuildOnly`（Hvigor 路径）。
+- `build-profile.json5` 的 `signingConfigs` 为空 → CLI 默认不产 signed hap；本机模拟器可直接安装 unsigned。真机 / 云备份端到端验证用 `scripts/build-signed.ps1`。
+- 本机**未安装 hdc/DevEco Studio**，历史文档里的 `hdc shell ...` 命令仅作参考，请优先使用 `devecocli`。
 
 ## 设计规范（唯一真相）
 - **`DESIGN.md`**：spec 合规（YAML design tokens + 9 章节），可被 AI 直接消费。改 UI 前先读它。
@@ -38,25 +56,17 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 - `build-profile.json5` 的 `signingConfigs` 为空 → CLI **不产 signed hap**；但本机模拟器**可直接安装 unsigned**（已验证）。
 - 故 `run.ps1` 默认（无 `-AllowUnsigned`/`-BuildOnly`）会因找不到 `*-signed.hap` 而退出 1；自动化请用 `-AllowUnsigned`。
 
-## 设备 / 模拟器
+## 设备 / 模拟器（历史 hdc 参考）
 ```powershell
+# 本机未安装 hdc；以下为历史命令，仅在装了 DevEco Studio / SDK 的机器上可用
 $hdc = "C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe"
-# Emulator.exe: C:\Program Files\Huawei\DevEco Studio\tools\emulator\Emulator.exe
-& $hdc list targets                 # 例：127.0.0.1:5555（模拟器已运行）
-
-# 安装 + 启动
+& $hdc list targets
 & $hdc install -r "entry\build\default\outputs\default\entry-default-unsigned.hap"
 & $hdc shell aa start -a EntryAbility -b com.example.carbonlife
-
-# 「看」界面：截图回传，然后用 Read 读图
 & $hdc shell snapshot_display -f /data/local/tmp/s.jpeg
-& $hdc file recv /data/local/tmp/s.jpeg .
-
-# 日志 / UI 自动化
 & $hdc shell hilog | Select-String CarbonLife
-& $hdc shell uitest uiInput click 640 1200
-& $hdc shell uitest dumpLayout -p /data/local/tmp/layout.json
 ```
+> 日常开发与验证请用上文的 `devecocli`（build / run / ui / log），无需 hdc。
 
 ## 代码约定
 - 数据层单例 `CarbonStore`；服务类均为 `Xxx.get()` 单例。UI 通过 `AppStorage` 的 `recordsVersion` / `familyVersion` 感知变更。
