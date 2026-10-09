@@ -265,14 +265,25 @@ export struct HomeTab {
             Row() {
               Column({ space: AppSpacing.XXS }) {
                 Row({ space: AppSpacing.SM }) {
-                  Column()
-                    .width(7)
-                    .height(7)
-                    .borderRadius(4)
-                    .backgroundColor(AppColor.MAGENTA)
-                    .shadow({ radius: this.live ? 10 : 2, color: AppColor.MAGENTA, offsetX: 0, offsetY: 0 })
-                    .scale({ x: this.live ? 1.15 : 0.8, y: this.live ? 1.15 : 0.8 })
-                    .animation(AppMotion.loopOptions(1400, true));
+                  // 「不和谐的秩序」：品红活点 = 柔和光晕 + 实心圆点（全站仅此一处）
+                  // 注：不要用 .shadow() 做辉光 —— 在 7vp 这种极小尺寸下会被渲染成方块
+                  Stack() {
+                    Column()
+                      .width(14)
+                      .height(14)
+                      .borderRadius(7)
+                      .backgroundColor(AppColor.MAGENTA)
+                      .opacity(this.live ? 0.22 : 0.10)
+                      .scale({ x: this.live ? 1 : 0.7, y: this.live ? 1 : 0.7 })
+                      .animation(AppMotion.loopOptions(1400, true));
+                    Column()
+                      .width(7)
+                      .height(7)
+                      .borderRadius(4)
+                      .backgroundColor(AppColor.MAGENTA);
+                  }
+                  .width(14)
+                  .height(14);
                   Text('CARBONLIFE').fontSize(AppTypography.SMALL.size).letterSpacing(2.5).fontColor(AppColor.TEXT_SUB);
                 }.alignItems(VerticalAlign.Center);
                 Text($r('app.string.home_slogan')).fontSize(AppTypography.H2.size).fontWeight(FontWeight.Bold).fontColor(AppColor.TEXT);

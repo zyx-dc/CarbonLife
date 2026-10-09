@@ -7,6 +7,7 @@ import { DateUtil } from '../common/DateUtil';
 import { VisionService, VisionResult } from '../model/VisionService';
 import { AppCard } from '../components/AppCard';
 import { AppButton } from '../components/AppButton';
+import { RangeSlider } from '../components/RangeSlider';
 import { AppMotion, AppRadius, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Localize';
 
@@ -216,25 +217,25 @@ export struct RecordTab {
                 .animation({ duration: AppMotion.reduceMotion() ? 0 : 160, curve: Curve.Friction });
             }.width('100%');
             // #4 滑杆吸附：按行为步长（0.5 / 1 / 5）吸附，松手时读数轻微回弹
-            Slider({
+            // 自绘 RangeSlider：系统 Slider 在本设备上滑块会多出一层「灰方块 + 白圈」底衬
+            RangeSlider({
               value: this.amountValue(),
               min: this.currentBehavior().step,
               max: this.amountMax(),
               step: this.currentBehavior().step,
-              style: SliderStyle.OutSet
-            })
-              .width('100%')
-              .blockColor(AppColor.PRIMARY)
-              .selectedColor(AppColor.PRIMARY)
-              .trackColor(AppColor.DIVIDER)
-              .onChange((value: number, mode: SliderChangeMode) => {
-                const changed = value !== this.amountValue();
+              trackHeight: 10,
+              blockSize: 24,
+              onChange: (value: number) => {
                 this.amountText = value.toString();
-                if (mode === SliderChangeMode.End && changed && !AppMotion.reduceMotion()) {
+              },
+              onChangeEnd: () => {
+                if (!AppMotion.reduceMotion()) {
                   this.amountPulse = true;
                   setTimeout(() => { this.amountPulse = false; }, 130);
                 }
-              });
+              }
+            })
+              .width('100%');
             Text(this.todayRecordPoints >= AppConst.DAILY_RECORD_POINTS_CAP
               ? $r('app.string.record_cap_reached', AppConst.DAILY_RECORD_POINTS_CAP.toString())
               : $r('app.string.record_points_progress', this.todayRecordPoints.toString(), AppConst.DAILY_RECORD_POINTS_CAP.toString()))
