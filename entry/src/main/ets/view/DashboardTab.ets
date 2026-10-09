@@ -452,7 +452,7 @@ export struct DashboardTab {
           this.dataCard()
         }
       }
-      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 120 })
+      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: AppSpacing.XL })
     }
     .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
   }

@@ -275,7 +275,8 @@ export struct RecordTab {
           }
         }
       }
-      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 170 })
+      // 底部留白：让出吸底操作条（≈86vp）+ 呼吸间距；Tabs 已为导航栏占位，此处无需再让
+      .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: 110 })
       }
       .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
 
