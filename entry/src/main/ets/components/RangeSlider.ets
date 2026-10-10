@@ -72,7 +72,9 @@ export struct RangeSlider {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Start }) {
+    // 注意：ArkUI 的 Alignment.Start 是「左 + 垂直居中」，会把轨道与滑块错开 7vp；
+    // 这里要用 TopStart（左上），下面的 offset(y) 才是相对顶部的偏移。
+    Stack({ alignContent: Alignment.TopStart }) {
       // 轨道
       Row()
         .width('100%')
