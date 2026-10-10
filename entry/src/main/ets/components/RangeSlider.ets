@@ -41,9 +41,16 @@ export struct RangeSlider {
     return this.ratio() * this.usableW();
   }
 
-  /** 已选段宽度：从轨道左端到滑块左缘（滑块自身覆盖到圆心，避免最小位置露出「小尾巴」） */
+  /**
+   * 已选段宽度：从轨道左端画到滑块**圆心**（滑块自身覆盖到圆心，视觉上「骑」在深色段末端）。
+   * 恰好处于最小值时不画，避免滑块左侧冒出一小截深色。
+   */
   private fillW(): number {
-    return Math.min(this.trackW, this.blockOffset());
+    const offset: number = this.blockOffset();
+    if (offset <= 0.5) {
+      return 0;
+    }
+    return Math.min(this.trackW, offset + this.blockSize / 2);
   }
 
   /** 把 x（相对组件左端，vp）换算为吸附后的值 */
@@ -93,7 +100,8 @@ export struct RangeSlider {
         .backgroundColor(AppColor.PRIMARY)
         .borderWidth(2)
         .borderColor(AppColor.CARD)
-        .offset({ x: this.blockOffset() });
+        .offset({ x: this.blockOffset() })
+        .id('rs_block');
     }
     .width('100%')
     .height(this.blockSize)
