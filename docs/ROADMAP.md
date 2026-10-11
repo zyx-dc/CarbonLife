@@ -63,7 +63,8 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 > **进度（2026-10 更新）**：
 > - 阶段 1（已实施）：`CarbonStore.exportSnapshot()/importSnapshot()` —— 整包快照（`records` + `redemptions` + `taskRewards`，含 `version`/`updatedAt`）导出与去重合并恢复；看板「本地数据管理」新增「备份全部数据 / 从备份恢复」；导入 JSON 时自动识别快照对象。
 > - 阶段 2（已实施）：`model/CloudBackup.ets` 接入 **AGC 云存储**（bucket `carbonlife-z58pd`，数据区中国）；`waitTask` 30s 超时；未启用时自动回退本地，本地备份始终可用。
-> - 待办：冲突合并策略（`updatedAt` 取新 / 按 `record.id` 并集）与**签名构建下的端到端验证**（模拟器只能验证到「可用」层级）。
+> - 阶段 2 修复（2026-10-10）：补上 **`ohos.permission.INTERNET`**（`uploadFile`/`downloadFile` 的必需权限，缺失时返回 `201`）；`downloadFile` 增加 `overwrite:true`、失败路径补齐 `hilog` 错误码（`201`/`1008220001`/`1008220009`/`1008221001`），UI 区分「云备份不可用」与「云备份失败」。
+> - 待办：冲突合并策略（`updatedAt` 取新 / 按 `record.id` 并集，当前为按 id 并集）与**签名构建下的端到端验证**（云存储需真机 + signed 构建，模拟器/unsigned 会在默认实例查询时报 `sign error 1008200009`）。
 
 
 ### 分阶段方案

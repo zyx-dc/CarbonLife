@@ -135,6 +135,7 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 
 | 权限 | 类型 | 用途 |
 |---|---|---|
+| `ohos.permission.INTERNET` | system_grant | AGC 云存储备份 / 恢复 |
 | `ohos.permission.DISTRIBUTED_DATASYNC` | user_grant（运行时申请） | 家庭碳积分多设备同步 |
 | `ohos.permission.PUBLISH_AGENT_REMINDER` | system_grant | 每日定时提醒 |
 

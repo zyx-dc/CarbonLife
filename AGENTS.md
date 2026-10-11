@@ -7,7 +7,7 @@
 - 类型：HarmonyOS / OpenHarmony 原生应用（ArkTS + ArkUI 声明式 UI，stage 模型）
 - 包名：`com.example.carbonlife` · 入口 Ability：`EntryAbility` · 启动流程 `pages/Splash` → `pages/Index`
 - 目标 SDK：26.0.0（见 `build-profile.json5`）；`deviceTypes: phone, tablet`
-- 权限：`ohos.permission.DISTRIBUTED_DATASYNC`（user_grant，运行时申请）、`ohos.permission.PUBLISH_AGENT_REMINDER`（system_grant）
+- 权限：`ohos.permission.INTERNET`（system_grant，云备份）、`ohos.permission.DISTRIBUTED_DATASYNC`（user_grant，运行时申请）、`ohos.permission.PUBLISH_AGENT_REMINDER`（system_grant）
 
 ## 目录结构
 ```
