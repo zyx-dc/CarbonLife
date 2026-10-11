@@ -55,4 +55,15 @@ export default function localUnitTest() {
       expect(text.indexOf('"taskRewards"') >= 0).assertTrue();
     });
   });
+
+  describe('ImportValidation', () => {
+    it('importJson_rejects_non_json', 0, () => {
+      expect(CarbonStore.get().importJson('not a json')).assertEqual(-1);
+    });
+
+    it('importJson_drops_records_without_id', 0, () => {
+      // 无 id / 空 id 的记录应被丢弃，且不产生任何新增
+      expect(CarbonStore.get().importJson('[{"amount":1},{"id":""}]')).assertEqual(0);
+    });
+  });
 }

@@ -158,6 +158,7 @@
 { "name": "dashboard_cloud_done", "value": "Backed up to cloud" },
 { "name": "dashboard_cloud_restored", "value": "Restored %d from cloud" },
 { "name": "dashboard_cloud_unavailable", "value": "Cloud backup unavailable" },
+{ "name": "dashboard_cloud_failed", "value": "Cloud backup failed, check network and retry" },
     { "name": "dashboard_backup_done", "value": "All data backed up" },
     { "name": "dashboard_restore_done", "value": "Restored %s item(s)" },
     { "name": "chart_no_data", "value": "No data" },

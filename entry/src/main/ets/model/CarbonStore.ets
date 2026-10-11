@@ -482,7 +482,117 @@ export class CarbonStore {
     return out;
   }
 
-  // 合并导入记录：按 id 去重，返回新增条数
+  // ---- 字段校验 / 归一化：导入的文件可能被手改或来自旧版本，必须逐字段校验 ----
+
+  private static isFiniteNum(n: number): boolean {
+    return n === n && n !== Infinity && n !== -Infinity;
+  }
+
+  private static strField(o: Record<string, Object>, key: string, def: string): string {
+    const v = o[key];
+    return typeof v === 'string' ? v as string : def;
+  }
+
+  private static numField(o: Record<string, Object>, key: string, def: number): number {
+    const v = o[key];
+    if (typeof v === 'number') {
+      const n = v as number;
+      return CarbonStore.isFiniteNum(n) ? n : def;
+    }
+    return def;
+  }
+
+  // 把任意 JSON 对象归一化为合法 CarbonRecord；不可用返回 null（丢弃该条）
+  private static coerceRecord(item: Object): CarbonRecord | null {
+    const o = item as Record<string, Object>;
+    const id = o['id'];
+    if (typeof id !== 'string' || (id as string) === '') {
+      return null;
+    }
+    const def = CarbonFactors.find(CarbonStore.strField(o, 'behaviorKey', ''));
+    const now = Date.now();
+    let amount = CarbonStore.numField(o, 'amount', 0);
+    if (amount < 0) {
+      amount = 0;
+    }
+    let saved = CarbonStore.numField(o, 'saved', def.factor * amount);
+    if (saved < 0) {
+      saved = 0;
+    }
+    // 单条记录积分封顶：防止手工构造的大数积分被兑换
+    let points = Math.floor(CarbonStore.numField(o, 'points', 0));
+    if (points < 0) {
+      points = 0;
+    }
+    if (points > AppConst.DAILY_RECORD_POINTS_CAP) {
+      points = AppConst.DAILY_RECORD_POINTS_CAP;
+    }
+    let timestamp = CarbonStore.numField(o, 'timestamp', now);
+    // 拒绝 > 1 天的未来时间戳，避免污染「今日 / 本周」统计
+    if (timestamp <= 0 || timestamp > now + 86400000) {
+      timestamp = now;
+    }
+    return {
+      id: id as string,
+      behaviorKey: def.key,
+      category: CarbonStore.strField(o, 'category', def.category),
+      name: CarbonStore.strField(o, 'name', def.name),
+      amount: amount,
+      unit: CarbonStore.strField(o, 'unit', def.unit),
+      factor: def.factor,
+      saved: saved,
+      points: points,
+      timestamp: timestamp,
+      dateKey: DateUtil.dayKey(timestamp),
+      note: CarbonStore.strField(o, 'note', '')
+    };
+  }
+
+  private static coerceRedemption(item: Object): RedemptionRecord | null {
+    const o = item as Record<string, Object>;
+    const id = o['id'];
+    if (typeof id !== 'string' || (id as string) === '') {
+      return null;
+    }
+    const now = Date.now();
+    let cost = CarbonStore.numField(o, 'cost', 0);
+    if (cost < 0) {
+      cost = 0;
+    }
+    let timestamp = CarbonStore.numField(o, 'timestamp', now);
+    if (timestamp <= 0) {
+      timestamp = now;
+    }
+    return {
+      id: id as string,
+      itemId: CarbonStore.strField(o, 'itemId', ''),
+      itemName: CarbonStore.strField(o, 'itemName', ''),
+      cost: cost,
+      timestamp: timestamp
+    };
+  }
+
+  private static coerceTaskReward(item: Object): TaskRewardRecord | null {
+    const o = item as Record<string, Object>;
+    const dateKey = o['dateKey'];
+    const taskKey = o['taskKey'];
+    if (typeof dateKey !== 'string' || (dateKey as string) === '' ||
+      typeof taskKey !== 'string' || (taskKey as string) === '') {
+      return null;
+    }
+    const now = Date.now();
+    let timestamp = CarbonStore.numField(o, 'timestamp', now);
+    if (timestamp <= 0) {
+      timestamp = now;
+    }
+    let points = Math.floor(CarbonStore.numField(o, 'points', 0));
+    if (points < 0) {
+      points = 0;
+    }
+    return { dateKey: dateKey as string, taskKey: taskKey as string, points: points, timestamp: timestamp };
+  }
+
+  // 合并导入记录：按 id 去重，返回新增条数（入参须已通过 coerceRecord）
   importRecords(list: CarbonRecord[]): number {
     const ids: string[] = this.records.map((r: CarbonRecord) => r.id);
     let added = 0;
@@ -504,11 +614,18 @@ export class CarbonStore {
   // 导入导出的 JSON（CarbonRecord 数组）。返回新增条数，解析失败返回 -1
   importJson(text: string): number {
     try {
-      const arr = JSON.parse(text) as CarbonRecord[];
+      const arr = JSON.parse(text) as Object[];
       if (!Array.isArray(arr)) {
         return -1;
       }
-      return this.importRecords(arr);
+      const list: CarbonRecord[] = [];
+      arr.forEach((item: Object) => {
+        const rec = CarbonStore.coerceRecord(item);
+        if (rec !== null) {
+          list.push(rec);
+        }
+      });
+      return this.importRecords(list);
     } catch (e) {
       return -1;
     }
@@ -530,7 +647,7 @@ export class CarbonStore {
         const name = cols[3];
         const matches = CarbonFactors.BEHAVIORS.filter((b: BehaviorDef) => b.name === name);
         const def = matches.length > 0 ? matches[0] : CarbonFactors.BEHAVIORS[0];
-        list.push({
+        const candidate: CarbonRecord = {
           id: cols[0],
           behaviorKey: def.key,
           category: cols[2] !== '' ? cols[2] : def.category,
@@ -543,7 +660,12 @@ export class CarbonStore {
           timestamp: DateUtil.dayKeyToTimestamp(cols[1]),
           dateKey: cols[1],
           note: cols[8] === '-' ? '' : cols[8]
-        });
+        };
+        // 与 JSON/快照导入共用同一套校验（数值 clamp、日期归一、积分封顶）
+        const rec = CarbonStore.coerceRecord(candidate);
+        if (rec !== null) {
+          list.push(rec);
+        }
       }
       return this.importRecords(list);
     } catch (e) {
@@ -572,11 +694,19 @@ export class CarbonStore {
       if (snap === null || snap === undefined || !Array.isArray(snap.records)) {
         return -1;
       }
-      let added = this.importRecords(snap.records);
+      const recs: CarbonRecord[] = [];
+      snap.records.forEach((item: CarbonRecord) => {
+        const rec = CarbonStore.coerceRecord(item);
+        if (rec !== null) {
+          recs.push(rec);
+        }
+      });
+      let added = this.importRecords(recs);
       const rIds: string[] = this.redemptions.map((r: RedemptionRecord) => r.id);
       if (Array.isArray(snap.redemptions)) {
-        snap.redemptions.forEach((r: RedemptionRecord) => {
-          if (r.id !== '' && rIds.indexOf(r.id) < 0) {
+        snap.redemptions.forEach((item: RedemptionRecord) => {
+          const r = CarbonStore.coerceRedemption(item);
+          if (r !== null && rIds.indexOf(r.id) < 0) {
             this.redemptions.push(r);
             rIds.push(r.id);
             added += 1;
@@ -585,7 +715,11 @@ export class CarbonStore {
       }
       const tKeys: string[] = this.taskRewards.map((t: TaskRewardRecord) => t.dateKey + '|' + t.taskKey);
       if (Array.isArray(snap.taskRewards)) {
-        snap.taskRewards.forEach((t: TaskRewardRecord) => {
+        snap.taskRewards.forEach((item: TaskRewardRecord) => {
+          const t = CarbonStore.coerceTaskReward(item);
+          if (t === null) {
+            return;
+          }
           const k = t.dateKey + '|' + t.taskKey;
           if (tKeys.indexOf(k) < 0) {
             this.taskRewards.push(t);

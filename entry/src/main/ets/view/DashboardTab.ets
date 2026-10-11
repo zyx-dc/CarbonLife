@@ -107,7 +107,7 @@ export struct DashboardTab {
       if (uris.length === 0) {
         return false;
       }
-      file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE);
+      file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC);
       fs.writeSync(file.fd, content);
       return true;
     } finally {
@@ -217,7 +217,7 @@ export struct DashboardTab {
       return;
     }
     const ok = await BackupService.backupToCloud();
-    ToastHelper.show(this.uiContext, ok ? $r('app.string.dashboard_cloud_done') : $r('app.string.dashboard_cloud_unavailable'));
+    ToastHelper.show(this.uiContext, ok ? $r('app.string.dashboard_cloud_done') : $r('app.string.dashboard_cloud_failed'));
   }
 
   async restoreCloud(): Promise<void> {
@@ -227,7 +227,7 @@ export struct DashboardTab {
     }
     const added = await BackupService.restoreFromCloud();
     if (added < 0) {
-      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_unavailable'));
+      ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_failed'));
     } else {
       ToastHelper.show(this.uiContext, $r('app.string.dashboard_cloud_restored', added.toString()));
       this.refreshData();
