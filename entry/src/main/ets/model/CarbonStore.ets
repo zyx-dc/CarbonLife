@@ -452,15 +452,19 @@ export class CarbonStore {
 
   // ---- 数据导入 ----
 
-  private static parseCsvLine(line: string): string[] {
-    const out: string[] = [];
+  // 解析整段 CSV 为「行/列」（RFC 4180：引号内的逗号与换行、"" 转义）。
+  // 之前按 \n 预先切行会破坏含换行的引号字段，这里一次扫描完成。
+  private static parseCsv(text: string): string[][] {
+    const rows: string[][] = [];
+    let row: string[] = [];
     let cur = '';
     let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line.charAt(i);
+    const s = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    for (let i = 0; i < s.length; i++) {
+      const ch = s.charAt(i);
       if (inQuotes) {
         if (ch === '"') {
-          if (i + 1 < line.length && line.charAt(i + 1) === '"') {
+          if (i + 1 < s.length && s.charAt(i + 1) === '"') {
             cur += '"';
             i++;
           } else {
@@ -472,14 +476,20 @@ export class CarbonStore {
       } else if (ch === '"') {
         inQuotes = true;
       } else if (ch === ',') {
-        out.push(cur);
+        row.push(cur);
+        cur = '';
+      } else if (ch === '\n') {
+        row.push(cur);
+        rows.push(row);
+        row = [];
         cur = '';
       } else {
         cur += ch;
       }
     }
-    out.push(cur);
-    return out;
+    row.push(cur);
+    rows.push(row);
+    return rows;
   }
 
   // ---- 字段校验 / 归一化：导入的文件可能被手改或来自旧版本，必须逐字段校验 ----
@@ -634,13 +644,19 @@ export class CarbonStore {
   // 导入导出的 CSV。返回新增条数，解析失败返回 -1
   importCsv(text: string): number {
     try {
-      const lines = text.replace(/\r\n/g, '\n').split('\n').filter((l: string) => l.trim() !== '');
-      if (lines.length <= 1) {
+      // 去掉可能的 UTF-8 BOM，再按 RFC 4180 解析（支持引号内含换行的字段）
+      const body = text.charCodeAt(0) === 0xFEFF ? text.substring(1) : text;
+      const rows = CarbonStore.parseCsv(body);
+      if (rows.length <= 1) {
         return 0;
       }
       const list: CarbonRecord[] = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = CarbonStore.parseCsvLine(lines[i]);
+      for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i];
+        // 跳过空行（末尾换行会产出一个全空行）
+        if (cols.length === 1 && cols[0].trim() === '') {
+          continue;
+        }
         if (cols.length < 9) {
           continue;
         }

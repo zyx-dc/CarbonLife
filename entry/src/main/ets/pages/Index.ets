@@ -39,6 +39,14 @@ struct Index {
     }
   }
 
+  // 窗口尺寸变化（旋转 / 折叠 / 分屏）时重新判定宽屏：断点不能只在启动时算一次
+  private applyWide(widthVp: number): void {
+    const wide: boolean = widthVp >= 840;
+    if (wide !== this.isWide) {
+      this.isWide = wide;
+    }
+  }
+
   aboutToAppear(): void {
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 50);
     setTimeout(() => this.drift = true, AppMotion.reduceMotion() ? 0 : 120);
@@ -156,6 +164,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
+    .onAreaChange((_oldValue: Area, newValue: Area) => { this.applyWide(newValue.width as number); })
     .backgroundColor(AppColor.BG_WASH_TOP)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
