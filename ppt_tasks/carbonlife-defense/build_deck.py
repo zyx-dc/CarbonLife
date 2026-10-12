@@ -32,6 +32,8 @@ IMG = {
     "splash": str(CARBON / "screen3.jpeg"),
     # 端侧 AI 识图：记录页 AI 卡片（模拟器实机截图，浅色，已裁系统状态栏）
     "ai": str(ASSETS / "ai.jpg"),
+    # 家庭碳积分：由实机首页截图裁切优化（去状态栏 / 截断行 / Tab 栏）
+    "family": str(ASSETS / "family.jpg"),
 }
 
 FONT = "Microsoft YaHei"
@@ -301,7 +303,7 @@ highlight_page(9, "HIGHLIGHT 04", "一个家庭码，把家人的减排聚在一
     [("家庭码", "生成 / 加入即可建立家庭组"),
      ("自动聚合", "同账号多设备按成员展示减排与积分"),
      ("不经第三方", "数据仅在本人设备间同步")],
-    IMG["home"],
+    IMG["family"],
     "生成或加入家庭码后，可在同一华为账号的多设备间同步，并按成员展示家庭减排与积分。")
 
 highlight_page(10, "HIGHLIGHT 05", "减排有回馈：积分 · 徽章 · 植树",
