@@ -149,6 +149,7 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 
 本项目按「写审分离」组织协作，仓库内置：
 - `AGENTS.md` — 仓库上下文（构建 / 部署 / 约定），任何 Agent 进入即可读
+- `docs/TEAM_TESTING.md` — **组内模拟器测试指南**（环境要求、三种运行方式、冒烟/单元测试、回归清单、反馈模板）
 - `.claude/agents/device-qa.md` / `.opencode/agent/device-qa.md` — 设备验证 Agent（只读）：在模拟器上构建、安装、截图、驱动 UI 并逐条核对验收清单
 - `HANDOFF.md` — 交接简报模板（变更清单 + 验收清单 + 命令）
 

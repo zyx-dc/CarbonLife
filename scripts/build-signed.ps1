@@ -17,12 +17,26 @@
 
 param(
     [string]$Version = "1.0.0",
-    [string]$BuildMode = "release"
+    [string]$BuildMode = "release",
+    [string]$DevEco = ""
 )
 
 $ErrorActionPreference = "Stop"
 
-$DevEco = "C:\Program Files\Huawei\DevEco Studio"
+# Auto-detect DevEco Studio (path differs per machine); override with -DevEco <path>.
+if ([string]::IsNullOrEmpty($DevEco)) {
+    $candidates = @(
+        "C:\Program Files\Huawei\DevEco Studio",
+        (Join-Path $env:ProgramFiles "Huawei\DevEco Studio"),
+        (Join-Path $env:LOCALAPPDATA "Huawei\DevEco Studio"),
+        (Join-Path $env:LOCALAPPDATA "Programs\Huawei\DevEco Studio")
+    ) | Where-Object { $_ -and (Test-Path (Join-Path $_ "tools\hvigor\bin\hvigorw.bat")) }
+    if ($candidates.Count -gt 0) { $DevEco = @($candidates)[0] }
+}
+if ([string]::IsNullOrEmpty($DevEco) -or -not (Test-Path (Join-Path $DevEco "tools\hvigor\bin\hvigorw.bat"))) {
+    throw "DevEco Studio not found. Install it, or pass -DevEco 'C:\path\to\DevEco Studio'."
+}
+Write-Host "==> Using DevEco: $DevEco"
 $env:DEVECO_SDK_HOME = "$DevEco\sdk"
 $env:OHOS_BASE_SDK_HOME = "$DevEco\sdk"
 $env:JAVA_HOME = "$DevEco\jbr"
