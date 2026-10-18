@@ -187,3 +187,52 @@
 
 **演示素材（2026-10 最新）**：仓库根目录 `screen3.jpeg` / `app_home_new.jpeg` / `app_record_new2.jpeg` /
 `app_dashboard.jpeg` / `app_rewards_v4.jpeg` / `app_knowledge.jpeg`；答辩 PPT / PDF / 讲稿见 `docs/tasks/ppt/`。
+
+---
+
+## 2026-10-18 修复与复测更新（code-review 后）
+
+> 基线：`master @ 908f4bc`（含 2026-10-10～10-14 的 5 个提交）· 方式：`devecocli build` + `check lint` +
+> `ui-smoke.ps1`（手机 + 平板模拟器）· **云备份 / 分布式权限 / 家庭跨设备等真机项本轮未复测**。
+> 上一节（2026-10-08）从此为历史口径。
+
+### 本轮修复（相对 10-08）
+
+| 提交 | 修复 | 优先级 |
+|---|---|---|
+| `09f9a72` | 补 **`ohos.permission.INTERNET`**（云存储 `uploadFile`/`downloadFile` 必需，缺失返回 `201`）；`downloadFile` 加 `overwrite:true`；失败路径补齐 `hilog` 错误码 | P1 |
+| `5216d3b` | 导入（JSON / CSV / 整包快照）**逐字段校验归一化**：丢弃无 `id` 记录、数值 clamp、单条积分封顶 `300`、拒绝 > 1 天未来时间戳、`dateKey` 由 `timestamp` 反推；导出文件补 `TRUNC` 截断 | P1/P2 |
+| `6f584b7` | 宽屏断点改 `onAreaChange` **响应式**（旋转 / 折叠 / 分屏）；CSV 改 **RFC 4180 整段解析**（支持引号内含换行） | P2/P3 |
+
+### 本轮验证
+
+| 项 | 结果 | 证据 / 说明 |
+|---|---|---|
+| 构建 `devecocli build` | **PASS** | `BUILD SUCCESSFUL`；打包后 `module.json` 含 `ohos.permission.INTERNET` |
+| 静态检查 `check lint` | **PASS** | 0 error（仅 1 条既有 `AppCard` 性能建议，属有意设计） |
+| 设备端 UI 冒烟 | **PASS 20/20** | 手机 `Mate 90 Pro` 与平板 `MatePad Pro 13` 各 20/20 |
+| 宽屏布局（`isWide`） | **PASS** | 平板 `ui layout` 为左栏导航（`首页` x≈65,y≈275；`看板` x≈65,y≈1011）→ 断点生效 |
+| 导入校验（运行时） | **待复测** | 需走系统文件选择器实测；已加单测用例（非 JSON→`-1`、无 id 记录被丢弃→`0`），**用例未执行** |
+| 云备份端到端 | **BLOCKED** | 模拟器 / unsigned 在云侧鉴权失败（`sign error 1008200009`）；需**真机 + 签名构建** |
+
+### 截至 2026-10-18 状态总表
+
+| # | 验证项 | 当前状态 | 说明 |
+|---|--------|---------|------|
+| 1 | 深色模式 | **PASS** | 跟随系统 `colorMode`，冷启动与运行中实时切换 |
+| 2 | 分布式权限弹窗 | **BLOCKED（环境受限）** | `12100009` 已消除；模拟器不弹动态授权框，需真机复测 |
+| 3 | 家庭聚合 | **本地 PASS / 跨设备待复测** | 单机家庭码 + 成员列表正常；跨设备并集受 DDO 对象级同步限制（见 `ROADMAP #2`） |
+| 4 | 清空数据 | **PASS** | — |
+| 5 | CSV 导出 | **PASS** | 含 BOM 与 RFC 4180 转义；导出文件已补 `TRUNC` |
+| 6 | 图表刷新 | **PASS** | 周期切换与新增记录均实时刷新 |
+| 7 | 记录增删 | **PASS** | 保存 / 删除后记录页与首页实时同步，无需重启 |
+| 8 | 设备端 UI 冒烟 | **PASS 20/20** | 手机 + 平板各 20/20（`scripts/ui-smoke.ps1`） |
+| 9 | 云备份（AGC） | **代码完成 / 端到端 BLOCKED** | 已补 `INTERNET` 权限与失败态区分；端到端需真机 + 签名构建 |
+| 10 | 平板多列 | **部分完成** | 数据看板多列 + 宽屏断点响应式已修；其余 4 个 Tab 待补齐 |
+| 11 | 数据导入健壮性 | **代码 PASS / 运行时待复测** | 逐字段校验与归一化（丢弃坏记录 / 积分封顶 / 时间戳归一）；单测用例已加 |
+
+**汇总（截至 2026-10-18）**：可验证项 **PASS**；`分布式权限`、`云备份端到端` 为 **BLOCKED（需真机）**；
+`家庭跨设备`、`导入运行时`、`平板其余 Tab` 为**待复测 / 部分完成**。
+
+**并行验证**：组内测试包 `CarbonLife-team-test-20261014.zip`（源码 + prebuilt HAP + `docs/TEAM_TESTING.md`）。
+
