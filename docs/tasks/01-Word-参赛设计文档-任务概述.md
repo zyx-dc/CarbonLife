@@ -33,7 +33,7 @@
    - 架构示意：入口 Ability → 5 个页面 Tab → 通用组件 → 数据与服务层（用方框图画出来即可，材料见 `AGENTS.md`「目录结构」）。
    - 数据存储：数据保存在本机（不上云）。
 5. **核心功能详述**（每个功能配 1 张截图 + 2–4 句说明，功能清单见下方第 4 节）。
-6. **设计系统与视觉规范**：说明 App 的配色（深林绿 + 暖白 + 琥珀金）、圆角、双主题，材料来自 `DESIGN.md`。
+6. **设计系统与视觉规范**：说明 App 的双主题设计系统（深色「夜行荧光」+ 浅色「日光纸感」）及主色 / 信号色 / 强调色 / 圆角 / 动效，材料来自 `DESIGN.md`（`DESIGN_SYSTEM.md` 已归档废弃，不要引用）。
 7. **隐私与权限**：见下方第 5 节。
 8. **创新点与项目难点**：例如端侧 AI 识图、家庭碳积分跨设备聚合、无云本机存储。
 9. **测试与验证**：说明项目用「AI 设备验证 Agent + 验收清单」的方法（材料见 `HANDOFF.md`、`QA_REPORT.md`）。
@@ -82,6 +82,23 @@
 - 权限弹窗 `qa_perm.jpeg`
 
 > 注意：`README.md` 里写的 `screen3.jpeg` 等是相对路径，实际文件都在 `docs/qa/` 里，从那里取图。
+
+### 6.1 文档构建方式（可复现）
+
+设计文档不是手工文件，而是从 HTML 源渲染出来的，改稿请改源文件：
+
+```powershell
+# 1) HTML 源：docs/tasks/design-doc/design-doc.html
+# 2) 生成 .docx（需先装依赖：npm i html-to-docx）
+node scripts\make-docx.cjs
+
+# 3) 用 LibreOffice 导出 PDF（输出到同目录）
+powershell -ExecutionPolicy Bypass -File scripts\make-design-doc-pdf.ps1
+```
+
+- 截图以 `src="qa:<文件名>"` 引用 `docs/qa/` 下的图片，`make-docx.cjs` 会把它们转成 base64 内嵌，因此 docx 可独立分发。
+- 图片尺寸必须写在 `<img>` 的**内联** `style="width:180px"` 上：html-to-docx 不解析 CSS class 规则，否则图片会按原始像素被放大到整页宽（历史上曾导致每张截图独占一页、全文 40+ 页）。
+- 表格题注写在表格前一行（`<p class="tabcap">表 N　…</p>`），图片题注用 `<div class="cap">图 N　…</div>`，编号需与正文引用一致。
 
 ## 7. 硬性要求与红线
 

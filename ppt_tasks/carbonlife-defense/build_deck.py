@@ -173,7 +173,7 @@ gradient_text(s, 0.9, 1.55, 6.6, 1.15, "CarbonLife",
 text(s, 0.95, 2.72, 6.4, 0.5, "碳足迹 · 全民绿色生活", font_size=22, color="primary", bold=True)
 text(s, 0.95, 3.35, 6.4, 0.4, "基于 HarmonyOS 的低碳生活记录与激励应用", font_size=15, color="text_muted")
 cx = 0.95
-for label in ["双碳目标", "HarmonyOS 原生", "端侧 AI", "无云隐私", "家庭共享"]:
+for label in ["双碳目标", "HarmonyOS 原生", "端侧 AI", "隐私优先", "家庭共享"]:
     cx += chip(s, cx, 4.15, label) + 0.18
 rect(s, 0.95, 5.05, 4.2, 0.02, "border")
 text(s, 0.95, 5.25, 6.4, 0.35, "参赛作品 · 答辩演示", font_size=13, color="accent", bold=True)
@@ -195,7 +195,7 @@ for i, (t, d) in enumerate(pains):
     text(s, x + 0.3, 2.3, cw - 0.6, 0.5, t, font_size=22, color="primary", bold=True)
     multiline(s, x + 0.3, 3.0, cw - 0.6, 1.3, [d], font_size=15, color="text_muted")
 band(s, M, 4.85, CW, 1.05, "另一个现实问题：用户对生活数据的隐私有顾虑。")
-text(s, M + 0.35, 5.5, CW - 0.7, 0.3, "这决定了我们坚持「数据留在本机、不依赖云」。", font_size=13, color="text_muted")
+text(s, M + 0.35, 5.5, CW - 0.7, 0.3, "这决定了我们坚持「数据默认留在本机，云备份由用户自主开关」。", font_size=13, color="text_muted")
 footer(s, 2)
 NOTES[2] = "在双碳目标背景下，日常低碳行为普遍「难记录、没反馈、难坚持」，同时用户对生活数据隐私有顾虑。"
 
@@ -241,7 +241,7 @@ NOTES[4] = "面向关注环保与健康的家庭用户、学生与通勤上班�
 s = new_slide(prs)
 header(s, "OVERVIEW", "8 大功能，覆盖记录—计算—激励的完整闭环")
 feats = [("01", "低碳行为记录", "13 种行为自动折算"), ("02", "端侧 AI 识图", "选图推荐低碳行为"),
-         ("03", "数据看板与导出", "趋势图表 + CSV/JSON"), ("04", "积分与荣誉", "兑换 · 徽章 · 植树 · 任务"),
+         ("03", "数据看板与导出", "趋势图表 + 导入导出"), ("04", "积分与荣誉", "兑换 · 徽章 · 植树 · 任务"),
          ("05", "家庭碳积分", "家庭码聚合多设备"), ("06", "每日提醒", "默认 20:00 提醒记录"),
          ("07", "双碳科普", "碳达峰 / 碳中和专栏"), ("08", "浅色 · 深色主题", "跟随系统实时切换")]
 cw = (CW - 3 * 0.28) / 4
@@ -255,7 +255,7 @@ for i, (n, t, d) in enumerate(feats):
     text(s, x + 0.25, y + 1.02, cw - 0.5, 0.35, d, font_size=12, color="text_muted")
 band(s, M, 5.35, CW, 0.95, "记录 → 计算 → 激励，形成可持续的低碳闭环。")
 footer(s, 5)
-NOTES[5] = "项目包含低碳行为记录、端侧 AI 识图、数据看板与导出、积分与荣誉、家庭碳积分、每日提醒、双碳科普、深浅主题八大功能。"
+NOTES[5] = "项目包含低碳行为记录、端侧 AI 识图、数据看板与导入导出、积分与荣誉、家庭碳积分、每日提醒、双碳科普、深浅主题八大功能；数据还支持本地整包备份与可选的云备份。"
 
 # ── P6 亮点1 ────────────────────────────────────────────────────────
 s = new_slide(prs)
@@ -295,9 +295,9 @@ highlight_page(7, "HIGHLIGHT 02", "选一张照片，自动推荐低碳行为",
 highlight_page(8, "HIGHLIGHT 03", "日 / 周 / 月 / 年，把减排趋势看清楚",
     [("多周期趋势", "日 / 周 / 月 / 年切换，汇总口径一致"),
      ("多视图", "折线 / 柱状 / 饼图呈现类别占比"),
-     ("可导出", "CSV / JSON（UTF-8 BOM，Excel 不乱码）")],
+     ("导入导出", "CSV / JSON 互导（UTF-8 BOM，Excel 不乱码）")],
     IMG["dashboard"],
-    "提供日 / 周 / 月 / 年趋势，折线、柱状、饼图多种呈现，并支持 CSV / JSON 导出。")
+    "提供日 / 周 / 月 / 年趋势，折线、柱状、饼图多种呈现；支持 CSV / JSON 导入与导出，导入时逐字段校验归一化。")
 
 highlight_page(9, "HIGHLIGHT 04", "一个家庭码，把家人的减排聚在一起",
     [("家庭码", "生成 / 加入即可建立家庭组"),
@@ -321,7 +321,7 @@ point_rows(s, M + 0.4, 2.35, 6.2,
            [("视觉基调", "暖白纸感底，深林绿为品牌、琥珀金为强调"),
             ("统一的系统", "玻璃质感卡片 + 单一信号色，层次靠字号与留白"),
             ("跟随系统", "主题随系统深浅色切换，运行中实时生效"),
-            ("有目的的动效", "读数滚动 / 图表入场，可一键「减弱动效」")], gap=1.15)
+            ("有目的的动效", "读数滚动 / 图表入场，支持「减弱动效」开关")], gap=1.15)
 phone(s, 7.75, 1.95, 2.35, 4.6, IMG["home"])
 phone(s, 10.35, 1.95, 2.35, 4.6, IMG["knowledge"])
 text(s, 7.75, 6.62, 2.35, 0.3, "首页", font_size=11, color="text_muted", align="center")
@@ -333,7 +333,7 @@ NOTES[11] = "整体采用可跟随系统的浅 / 深双主题，颜色与控件�
 s = new_slide(prs)
 header(s, "TECH", "基于 HarmonyOS 的原生实现")
 layers = [("应用层", "ArkUI 声明式 UI · 5 Tab（首页 / 记录 / 看板 / 积分 / 科普）", "primary"),
-          ("数据与服务层", "CarbonStore · CarbonFactors · Family / Mall / Reminder / Vision Service", "accent"),
+          ("数据与服务层", "CarbonStore · CarbonFactors · Family / Mall / Reminder / Vision · Backup", "accent"),
           ("系统 Kit 层", "ArkData · CoreVisionKit · BackgroundTasksKit · MediaLibrary / ImageKit · CoreFileKit · AbilityKit", "primary")]
 for i, (t, d, a) in enumerate(layers):
     y = 1.95 + i * (1.28 + 0.2)
@@ -346,15 +346,16 @@ text(s, 8.45, 2.2, 3.9, 0.4, "技术栈", font_size=17, color="primary", bold=Tr
 multiline(s, 8.45, 2.75, 3.9, 3.5,
           ["· 语言：ArkTS", "· UI：ArkUI（声明式）", "· 模型：Stage 模型",
            "· SDK：compatibleSdkVersion 26.0.0", "· 设备：phone / tablet",
-           "· 存储：Preferences 本地持久化", "· 同步：DistributedDataObject"],
+           "· 存储：Preferences 本地持久化", "· 同步：DistributedDataObject",
+           "· 备份：AGC 云存储（可开关）"],
           font_size=13, color="text_dark", line_spacing=7)
 footer(s, 12)
-NOTES[12] = "基于 HarmonyOS / OpenHarmony 原生开发，使用 ArkTS 与 ArkUI 声明式 UI，Stage 模型、SDK 26.0.0；本机存储、端侧 AI、分布式数据与后台提醒。"
+NOTES[12] = "基于 HarmonyOS / OpenHarmony 原生开发，使用 ArkTS 与 ArkUI 声明式 UI，Stage 模型、SDK 26.0.0；本机存储、端侧 AI、分布式数据、后台提醒，以及可开关的 AGC 云备份。"
 
 # ── P13 隐私与安全 ──────────────────────────────────────────────────
 s = new_slide(prs)
 header(s, "PRIVACY", "数据留在本机，隐私优先")
-priv = [("记录仅存本机", "低碳记录保存在本机 Preferences，不上传云端。"),
+priv = [("默认仅存本机", "记录默认保存在本机 Preferences；云备份为独立开关，默认关闭。"),
         ("家庭同步不经第三方", "家庭碳积分仅在本人同账号设备间同步，不经过第三方服务器。"),
         ("识图不出本机", "端侧 AI 识图在本机完成，图片不上传。")]
 cw = (CW - 2 * 0.3) / 3
@@ -367,7 +368,7 @@ for i, (t, d) in enumerate(priv):
     multiline(s, x + 0.3, 4.15, cw - 0.6, 0.75, [d], font_size=13, color="text_muted")
 band(s, M, 5.35, CW, 0.85, "隐私不是附加项，而是产品设计的起点。")
 footer(s, 13)
-NOTES[13] = "记录只存本机、不上云；家庭数据只在同一账号设备间同步，不经过第三方；识图在本机完成。"
+NOTES[13] = "记录默认只存本机（Preferences），云备份是可选的独立开关、默认关闭；家庭数据只在同一账号设备间同步，不经过第三方；识图在本机完成。"
 
 # ── P14 验证与质量 ──────────────────────────────────────────────────
 s = new_slide(prs)
@@ -376,18 +377,18 @@ card(s, M, 1.95, 5.4, 4.6, accent="primary")
 text(s, M + 0.3, 2.2, 4.8, 0.4, "只读的设备验证流程", font_size=17, color="primary", bold=True)
 multiline(s, M + 0.3, 2.8, 4.8, 3.4,
           ["· 写代码与审查分离，避免自证", "· 设备验证 Agent 在模拟器上构建、安装、截图",
-           "· 逐条核对验收清单并输出证据", "· 依据 QA_REPORT.md 的复测结论"],
+           "· 逐条核对验收清单并输出证据", "· 依据验收清单与复测记录归档"],
           font_size=14, color="text_dark", line_spacing=9)
 card(s, 6.35, 1.95, 6.28, 4.6, accent="accent")
 text(s, 6.65, 2.2, 5.7, 0.4, "复测结果", font_size=17, color="primary", bold=True)
 rrect(s, 6.65, 2.75, 5.65, 1.5, TINT, line="border")
 text(s, 6.85, 2.9, 5.3, 0.35, "✓ 已通过", font_size=14, color="success", bold=True)
-multiline(s, 6.85, 3.3, 5.3, 0.9, ["记录增删实时刷新 · 图表刷新 · 家庭聚合（本地侧）"], font_size=13, color="text_dark")
+multiline(s, 6.85, 3.3, 5.3, 0.9, ["记录增删实时刷新 · 图表刷新 · 家庭聚合（本地侧） · UI 冒烟 20/20（手机 + 平板）"], font_size=13, color="text_dark")
 rrect(s, 6.65, 4.5, 5.65, 1.5, TINT, line="border")
 text(s, 6.85, 4.65, 5.3, 0.35, "! 待真机复测", font_size=14, color="accent", bold=True)
 multiline(s, 6.85, 5.05, 5.3, 0.9, ["分布式权限弹窗 · 跨设备家庭聚合"], font_size=13, color="text_dark")
 footer(s, 14)
-NOTES[14] = "项目采用「写审分离 + 设备验证」，在模拟器上逐条核对验收清单；记录刷新、图表刷新、家庭聚合已在复测中通过，权限弹窗与跨设备聚合仍需真机复测。"
+NOTES[14] = "项目采用「写审分离 + 设备验证」，在模拟器上逐条核对验收清单；记录刷新、图表刷新、家庭聚合（本地侧）与设备端 UI 冒烟 20/20 已通过，分布式权限弹窗与跨设备家庭聚合仍需真机复测。"
 
 # ── P15 展望与致谢 (dark) ───────────────────────────────────────────
 s = new_slide(prs)
@@ -395,9 +396,9 @@ rect(s, 0, 0, 0.16, H, "primary")
 text(s, M, 0.7, 6, 0.4, "ROADMAP", font_size=12, color="accent", bold=True)
 text(s, M, 1.05, 7, 0.7, "接下来", font_size=30, color="primary", bold=True)
 road = ["· 对接真实城市碳普惠平台 API，替代本地模拟兑换码",
-        "· 数据云备份（AGC）与冲突合并策略",
+        "· 云备份冲突合并策略与签名构建端到端验证",
         "· 接入系统无障碍设置，真正启用「减弱动效」",
-        "· 平板多列布局适配"]
+        "· 平板其余页面补齐多列布局"]
 multiline(s, M, 2.0, 7.2, 3.4, road, font_size=16, color="text_dark", line_spacing=11)
 gradient_text(s, 8.0, 2.2, 4.6, 1.6, "谢谢", stops=[("#0F3D2E", 0), ("#2F6B4F", 60), ("#0E8F79", 100)], font_size=72, bold=True)
 text(s, 8.05, 4.0, 4.6, 0.4, "记录每一次低碳行动", font_size=14, color="text_muted")
@@ -405,7 +406,7 @@ text(s, 8.05, 4.35, 4.6, 0.4, "积少成多守护地球", font_size=14, color="t
 rect(s, M, 5.65, 11.93, 0.02, "border")
 text(s, M, 5.85, 8, 0.4, "CarbonLife 碳足迹 · 基于 HarmonyOS 的低碳生活应用", font_size=13, color="primary", bold=True)
 footer(s, 15)
-NOTES[15] = "后续计划对接真实碳普惠平台、增加数据导入与云备份、接入系统无障碍与平板布局。谢谢观看。"
+NOTES[15] = "后续计划对接真实碳普惠平台、完成云备份冲突合并与签名构建验证、接入系统无障碍与补齐平板多列布局。谢谢观看。"
 
 for i, slide in enumerate(prs.slides, start=1):
     if i in NOTES:
