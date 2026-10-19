@@ -14,8 +14,10 @@ import { CloudBackupProvider } from './BackupService';
  *
  * 前置条件（云侧 / 设备侧）：
  * 1. 已在 AGC 开通云存储并存在默认实例；
- * 2. module.json5 已声明 ohos.permission.INTERNET（缺失时上传/下载返回 201）；
- * 3. 真机 + 已签名构建（模拟器与 unsigned 构建无法通过云侧鉴权）。
+ * 2. module.json5 已声明 ohos.permission.INTERNET；
+ * 3. 已通过 CloudAuth 完成 AGC 登录并 cloudCommon.init(authProvider)——
+ *    云存储安全规则为 `if request.auth != null`，缺少用户凭证会返回 403 Authentication failed；
+ * 4. 模拟器调试需在 HarmonyOS 开发者中心注册「模拟器调试凭据」，真机需正常签名。
  *
  * 未开通云存储 / 初始化失败时 isEnabled() 返回 false，本地备份不受影响。
  */

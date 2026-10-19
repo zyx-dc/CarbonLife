@@ -7,6 +7,7 @@ import { CarbonStore } from '../model/CarbonStore';
 import { FamilyService } from '../model/FamilyService';
 import { BackupService } from '../model/BackupService';
 import { CloudStorageBackupProvider } from '../model/CloudBackup';
+import { CloudAuth } from '../model/CloudAuth';
 
 const DOMAIN: number = 0x0000;
 const TAG: string = 'CarbonLife';
@@ -41,6 +42,9 @@ export default class EntryAbility extends UIAbility {
         CarbonStore.get().init(this.context).then(async () => {
           await FamilyService.get().init(this.context);
           FamilyService.get().pushLocal();
+          // 先完成云侧登录（游客匿名）+ cloudCommon 初始化，再创建云存储实例。
+          // 云存储安全规则为 request.auth != null，缺少用户凭证会返回 403 Authentication failed。
+          await CloudAuth.ensure(this.context);
           // 注入云备份实现（AGC 云存储）；未开通/初始化失败时 isEnabled() 为 false
           const cloud = new CloudStorageBackupProvider();
           cloud.init(this.context);
