@@ -110,6 +110,48 @@ python ppt_tasks\carbonlife-defense\contact_sheet.py
 - 页级方案 / 复核记录：`page-plan.md`、`brief.md`、`visual-review.md`、`acceptance-contract.md`
 - `output/` 为生成产物（已 gitignore），脚本 + 素材 + 任务记录入库即可复现
 
+### 6.2 截图素材怎么重截（可复现）
+
+> **教训**：截图是最容易过期的资产。2026-10 复核发现两处翻车：Word 设计文档整篇用的是
+> `docs/qa/` 里 **2026-09-21/22** 的旧 UI 截图（本节第 6 条自己写明"不建议再用于答辩演示"）；
+> PPT 素材停在 **10-09 12:06**，而之后又落了 8 个 UI 提交（底栏留白、滑杆、看板图表、家庭卡文案）。
+> **改完 UI 就要重截，并用肉眼比对新旧图。**
+
+前置：模拟器 `Mate 90 Pro` 已启动，且 App 是当前构建
+（`devecocli run --device "Mate 90 Pro" --ability EntryAbility --skip-build`）。
+`hdc` 在 `D:\DEStudio\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe`。
+
+1. **造数据**——否则首页 / 看板全是 0，图比旧的还差。用 App 自带的
+   「看板 → 数据管理 → 从备份恢复」导入一份快照：文件先用 hdc 推到文件选择器能看到的目录
+   ```powershell
+   & $hdc file send seed.json /storage/media/100/local/files/Docs/Documents/
+   ```
+   快照格式见 `entry/src/main/ets/model/CarbonTypes.ets` 的 `BackupSnapshot`
+   （`app/version/updatedAt/records/redemptions/taskRewards`）。
+   注意：**导入不受每日积分上限约束**，而手动记录受 `DAILY_RECORD_POINTS_CAP = 300` 分/天限制
+   （约合 3 kg/天），所以想要「累计减排 / 累计种树」像样就必须走导入。
+   一个已知坑：模拟器时钟与主机不一致（实测差 12 小时），造时间戳时按模拟器侧推算。
+2. **切页面 + 截图**
+   ```powershell
+   & $cli ui screenshot --device "Mate 90 Pro" --path shot.png
+   & $cli ui click      --device "Mate 90 Pro" <x> <y>
+   & $cli ui layout     --device "Mate 90 Pro" --format json --mode simplified   # 取节点 bounds 算中心
+   ```
+   找坐标的现成写法见 `scripts/ui-smoke.ps1`（按文本找节点再取 bounds 中心）。
+3. **深色模式**：App 严格跟随系统 `colorMode`，自身没有开关。用
+   `hdc shell "aa start -b com.huawei.hmos.settings -a com.huawei.hmos.settings.MainAbility"`
+   打开设置 →「显示和亮度」→「深色」；**截完记得切回浅色**。
+4. **后处理**：`python scripts\make-shots.py --src <原始截图目录>`。它会统一
+   裁掉状态栏（1280×2832 → 裁 137px）、缩到 1200 宽（得 1200×2527），输出到
+   `docs/shots/`（设计文档用，入库，通过 `make-docx.cjs` 的 `shot:` 前缀引用），
+   并把 PPT 需要的那几张复制进 `assets/`。脚本内置**主题自检**：本应浅色的页面如果
+   截成了深色会直接报错——这个坑真的踩过。
+
+环境受限、**截不到**的两张，不要硬凑：
+- **分布式权限弹窗**：模拟器不弹动态授权框（`QA_REPORT.md` #2 标 BLOCKED），需真机。
+  设计文档改用「本机数据管理」作为隐私章节的插图。
+- **端侧 AI 识图的实际识别结果**：模拟器图库无图可选，只能用记录页的识图**入口卡片**示意
+  （PPT 第 7 页一直就是这么用的）。
 
 ## 7. 硬性要求与红线
 

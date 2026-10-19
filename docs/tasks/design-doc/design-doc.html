@@ -178,40 +178,40 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
 
 <h3>4.1 启动页与首页</h3>
 <p>启动页展示品牌标识与光晕动效；首页汇聚今日减排 / 积分、累计减排 / 种树、家庭碳积分、今日任务与智能建议，并提供「去记录低碳行为」与「生成成果卡片」两个主入口。</p>
-<div class="fig"><img style="width:180px" src="qa:splash_new.jpeg"><div class="cap">图 1　启动页</div></div>
-<div class="fig"><img style="width:180px" src="qa:app_home_new.jpeg"><div class="cap">图 2　首页（浅色）</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig01-splash.jpg"><div class="cap">图 1　启动页</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig02-home.jpg"><div class="cap">图 2　首页（浅色）</div></div>
 
 <h3>4.2 低碳行为记录（F1）</h3>
 <p>提供出行、节能、回收、餐饮 4 大类共 13 种行为。选择类别与行为、填写数量后，应用按排放因子实时估算减排量与可获积分，支持数量步进与备注；保存后写入本机并更新今日记录与首页统计。</p>
-<div class="fig"><img style="width:180px" src="qa:app_record_new2.jpeg"><div class="cap">图 3　记录页</div></div>
-<div class="fig"><img style="width:180px" src="qa:app_recycle_v3.jpeg"><div class="cap">图 4　回收类行为</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig03-record.jpg"><div class="cap">图 3　记录页</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig04-recycle.jpg"><div class="cap">图 4　回收类行为</div></div>
 
 <h3>4.3 端侧 AI 识图（F2）</h3>
-<p>基于 CoreVisionKit 端侧物体检测：用户选择一张照片，模型在本机识别物体（如食物、车辆、植物、纸张等），据此推荐对应的低碳行为并自动定位到该行为，识别过程不上传图片。</p>
-<div class="fig"><img style="width:180px" src="qa:app_food.jpeg"><div class="cap">图 5　AI 识图推荐低碳行为</div></div>
+<p>基于 CoreVisionKit 端侧物体检测：用户选择一张照片，模型在本机识别物体（如食物、车辆、植物、纸张等），据此推荐对应的低碳行为并自动定位到该行为，识别过程不上传图片。图 5 为记录页的 AI 识图入口（实际识别需在具备图库 / 相机的设备上操作）。</p>
+<div class="fig"><img style="width:180px" src="shot:fig05-ai-entry.jpg"><div class="cap">图 5　AI 识图入口（记录页）</div></div>
 
 <h3>4.4 数据看板与数据管理（F3）</h3>
 <p>按日 / 周 / 月 / 年聚合减排量与积分，折线图展示趋势（数据点稀疏时改用柱状，避免误导），饼图展示类别占比；汇总卡片、趋势图与类别占比<b>统一跟随所选周期</b>。下方为最近记录与本地数据管理区，可导出 / 导入 CSV 与 JSON、清空数据；导出含 UTF-8 BOM 与 RFC 4180 转义，导入逐字段校验归一化。</p>
-<div class="fig"><img style="width:180px" src="qa:qa_dash_day.jpeg"><div class="cap">图 6　看板 · 日</div></div>
-<div class="fig"><img style="width:180px" src="qa:qa_dash_week.jpeg"><div class="cap">图 7　看板 · 周</div></div>
-<div class="fig"><img style="width:180px" src="qa:qa_dash_month.jpeg"><div class="cap">图 8　看板 · 月</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig06-dash-day.jpg"><div class="cap">图 6　看板 · 日</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig07-dash-week.jpg"><div class="cap">图 7　看板 · 周</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig08-dash-month.jpg"><div class="cap">图 8　看板 · 月</div></div>
 
 <h3>4.5 积分与荣誉（F4）</h3>
 <p>汇总可用碳积分、累计获得与已兑换；提供碳普惠权益商城（模拟兑换码）、植树证书（每减排 10 kg 折算 1 棵树）、低碳徽章（按减排 / 行为达成解锁）与今日任务（完成即发放积分，幂等）。</p>
-<div class="fig"><img style="width:180px" src="qa:app_rewards_v4.jpeg"><div class="cap">图 9　积分与荣誉</div></div>
-<div class="fig"><img style="width:180px" src="qa:qa_redeem.jpeg"><div class="cap">图 10　权益兑换</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig09-rewards.jpg"><div class="cap">图 9　积分与荣誉</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig10-redeem.jpg"><div class="cap">图 10　碳普惠权益与兑换记录</div></div>
 
 <h3>4.6 家庭碳积分（F5）</h3>
 <p>生成或加入家庭码后，可在同一华为账号的多设备间同步各自的减排量与积分，并以「家庭成员」列表按设备展示，实现家庭碳积分的合并统计。</p>
-<div class="fig"><img style="width:180px" src="qa:app_home_new.jpeg"><div class="cap">图 11　家庭碳积分卡片（首页）</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig11-family.jpg"><div class="cap">图 11　家庭碳积分（首页卡片）</div></div>
 
 <h3>4.7 每日提醒与科普专栏（F6 / F7）</h3>
 <p>每日提醒默认 20:00，可在首页开启 / 关闭并调整时间，基于后台代理提醒发布；科普专栏提供碳达峰 / 碳中和、绿色出行、家庭节能等图文内容与低碳指数自测。</p>
-<div class="fig"><img style="width:180px" src="qa:app_knowledge.jpeg"><div class="cap">图 12　双碳科普专栏</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig12-knowledge.jpg"><div class="cap">图 12　双碳科普专栏</div></div>
 
 <h3>4.8 浅色 / 深色主题（F8）</h3>
 <p>所有色彩走动态设计 token，冷启动读取系统 colorMode，运行中实时跟随系统切换。</p>
-<div class="fig"><img style="width:180px" src="qa:qa_dark_home.jpeg"><div class="cap">图 13　深色模式首页</div></div>
+<div class="fig"><img style="width:180px" src="shot:fig13-home-dark.jpg"><div class="cap">图 13　深色模式首页</div></div>
 
 <h3>4.9 数据备份与恢复（F9）</h3>
 <p>应用支持整包快照的备份与恢复：快照包含记录、兑换与任务奖励三类数据，本地以 JSON 文件形式由用户导出保存（入口与数据管理同处看板，见图 6 – 图 8）；恢复时与现有数据<b>去重合并</b>，不覆盖本机既有记录。此外可选择性开启 AGC 云存储备份，该开关<b>默认关闭</b>，未开启时应用行为与纯本地应用完全一致。</p>
@@ -251,7 +251,8 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
   <li>AI 识图<b>在本机完成</b>，不上传图片。</li>
   <li>云备份为<b>可选开关且默认关闭</b>；未开启时应用行为与纯本地应用完全一致。</li>
 </ul>
-<div class="fig"><img style="width:180px" src="qa:qa_perm.jpeg"><div class="cap">图 14　权限申请界面</div></div>
+<p>数据的导出 / 导入 / 备份全部在设备本地完成，入口见下图。</p>
+<div class="fig"><img style="width:180px" src="shot:fig14-local-data.jpg"><div class="cap">图 14　本机数据管理（导出 / 导入 / 备份）</div></div>
 
 <!-- ================= 7 ================= -->
 <div class="page-break"></div>
@@ -294,7 +295,7 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
   <tr><td>导入运行时</td><td>经系统文件选择器导入 JSON / CSV / 整包快照</td><td>校验逻辑已配单元测试用例；运行时待复测</td></tr>
 </table>
 <p>此外，界面文案已抽取为资源并完成中 / 英双语；英文环境下遍历各页面确认无中文残留。</p>
-<p><b>已知边界（不计入已完成能力）</b>：平板多列布局目前仅数据看板完成，其余 4 个 Tab 待补齐；「减弱动效」目前为 App 内开关，尚未接入系统无障碍设置。上述两项均已列入第 9.2 节展望。</p>
+<p><b>已知边界（不计入已完成能力）</b>：平板多列布局目前仅数据看板完成，其余 4 个 Tab 待补齐；「减弱动效」目前为 App 内开关，尚未接入系统无障碍设置；端侧 AI 识图的识别过程需在具备图库 / 相机的设备上操作（模拟器环境选图受限）。上述各项均已列入第 9.2 节展望或经真机复测确认。</p>
 
 <!-- ================= 9 ================= -->
 <div class="page-break"></div>

@@ -36,7 +36,9 @@ $cli = "C:\Users\39748\AppData\Roaming\npm\devecocli.cmd"
 - 模拟器：`Mate 90 Pro`（`127.0.0.1:5555`，手机）、`MatePad Pro 13`（`127.0.0.1:5557`，平板）；`devecocli emulator start <name>` 启动。
 - 也可用 `scripts/run.ps1 -AllowUnsigned` / `-BuildOnly`（Hvigor 路径）。
 - `build-profile.json5` 的 `signingConfigs` 为空 → CLI 默认不产 signed hap；本机模拟器可直接安装 unsigned。真机 / 云备份端到端验证用 `scripts/build-signed.ps1`。
-- 本机**未安装 hdc/DevEco Studio**，历史文档里的 `hdc shell ...` 命令仅作参考，请优先使用 `devecocli`。
+- **DevEco Studio 已安装**（`D:\DEStudio\DevEco Studio`），其 SDK 自带 `hdc`：
+  `D:\DEStudio\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe`。
+  推/取文件、`aa start`、`snapshot_display`、读应用沙箱都用它。日常构建与 UI 驱动仍优先用 `devecocli`。
 
 ## 设计规范（唯一真相）
 - **`DESIGN.md`**：spec 合规（YAML design tokens + 9 章节），可被 AI 直接消费。改 UI 前先读它。
@@ -56,17 +58,16 @@ powershell -ExecutionPolicy Bypass -File scripts\run.ps1 -BuildOnly
 - `build-profile.json5` 的 `signingConfigs` 为空 → CLI **不产 signed hap**；但本机模拟器**可直接安装 unsigned**（已验证）。
 - 故 `run.ps1` 默认（无 `-AllowUnsigned`/`-BuildOnly`）会因找不到 `*-signed.hap` 而退出 1；自动化请用 `-AllowUnsigned`。
 
-## 设备 / 模拟器（历史 hdc 参考）
+## 设备 / 模拟器（hdc 参考）
 ```powershell
-# 本机未安装 hdc；以下为历史命令，仅在装了 DevEco Studio / SDK 的机器上可用
-$hdc = "C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe"
-& $hdc list targets
-& $hdc install -r "entry\build\default\outputs\default\entry-default-unsigned.hap"
-& $hdc shell aa start -a EntryAbility -b com.example.carbonlife
-& $hdc shell snapshot_display -f /data/local/tmp/s.jpeg
-& $hdc shell hilog | Select-String CarbonLife
+$hdc = "D:\DEStudio\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe"
+& $hdc list targets                                    # 127.0.0.1:5555（模拟器）
+& $hdc shell "aa start -a EntryAbility -b com.example.carbonlife"
+& $hdc shell "snapshot_display -f /data/local/tmp/s.jpeg"
+& $hdc file recv /data/local/tmp/s.jpeg .               # 取回截图
+& $hdc shell "hilog | grep CarbonLife"
 ```
-> 日常开发与验证请用上文的 `devecocli`（build / run / ui / log），无需 hdc。
+> 构建与 UI 交互（点击 / 滑动 / 截图 / 布局）优先用 `devecocli`；`hdc` 用于它做不到的事：文件推送与取回、`aa start/force-stop`、`snapshot_display`、读应用沙箱。模拟器 shell 为 uid 2000，**用户文件区只读**，但应用沙箱（`/data/app/el2/100/base/com.example.carbonlife/`）与 `/storage/media/100/local/files/Docs`（即文件选择器的「我的手机」）**可写**。
 
 ## 代码约定
 - 数据层单例 `CarbonStore`；服务类均为 `Xxx.get()` 单例。UI 通过 `AppStorage` 的 `recordsVersion` / `familyVersion` 感知变更。
