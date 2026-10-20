@@ -1,5 +1,7 @@
-import { UIContext } from '@kit.ArkUI';
+import { UIContext, componentSnapshot } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { image } from '@kit.ImageKit';
+import { picker, fileIo as fs } from '@kit.CoreFileKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
@@ -213,6 +215,35 @@ export struct HomeTab {
     return Math.round(this.sapling.progress * 100) + '%';
   }
 
+  /** 把碳账单卡片截成 PNG，交给系统文件选择器保存（无需额外权限）。 */
+  private async saveReportImage(): Promise<void> {
+    try {
+      const pixel: image.PixelMap = await componentSnapshot.get('reportCard');
+      const packer: image.ImagePacker = image.createImagePacker();
+      const data: ArrayBuffer = await packer.packing(pixel, { format: 'image/png', quality: 100 });
+      await packer.release();
+      const ctx = this.uiContext.getHostContext();
+      if (ctx === undefined) {
+        return;
+      }
+      const documentPicker = new picker.DocumentViewPicker(ctx);
+      const fileName: string = 'carbonlife-report-' + Date.now().toString() + '.png';
+      const uris: string[] = await documentPicker.save({ newFileNames: [fileName] });
+      if (uris.length === 0) {
+        return;
+      }
+      const file = fs.openSync(uris[0], fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
+      fs.writeSync(file.fd, data);
+      fs.closeSync(file);
+      const stat = fs.statSync(uris[0]);
+      hilog.info(0x0000, 'CarbonLife', 'report image saved, size=%{public}d', stat.size);
+      ToastHelper.show(this.uiContext, $r('app.string.report_saved'));
+    } catch (e) {
+      hilog.error(0x0000, 'CarbonLife', 'save report image failed: %{public}s', JSON.stringify(e));
+      ToastHelper.show(this.uiContext, $r('app.string.report_save_failed'));
+    }
+  }
+
   @Builder shareStat(label: ResourceStr, value: string, color: string) {
     Column() {
       Text(value).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(color);
@@ -379,20 +410,27 @@ export struct HomeTab {
       }
       .width('100%')
       .padding({ left: AppSpacing.LG, right: AppSpacing.LG, top: AppSpacing.LG, bottom: AppSpacing.SM })
-      .alignItems(HorizontalAlign.Start);
+      .alignItems(HorizontalAlign.Start)
+      .id('reportCard');
       }
       .layoutWeight(1)
       .width('100%')
       .scrollBar(BarState.Off);
 
       Column({ space: AppSpacing.XS }) {
-        AppButton({ text: $r('app.string.share_copy'), type: 'primary', fullWidth: true }).onClick(() => {
-          const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
-          pasteboard.getSystemPasteboard().setData(data).then(() => {
-            ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
-            this.showShare = false;
+        Row({ space: AppSpacing.SM }) {
+          AppButton({ text: $r('app.string.share_copy'), type: 'primary' }).layoutWeight(1).onClick(() => {
+            const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
+            pasteboard.getSystemPasteboard().setData(data).then(() => {
+              ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
+              this.showShare = false;
+            });
           });
-        });
+          AppButton({ text: $r('app.string.report_save_image'), type: 'secondary' }).layoutWeight(1).onClick(() => {
+            this.saveReportImage();
+          });
+        }
+        .width('100%');
         AppButton({ text: $r('app.string.common_close'), type: 'ghost', fullWidth: true }).onClick(() => { this.showShare = false; });
       }
       .width('100%')
