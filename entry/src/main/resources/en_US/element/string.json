@@ -39,6 +39,7 @@
     { "name": "report_equivalent", "value": "Equivalent to %s trees" },
     { "name": "report_share_text", "value": "I've cut %s kg CO2e with CarbonLife and planted %s trees. My sapling is now %s with a %s-day streak. Join me!" },
     { "name": "report_save_image", "value": "Save image" },
+    { "name": "report_copy", "value": "Copy text" },
     { "name": "report_saved", "value": "Carbon report image saved" },
     { "name": "report_save_failed", "value": "Could not save the image" },
     { "name": "home_go_record", "value": "Log a low-carbon action" },

@@ -39,6 +39,7 @@
     { "name": "report_equivalent", "value": "相当于种下 %s 棵树" },
     { "name": "report_share_text", "value": "我用 CarbonLife 累计减排 %s kg，种下 %s 棵树；碳小树已长成「%s」，连续记录 %s 天。一起低碳吧！" },
     { "name": "report_save_image", "value": "保存图片" },
+    { "name": "report_copy", "value": "复制文案" },
     { "name": "report_saved", "value": "碳账单图片已保存" },
     { "name": "report_save_failed", "value": "保存图片失败" },
     { "name": "home_go_record", "value": "去记录低碳行为" },

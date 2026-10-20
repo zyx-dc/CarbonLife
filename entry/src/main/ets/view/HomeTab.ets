@@ -402,10 +402,12 @@ export struct HomeTab {
         }
         .width('100%');
 
-        Text($r('app.string.report_equivalent', this.treeCount))
-          .fontSize(AppTypography.SMALL.size)
-          .fontColor(AppColor.TEXT_SUB)
-          .width('100%');
+        if (Number(this.treeCount) > 0) {
+          Text($r('app.string.report_equivalent', this.treeCount))
+            .fontSize(AppTypography.SMALL.size)
+            .fontColor(AppColor.TEXT_SUB)
+            .width('100%');
+        }
 
       }
       .width('100%')
@@ -419,7 +421,7 @@ export struct HomeTab {
 
       Column({ space: AppSpacing.XS }) {
         Row({ space: AppSpacing.SM }) {
-          AppButton({ text: $r('app.string.share_copy'), type: 'primary' }).layoutWeight(1).onClick(() => {
+          AppButton({ text: $r('app.string.report_copy'), type: 'primary' }).layoutWeight(1).onClick(() => {
             const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
             pasteboard.getSystemPasteboard().setData(data).then(() => {
               ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
