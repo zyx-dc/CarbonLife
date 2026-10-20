@@ -292,6 +292,7 @@
 | 构建 / 单测 | **PASS** | `BUILD SUCCESSFUL`；`Tests run: 17, Failure: 0` |
 | 设备端 | **PASS** | 首屏完整展示树 / 阶段 / 4 指标 / 4 类构成；「复制分享文案」后自动关闭 |
 | 保存图片 | **PASS** | `componentSnapshot` → PNG → `DocumentViewPicker` 落盘；日志 `report image saved, size=144658`；文件名带时间戳避免重名 |
+| 深色模式 | **PASS** | 设置 → 显示和亮度 → 深色：首页（含小树）与碳账单均正常 |
 
 ### 体验打磨（同日）
 
