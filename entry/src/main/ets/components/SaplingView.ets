@@ -10,6 +10,7 @@ import { AppMotion } from '../common/Theme';
 export struct SaplingView {
   @Prop @Watch('onStageChanged') stage: number;
   @Prop treeSize: number = 92;
+  @Prop variant: string = 'mixed';
   @State zoom: number = 1;
 
   private onStageChanged(): void {
@@ -33,17 +34,35 @@ export struct SaplingView {
     }
   }
 
+  private mediaForVariant(): Resource {
+    switch (this.variant) {
+      case 'travel': return $r('app.media.accent_travel');
+      case 'energy': return $r('app.media.accent_energy');
+      case 'recycle': return $r('app.media.accent_recycle');
+      case 'food': return $r('app.media.accent_food');
+      default: return $r('app.media.accent_travel');
+    }
+  }
+
   build() {
     Stack() {
       Image(this.mediaForStage(this.stage))
         .width(this.treeSize)
         .height(this.treeSize)
-        .objectFit(ImageFit.Contain)
-        .scale({ x: this.zoom, y: this.zoom })
-        .animation({ duration: 460, curve: Curve.EaseOut });
+        .objectFit(ImageFit.Contain);
+      if (this.stage >= 2 && this.variant !== 'mixed') {
+        Image(this.mediaForVariant())
+          .width(this.treeSize)
+          .height(this.treeSize)
+          .objectFit(ImageFit.Contain)
+          .opacity(0.96)
+          .transition(TransitionEffect.OPACITY.animation({ duration: 320, curve: Curve.EaseOut }));
+      }
     }
     .width(this.treeSize)
     .height(this.treeSize)
-    .alignContent(Alignment.Center);
+    .alignContent(Alignment.Center)
+    .scale({ x: this.zoom, y: this.zoom })
+    .animation({ duration: 460, curve: Curve.EaseOut });
   }
 }

@@ -339,7 +339,7 @@ export struct HomeTab {
 
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 2 }) {
             Row({ space: AppSpacing.MD }) {
-              SaplingView({ stage: this.sapling.stage, treeSize: 108 })
+              SaplingView({ stage: this.sapling.stage, treeSize: 108, variant: this.sapling.variant })
               Column({ space: AppSpacing.XS }) {
                 Row() {
                   Text($r('app.string.home_sapling_title'))
@@ -356,6 +356,10 @@ export struct HomeTab {
                 }
                 .width('100%')
                 .alignItems(VerticalAlign.Center);
+
+                Text(Sapling.variantNameRes(this.sapling.variant))
+                  .fontSize(AppTypography.SMALL.size)
+                  .fontColor(AppColor.TEXT_SUB);
 
                 Stack({ alignContent: Alignment.Start }) {
                   Column()

@@ -28,6 +28,8 @@ export interface SaplingState {
   todayGrowth: number;
   capped: boolean;
   maxed: boolean;
+  /** 行为结构：travel / energy / recycle / food / mixed，决定树冠装饰 */
+  variant: string;
 }
 
 /** 单日原始行为数：增长算法的纯输入，便于单测。 */
@@ -76,7 +78,52 @@ export class Sapling {
       return s;
     });
 
-    return Sapling.compute(stats, DateUtil.dayKey(Date.now()));
+    const state: SaplingState = Sapling.compute(stats, DateUtil.dayKey(Date.now()));
+    state.variant = Sapling.variantOf(store);
+    return state;
+  }
+
+  /**
+   * 行为结构判定：主导类别占比 ≥ 40%（且至少有 5 条记录）才形成"偏向"，
+   * 否则视为均衡。装饰层据此切换，让每棵树对自己的生活方式有辨识度。
+   */
+  static variantOf(store: CarbonStore): string {
+    const records: CarbonRecord[] = store.getRecords();
+    if (records.length < 5) {
+      return 'mixed';
+    }
+    const counts: Map<string, number> = new Map<string, number>();
+    records.forEach((r: CarbonRecord) => {
+      counts.set(r.category, (counts.get(r.category) ?? 0) + 1);
+    });
+    let bestKey: string = '';
+    let best: number = 0;
+    counts.forEach((v: number, k: string) => {
+      if (v > best) {
+        best = v;
+        bestKey = k;
+      }
+    });
+    if (best / records.length < 0.4) {
+      return 'mixed';
+    }
+    switch (bestKey) {
+      case '出行': return 'travel';
+      case '节能': return 'energy';
+      case '回收': return 'recycle';
+      case '餐饮': return 'food';
+      default: return 'mixed';
+    }
+  }
+
+  static variantNameRes(variant: string): ResourceStr {
+    switch (variant) {
+      case 'travel': return $r('app.string.home_sapling_variant_travel');
+      case 'energy': return $r('app.string.home_sapling_variant_energy');
+      case 'recycle': return $r('app.string.home_sapling_variant_recycle');
+      case 'food': return $r('app.string.home_sapling_variant_food');
+      default: return $r('app.string.home_sapling_variant_mixed');
+    }
   }
 
   /** 纯函数：给定每天的原始行为数，算出小树状态。 */
@@ -135,7 +182,8 @@ export class Sapling {
       activeDays: activeDays,
       todayGrowth: todayGrowth,
       capped: todayRaw >= Sapling.DAILY_CAP,
-      maxed: maxed
+      maxed: maxed,
+      variant: 'mixed'
     };
   }
 
