@@ -280,3 +280,15 @@
 | 构建 / 单测 | **PASS** | `BUILD SUCCESSFUL`；`Tests run: 17, Failure: 0` |
 | 设备端 | **PASS** | 5 条「出行」记录 → 卡片显示「偏向绿色出行」，树冠出现新叶装饰；阶段 < 2 时不显示装饰 |
 
+### P1b：碳账单 + 分享文案（同日完成）
+
+| 文件 | 变更 |
+|---|---|
+| `view/HomeTab.ets` | 「生成成果卡片」升级为完整**碳账单**：树 + 阶段/偏向 + 累计减排 + 积分/种树/活跃天数/最长连续（单行 4 指标）+ **减排构成条形图** + 「相当于种下 X 棵树」；操作按钮固定在底部，内容区可滚动 |
+| `resources/*/element/string.json` | 新增 6 个键：`report_title` / `report_active_days` / `report_best_streak` / `report_categories` / `report_equivalent` / `report_share_text` |
+
+| 项 | 结果 | 证据 |
+|---|---|---|
+| 构建 / 单测 | **PASS** | `BUILD SUCCESSFUL`；`Tests run: 17, Failure: 0` |
+| 设备端 | **PASS** | 首屏完整展示树 / 阶段 / 4 指标 / 4 类构成；「复制分享文案」后自动关闭 |
+

@@ -3,7 +3,7 @@ import { pasteboard } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
 import { AppColor } from '../common/Constants';
-import { DailyTask } from '../model/CarbonTypes';
+import { CategoryStat, DailyTask } from '../model/CarbonTypes';
 import { FamilyService, MemberData } from '../model/FamilyService';
 import { ReminderService } from '../model/ReminderService';
 import { AppButton } from '../components/AppButton';
@@ -13,7 +13,7 @@ import { TaskCard } from '../components/TaskCard';
 import { SaplingView } from '../components/SaplingView';
 import { Sapling, SaplingState } from '../model/Sapling';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
-import { resolveStr } from '../common/Localize';
+import { categoryRes, resolveStr } from '../common/Localize';
 
 @Component
 export struct HomeTab {
@@ -49,6 +49,7 @@ export struct HomeTab {
   @State live: boolean = false;
   // 碳小树：成长值由记录派生，见 model/Sapling.ets
   @State sapling: SaplingState = Sapling.of(CarbonStore.get());
+  @State categories: CategoryStat[] = [];
   private lastStage: number = -1;
 
   aboutToAppear(): void {
@@ -92,6 +93,7 @@ export struct HomeTab {
     this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
     const s: SaplingState = Sapling.of(store);
     this.sapling = s;
+    this.categories = store.savedByCategory();
     if (this.lastStage >= 0 && s.stage > this.lastStage) {
       ToastHelper.show(this.uiContext,
         $r('app.string.home_sapling_levelup', resolveStr(Sapling.stageNameRes(s.stage))));
@@ -195,7 +197,11 @@ export struct HomeTab {
   }
 
   shareText(): string {
-    return resolveStr($r('app.string.home_share_text', this.totalSaved, this.totalPoints, this.treeCount));
+    return resolveStr($r('app.string.report_share_text',
+      this.totalSaved,
+      this.treeCount,
+      resolveStr(Sapling.stageNameRes(this.sapling.stage)),
+      this.sapling.streak.toString()));
   }
 
   private progressWidth(): string {
@@ -240,37 +246,155 @@ export struct HomeTab {
     .width('100%').padding({ top: AppSpacing.XS, bottom: AppSpacing.XS });
   }
 
-  @Builder shareSheet() {
-    Column({ space: AppSpacing.MD }) {
-      Text($r('app.string.share_title')).fontSize(AppTypography.H3.size).fontWeight(AppTypography.H3.weight).fontColor(AppColor.TEXT);
-      AppCard({ cardPadding: AppSpacing.LG, showShadow: false, showBorder: true, enter: this.ready, enterDelayIndex: 0 }) {
-        Column({ space: AppSpacing.SM }) {
-          Row({ space: AppSpacing.XS }) {
-            Image($r('app.media.ic_leaf'))
-              .width(18)
-              .height(18)
-              .fillColor(AppColor.PRIMARY);
-            Text($r('app.string.share_brand')).fontSize(AppTypography.BODY.size).fontColor(AppColor.PRIMARY);
-          }
-          Text(this.totalSaved + ' kg').fontSize(34).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY);
-          Text($r('app.string.share_total_saved')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-          Divider().color(AppColor.DIVIDER).margin({ top: AppSpacing.SM, bottom: AppSpacing.SM });
-          Row() {
-            this.shareStat($r('app.string.share_points'), this.totalPoints, AppColor.ACCENT);
-            this.shareStat($r('app.string.share_trees'), this.treeCount, AppColor.PRIMARY_LIGHT);
-            this.shareStat($r('app.string.share_records'), this.totalCount, AppColor.CHART_BLUE);
-          }.width('100%');
-        }.width('100%').alignItems(HorizontalAlign.Center);
+  @Builder reportStat(label: ResourceStr, value: string, color: string) {
+    Column({ space: AppSpacing.XXS }) {
+      Text(value)
+        .fontSize(AppTypography.H3.size)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(color);
+      Text(label)
+        .fontSize(AppTypography.SMALL.size)
+        .fontColor(AppColor.TEXT_SUB);
+    }
+    .layoutWeight(1)
+    .alignItems(HorizontalAlign.Center);
+  }
+
+  @Builder categoryBar(c: CategoryStat) {
+    Row({ space: AppSpacing.SM }) {
+      Text(categoryRes(c.category))
+        .fontSize(AppTypography.SMALL.size)
+        .fontColor(AppColor.TEXT_SUB)
+        .width(44);
+      Stack({ alignContent: Alignment.Start }) {
+        Column()
+          .width('100%')
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(AppColor.PRIMARY_SOFT);
+        Column()
+          .width(this.categoryWidth(c.saved))
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(c.color);
       }
-      AppButton({ text: $r('app.string.share_copy'), type: 'primary', fullWidth: true }).onClick(() => {
-        const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
-        pasteboard.getSystemPasteboard().setData(data).then(() => {
-          ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
-          this.showShare = false;
+      .layoutWeight(1)
+      .height(6);
+      Text(c.saved.toFixed(2))
+        .fontSize(AppTypography.SMALL.size)
+        .fontColor(AppColor.TEXT_SUB)
+        .width(54)
+        .textAlign(TextAlign.End);
+    }
+    .width('100%');
+  }
+
+  private maxCategorySaved(): number {
+    let max: number = 0;
+    this.categories.forEach((c: CategoryStat) => {
+      if (c.saved > max) {
+        max = c.saved;
+      }
+    });
+    return max <= 0 ? 1 : max;
+  }
+
+  private categoryWidth(saved: number): string {
+    if (saved <= 0) {
+      return '0%';
+    }
+    return Math.max(2, Math.round(saved / this.maxCategorySaved() * 100)) + '%';
+  }
+
+  @Builder shareSheet() {
+    Column({ space: AppSpacing.SM }) {
+      Scroll() {
+      Column({ space: AppSpacing.SM }) {
+        Row() {
+          Text($r('app.string.report_title'))
+            .fontSize(AppTypography.H3.size)
+            .fontWeight(AppTypography.H3.weight)
+            .fontColor(AppColor.TEXT);
+          Blank();
+          Text($r('app.string.share_brand'))
+            .fontSize(AppTypography.SMALL.size)
+            .fontColor(AppColor.TEXT_SUB);
+        }
+        .width('100%');
+
+        Column({ space: AppSpacing.XXS }) {
+          SaplingView({ stage: this.sapling.stage, treeSize: 84, variant: this.sapling.variant });
+          Text(Sapling.stageNameRes(this.sapling.stage))
+            .fontSize(AppTypography.H4.size)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppColor.TEXT);
+          Text(Sapling.variantNameRes(this.sapling.variant))
+            .fontSize(AppTypography.CAPTION.size)
+            .fontColor(AppColor.TEXT_SUB);
+        }
+        .width('100%');
+
+        Column({ space: AppSpacing.XXS }) {
+          Text(this.totalSaved + ' kg')
+            .fontSize(30)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppColor.PRIMARY);
+          Text($r('app.string.share_total_saved'))
+            .fontSize(AppTypography.CAPTION.size)
+            .fontColor(AppColor.TEXT_SUB);
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start);
+
+        Row() {
+          this.reportStat($r('app.string.share_points'), this.totalPoints, AppColor.ACCENT);
+          this.reportStat($r('app.string.share_trees'), this.treeCount, AppColor.PRIMARY_LIGHT);
+          this.reportStat($r('app.string.report_active_days'), this.sapling.activeDays.toString(), AppColor.CHART_BLUE);
+          this.reportStat($r('app.string.report_best_streak'), this.sapling.bestStreak.toString(), AppColor.CHART_TEAL);
+        }
+        .width('100%');
+
+        Divider().color(AppColor.DIVIDER);
+
+        Column({ space: AppSpacing.XS }) {
+          Text($r('app.string.report_categories'))
+            .fontSize(AppTypography.CAPTION.size)
+            .fontColor(AppColor.TEXT_SUB);
+          ForEach(this.categories, (c: CategoryStat) => {
+            this.categoryBar(c);
+          }, (c: CategoryStat) => c.category);
+        }
+        .width('100%');
+
+        Text($r('app.string.report_equivalent', this.treeCount))
+          .fontSize(AppTypography.SMALL.size)
+          .fontColor(AppColor.TEXT_SUB)
+          .width('100%');
+
+      }
+      .width('100%')
+      .padding({ left: AppSpacing.LG, right: AppSpacing.LG, top: AppSpacing.LG, bottom: AppSpacing.SM })
+      .alignItems(HorizontalAlign.Start);
+      }
+      .layoutWeight(1)
+      .width('100%')
+      .scrollBar(BarState.Off);
+
+      Column({ space: AppSpacing.XS }) {
+        AppButton({ text: $r('app.string.share_copy'), type: 'primary', fullWidth: true }).onClick(() => {
+          const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.shareText());
+          pasteboard.getSystemPasteboard().setData(data).then(() => {
+            ToastHelper.show(this.uiContext, $r('app.string.share_copied'));
+            this.showShare = false;
+          });
         });
-      });
-      AppButton({ text: $r('app.string.common_close'), type: 'ghost', fullWidth: true }).onClick(() => { this.showShare = false; });
-    }.width('100%').padding(AppSpacing.LG);
+        AppButton({ text: $r('app.string.common_close'), type: 'ghost', fullWidth: true }).onClick(() => { this.showShare = false; });
+      }
+      .width('100%')
+      .padding({ left: AppSpacing.LG, right: AppSpacing.LG, bottom: AppSpacing.LG });
+    }
+    .width('100%')
+    .height('100%');
   }
 
   build() {
@@ -540,7 +664,7 @@ export struct HomeTab {
           Column() {
             this.shareSheet();
           }
-          .width('88%').backgroundColor(AppColor.CARD).borderRadius(AppRadius.LG)
+          .width('88%').height('82%').backgroundColor(AppColor.CARD).borderRadius(AppRadius.LG)
           .onClick(() => {});
         }
         .width('100%').height('100%').backgroundColor(AppColor.OVERLAY).justifyContent(FlexAlign.Center)
