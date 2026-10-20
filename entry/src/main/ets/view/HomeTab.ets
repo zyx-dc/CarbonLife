@@ -1,4 +1,5 @@
 import { UIContext } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { Rewards } from '../model/Rewards';
@@ -95,8 +96,12 @@ export struct HomeTab {
     this.sapling = s;
     this.categories = store.savedByCategory();
     if (this.lastStage >= 0 && s.stage > this.lastStage) {
-      ToastHelper.show(this.uiContext,
-        $r('app.string.home_sapling_levelup', resolveStr(Sapling.stageNameRes(s.stage))));
+      hilog.info(0x0000, 'CarbonLife', 'sapling level up %{public}d -> %{public}d', this.lastStage, s.stage);
+      // 与「记录成功」的系统 Toast 错开，否则升级提示会被立刻覆盖
+      const stageName: string = resolveStr(Sapling.stageNameRes(s.stage));
+      setTimeout(() => {
+        ToastHelper.show(this.uiContext, $r('app.string.home_sapling_levelup', stageName));
+      }, 2000);
     }
     this.lastStage = s.stage;
   }
@@ -461,7 +466,8 @@ export struct HomeTab {
           .shadow(AppShadow.soft())
           .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
 
-          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 2 }) {
+          Column() {
+            AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 2 }) {
             Row({ space: AppSpacing.MD }) {
               SaplingView({ stage: this.sapling.stage, treeSize: 108, variant: this.sapling.variant })
               Column({ space: AppSpacing.XS }) {
@@ -477,6 +483,10 @@ export struct HomeTab {
                     .padding({ left: AppSpacing.SM, right: AppSpacing.SM, top: AppSpacing.XXS, bottom: AppSpacing.XXS })
                     .borderRadius(AppRadius.FULL)
                     .backgroundColor(AppColor.PRIMARY_SOFT);
+                  Text('›')
+                    .fontSize(AppTypography.BODY.size)
+                    .fontColor(AppColor.TEXT_SUB)
+                    .margin({ left: AppSpacing.XS });
                 }
                 .width('100%')
                 .alignItems(VerticalAlign.Center);
@@ -516,13 +526,17 @@ export struct HomeTab {
                 .width('100%');
 
                 Row() {
-                  Text($r('app.string.home_sapling_streak', this.sapling.streak))
+                  Text(this.sapling.activeDays === 0
+                    ? $r('app.string.home_sapling_empty')
+                    : $r('app.string.home_sapling_streak', this.sapling.streak))
                     .fontSize(AppTypography.SMALL.size)
                     .fontColor(AppColor.ACCENT);
                   Blank();
-                  Text($r('app.string.home_sapling_today', this.sapling.todayGrowth))
+                  Text(this.sapling.capped
+                    ? $r('app.string.home_sapling_today_capped', this.sapling.todayGrowth)
+                    : $r('app.string.home_sapling_today', this.sapling.todayGrowth))
                     .fontSize(AppTypography.SMALL.size)
-                    .fontColor(AppColor.TEXT_SUB);
+                    .fontColor(this.sapling.capped ? AppColor.ACCENT : AppColor.TEXT_SUB);
                 }
                 .width('100%');
               }
@@ -532,6 +546,9 @@ export struct HomeTab {
             .width('100%')
             .alignItems(VerticalAlign.Center);
           }
+          }
+          .width('100%')
+          .onClick(() => { this.showShare = true; })
 
           Row({ space: AppSpacing.SM }) {
             AppButton({ text: $r('app.string.home_go_record'), type: 'primary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(1));
