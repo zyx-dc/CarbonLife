@@ -3,6 +3,7 @@ import { CarbonFactors } from '../main/ets/model/CarbonFactors';
 import { DateUtil } from '../main/ets/common/DateUtil';
 import { Rewards } from '../main/ets/model/Rewards';
 import { CarbonStore } from '../main/ets/model/CarbonStore';
+import { Sapling, DayStat, SaplingState } from '../main/ets/model/Sapling';
 
 export default function localUnitTest() {
   describe('DateUtil', () => {
@@ -64,6 +65,77 @@ export default function localUnitTest() {
     it('importJson_drops_records_without_id', 0, () => {
       // 无 id / 空 id 的记录应被丢弃，且不产生任何新增
       expect(CarbonStore.get().importJson('[{"amount":1},{"id":""}]')).assertEqual(0);
+    });
+  });
+
+  describe('Sapling', () => {
+    const day = (dateKey: string, records: number, tasks: number): DayStat => {
+      const d: DayStat = { dateKey: dateKey, records: records, tasks: tasks };
+      return d;
+    };
+
+    it('stageOf_matches_thresholds', 0, () => {
+      expect(Sapling.stageOf(0)).assertEqual(0);
+      expect(Sapling.stageOf(59)).assertEqual(0);
+      expect(Sapling.stageOf(60)).assertEqual(1);
+      expect(Sapling.stageOf(179)).assertEqual(1);
+      expect(Sapling.stageOf(180)).assertEqual(2);
+      expect(Sapling.stageOf(2400)).assertEqual(5);
+    });
+
+    it('compute_single_day_grows_six_records_to_sprout', 0, () => {
+      const s: SaplingState = Sapling.compute([day('2026-10-20', 6, 0)], '2026-10-20');
+      expect(s.growth).assertEqual(60);
+      expect(s.stage).assertEqual(1);
+      expect(s.streak).assertEqual(1);
+      expect(s.todayGrowth).assertEqual(60);
+      expect(s.capped).assertFalse();
+    });
+
+    it('compute_caps_daily_growth_at_80', 0, () => {
+      const s: SaplingState = Sapling.compute([day('2026-10-20', 20, 0)], '2026-10-20');
+      expect(s.growth).assertEqual(80);
+      expect(s.capped).assertTrue();
+    });
+
+    it('compute_counts_daily_tasks', 0, () => {
+      const s: SaplingState = Sapling.compute([day('2026-10-20', 0, 2)], '2026-10-20');
+      expect(s.growth).assertEqual(30);
+      expect(s.todayGrowth).assertEqual(30);
+    });
+
+    it('compute_applies_streak_bonus_on_consecutive_days', 0, () => {
+      // 第 1 天 4 条 = 40；第 2 天 4 条 = 40 * 1.05 = 42
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-19', 4, 0),
+        day('2026-10-20', 4, 0)
+      ], '2026-10-20');
+      expect(s.growth).assertEqual(82);
+      expect(s.streak).assertEqual(2);
+      expect(s.bestStreak).assertEqual(2);
+      expect(s.todayGrowth).assertEqual(42);
+    });
+
+    it('compute_resets_streak_when_days_are_not_adjacent', 0, () => {
+      // 中间断了一天：连续天数必须重置为 1，且不享受加成
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-18', 4, 0),
+        day('2026-10-20', 4, 0)
+      ], '2026-10-20');
+      expect(s.streak).assertEqual(1);
+      expect(s.todayGrowth).assertEqual(40);
+    });
+
+    it('compute_reaches_max_stage', 0, () => {
+      const days: DayStat[] = [];
+      for (let i: number = 1; i <= 30; i++) {
+        const dk: string = '2026-10-' + (i < 10 ? '0' : '') + i.toString();
+        days.push(day(dk, 8, 0));
+      }
+      const s: SaplingState = Sapling.compute(days, '2026-10-30');
+      expect(s.stage).assertEqual(5);
+      expect(s.maxed).assertTrue();
+      expect(s.progress).assertEqual(1);
     });
   });
 }

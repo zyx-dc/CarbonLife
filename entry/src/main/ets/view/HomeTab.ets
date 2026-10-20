@@ -10,6 +10,8 @@ import { AppButton } from '../components/AppButton';
 import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
+import { SaplingView } from '../components/SaplingView';
+import { Sapling, SaplingState } from '../model/Sapling';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { resolveStr } from '../common/Localize';
 
@@ -45,6 +47,9 @@ export struct HomeTab {
   @State suggestionsList: ResourceStr[] = [];
   // 「不和谐的秩序」：品红活点，一屏仅此一处
   @State live: boolean = false;
+  // 碳小树：成长值由记录派生，见 model/Sapling.ets
+  @State sapling: SaplingState = Sapling.of(CarbonStore.get());
+  private lastStage: number = -1;
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onStoreChange);
@@ -85,6 +90,13 @@ export struct HomeTab {
     this.members = family.getMembers();
     this.suggestionsList = Rewards.suggestions(store);
     this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
+    const s: SaplingState = Sapling.of(store);
+    this.sapling = s;
+    if (this.lastStage >= 0 && s.stage > this.lastStage) {
+      ToastHelper.show(this.uiContext,
+        $r('app.string.home_sapling_levelup', resolveStr(Sapling.stageNameRes(s.stage))));
+    }
+    this.lastStage = s.stage;
   }
 
   onGenCode(): void {
@@ -184,6 +196,10 @@ export struct HomeTab {
 
   shareText(): string {
     return resolveStr($r('app.string.home_share_text', this.totalSaved, this.totalPoints, this.treeCount));
+  }
+
+  private progressWidth(): string {
+    return Math.round(this.sapling.progress * 100) + '%';
   }
 
   @Builder shareStat(label: ResourceStr, value: string, color: string) {
@@ -320,6 +336,74 @@ export struct HomeTab {
           .borderColor(AppColor.GLASS_BORDER)
           .shadow(AppShadow.soft())
           .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
+
+          AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 2 }) {
+            Row({ space: AppSpacing.MD }) {
+              SaplingView({ stage: this.sapling.stage, treeSize: 108 })
+              Column({ space: AppSpacing.XS }) {
+                Row() {
+                  Text($r('app.string.home_sapling_title'))
+                    .fontSize(AppTypography.H4.size)
+                    .fontWeight(AppTypography.H4.weight)
+                    .fontColor(AppColor.TEXT);
+                  Blank();
+                  Text(Sapling.stageNameRes(this.sapling.stage))
+                    .fontSize(AppTypography.SMALL.size)
+                    .fontColor(AppColor.PRIMARY)
+                    .padding({ left: AppSpacing.SM, right: AppSpacing.SM, top: AppSpacing.XXS, bottom: AppSpacing.XXS })
+                    .borderRadius(AppRadius.FULL)
+                    .backgroundColor(AppColor.PRIMARY_SOFT);
+                }
+                .width('100%')
+                .alignItems(VerticalAlign.Center);
+
+                Stack({ alignContent: Alignment.Start }) {
+                  Column()
+                    .width('100%')
+                    .height(6)
+                    .borderRadius(3)
+                    .backgroundColor(AppColor.PRIMARY_SOFT);
+                  Column()
+                    .width(this.progressWidth())
+                    .height(6)
+                    .borderRadius(3)
+                    .backgroundColor(AppColor.PRIMARY)
+                    .animation({ duration: AppMotion.reduceMotion() ? 0 : 480, curve: Curve.EaseOut });
+                }
+                .width('100%')
+                .height(6)
+                .margin({ top: AppSpacing.XXS, bottom: AppSpacing.XXS });
+
+                Row() {
+                  Text($r('app.string.home_sapling_growth', this.sapling.growth))
+                    .fontSize(AppTypography.CAPTION.size)
+                    .fontColor(AppColor.TEXT_SUB);
+                  Blank();
+                  Text(this.sapling.maxed
+                    ? $r('app.string.home_sapling_max')
+                    : $r('app.string.home_sapling_next', this.sapling.stageEnd - this.sapling.growth))
+                    .fontSize(AppTypography.CAPTION.size)
+                    .fontColor(AppColor.TEXT_SUB);
+                }
+                .width('100%');
+
+                Row() {
+                  Text($r('app.string.home_sapling_streak', this.sapling.streak))
+                    .fontSize(AppTypography.SMALL.size)
+                    .fontColor(AppColor.ACCENT);
+                  Blank();
+                  Text($r('app.string.home_sapling_today', this.sapling.todayGrowth))
+                    .fontSize(AppTypography.SMALL.size)
+                    .fontColor(AppColor.TEXT_SUB);
+                }
+                .width('100%');
+              }
+              .layoutWeight(1)
+              .alignItems(HorizontalAlign.Start);
+            }
+            .width('100%')
+            .alignItems(VerticalAlign.Center);
+          }
 
           Row({ space: AppSpacing.SM }) {
             AppButton({ text: $r('app.string.home_go_record'), type: 'primary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(1));
