@@ -45,9 +45,11 @@ export class CloudAuth {
         hilog.info(DOMAIN, TAG, 'auth sdk init ok');
       }
 
-      let user: AuthUser | null = await auth.getCurrentUser();
+      // 注：AGC SDK 的 .d.ets 被混淆过，lint 无法识别其返回 Promise，
+      // 这里用 Promise.resolve 兜底，运行时与 await 行为一致。
+      let user: AuthUser | null = await Promise.resolve(auth.getCurrentUser());
       if (user === null) {
-        const result = await auth.signInAnonymously();
+        const result = await Promise.resolve(auth.signInAnonymously());
         user = result.getUser();
         hilog.info(DOMAIN, TAG, 'anonymous sign-in ok');
       } else {
