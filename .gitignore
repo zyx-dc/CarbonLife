@@ -40,6 +40,8 @@ __pycache__/
 !/app_rewards_v4.jpeg
 !/app_knowledge.jpeg
 !/app_dashboard.jpeg
+!/app_home_sapling.jpeg
+!/app_carbon_report.jpeg
 
 # 答辩 PPT 构建工程：脚本与素材入库（可复现），生成产物 / 渲染结果不入库
 !/ppt_tasks/carbonlife-defense/assets/*.jpg

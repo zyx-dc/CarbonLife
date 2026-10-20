@@ -60,6 +60,10 @@
 |:---:|:---:|:---:|
 | <img src="app_dashboard.jpeg" width="220"> | <img src="app_rewards_v4.jpeg" width="220"> | <img src="app_knowledge.jpeg" width="220"> |
 
+| 碳小树 | 碳账单 |
+| --- | --- |
+| <img src="app_home_sapling.jpeg" width="220"> | <img src="app_carbon_report.jpeg" width="220"> |
+
 > 以上为 2026-10 最新 UI；答辩用的 PPT / PDF / 讲稿见 [`docs/tasks/ppt/`](docs/tasks/ppt/)。
 
 ## 技术栈
