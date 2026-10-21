@@ -7,7 +7,7 @@ import { DateUtil } from '../common/DateUtil';
  *
  * 设计约束（防刷 / 不制造焦虑）：
  * - 成长值**完全由记录与任务奖励派生**，没有独立的可写状态 → 无法靠点按钮刷；
- * - 每日成长上限 80，约 6~8 条有效记录封顶，避免极小事重复刷；
+ * - 每日成长上限 80（**含连签加成后的最终值**，约 5~8 条有效记录封顶），避免极小事重复刷；
  * - 连续记录有加成（每天 +5%，封顶 +50%），但**断签不掉级**，只影响当天加成；
  * - 连续天数只在"相邻自然日"累加，中间断档从 1 重新开始；
  * - **断签（最后一条记录早于昨天）时连续天数展示归零**，最长连续与成长值保留。
@@ -137,7 +137,6 @@ export class Sapling {
     let bestStreak: number = 0;
     let activeDays: number = 0;
     let todayGrowth: number = 0;
-    let todayRaw: number = 0;
     let prevTs: number = 0;
     let lastActiveTs: number = 0;
 
@@ -158,11 +157,11 @@ export class Sapling {
       activeDays = activeDays + 1;
       bestStreak = Math.max(bestStreak, streak);
       const bonus: number = Math.min(Sapling.MAX_BONUS, (streak - 1) * Sapling.STREAK_BONUS);
-      const gained: number = Math.round(raw * (1 + bonus));
+      // 硬上限：连签加成不能突破每日上限（封顶作用在最终值上）
+      const gained: number = Math.min(Sapling.DAILY_CAP, Math.round(raw * (1 + bonus)));
       growth = growth + gained;
       if (d.dateKey === todayKey) {
         todayGrowth = gained;
-        todayRaw = raw;
       }
       prevTs = ts;
       lastActiveTs = ts;
@@ -193,7 +192,7 @@ export class Sapling {
       bestStreak: bestStreak,
       activeDays: activeDays,
       todayGrowth: todayGrowth,
-      capped: todayRaw >= Sapling.DAILY_CAP,
+      capped: todayGrowth >= Sapling.DAILY_CAP,
       maxed: maxed,
       variant: 'mixed'
     };

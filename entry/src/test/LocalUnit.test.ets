@@ -98,6 +98,30 @@ export default function localUnitTest() {
       expect(s.capped).assertTrue();
     });
 
+    it('compute_hard_caps_daily_gain_after_streak_bonus', 0, () => {
+      // 连续第 2 天：8 条 = 原始 80，加成 5% 后最终仍必须封在 80（不是 84）
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-19', 8, 0),
+        day('2026-10-20', 8, 0)
+      ], '2026-10-20');
+      expect(s.todayGrowth).assertEqual(80);
+      expect(s.growth).assertEqual(160);
+      expect(s.capped).assertTrue();
+    });
+
+    it('compute_marks_capped_when_bonus_pushes_gain_over_the_cap', 0, () => {
+      // 连续第 4 天（+15%）：7 条 = 原始 70，加成后 81 → 封 80，且 capped 必须为真
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-17', 4, 0),
+        day('2026-10-18', 4, 0),
+        day('2026-10-19', 4, 0),
+        day('2026-10-20', 7, 0)
+      ], '2026-10-20');
+      expect(s.todayGrowth).assertEqual(80);
+      expect(s.growth).assertEqual(206);
+      expect(s.capped).assertTrue();
+    });
+
     it('compute_counts_daily_tasks', 0, () => {
       const s: SaplingState = Sapling.compute([day('2026-10-20', 0, 2)], '2026-10-20');
       expect(s.growth).assertEqual(30);
