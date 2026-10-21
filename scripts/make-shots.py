@@ -38,28 +38,32 @@ STATUS_BAR_PX = 137   # status bar height in device pixels (1280-wide capture)
 TARGET_WIDTH = 1200
 JPEG_QUALITY = 88
 
-# figure -> (raw screenshot basename, extra bottom crop in device px)
-# "--" means the splash: no status bar to drop, keep the full frame.
+# figure -> (raw screenshot stem, extra bottom crop, optional explicit crop box)
+# box = (left, top, right, bottom) in device pixels and overrides the default
+# "drop the status bar" crop; used for the card crops (sapling / family).
 FIGURES = {
-    "fig01-splash":     ("splash", 0),
-    "fig02-home":       ("home-light", 0),
-    "fig03-record":     ("record", 0),
-    "fig04-recycle":    ("record-recycle", 0),
-    "fig05-ai-entry":   ("record", 0),
-    "fig06-dash-day":   ("dash-day", 0),
-    "fig07-dash-week":  ("dash-week", 0),
-    "fig08-dash-month": ("dash-month", 0),
-    "fig09-rewards":    ("rewards", 0),
-    "fig10-redeem":     ("rewards-records", 0),
-    "fig11-family":     ("home-family", 132),   # also drop the bottom tab bar
-    "fig12-knowledge":  ("knowledge", 0),
-    "fig13-home-dark":  ("home-dark", 0),
-    "fig14-local-data": ("data-manager", 0),
+    "fig01-splash":     ("splash", 0, None),
+    "fig02-home":       ("home", 0, None),
+    "fig03-record":     ("record", 0, None),
+    "fig04-recycle":    ("record-recycle", 0, None),
+    "fig05-ai-entry":   ("record", 0, None),
+    "fig06-dash-day":   ("dash-day", 0, None),
+    "fig07-dash-week":  ("dash-week", 0, None),
+    "fig08-dash-month": ("dash-month", 0, None),
+    "fig09-rewards":    ("rewards", 0, None),
+    "fig10-redeem":     ("rewards-records", 0, None),
+    "fig11-family":     ("home-family", 0, None),
+    "fig12-knowledge":  ("knowledge", 0, None),
+    # the sapling card only: cropped out of the home page
+    "fig13-sapling":    ("home", 0, (30, 1150, 1250, 1600)),
+    # the report sheet only: drop the dimmed home page around the modal
+    "fig14-report":     ("report", 0, (60, 392, 1220, 2320)),
+    "fig15-local-data": ("data-manager", 0, None),
 }
 
 # Pages that must come from a light-theme capture. The dark theme follows the system
 # color mode, and one capture silently came back dark, so this is verified, not assumed.
-LIGHT_ONLY = {"fig01-splash", "fig13-home-dark"}   # these two are expected dark/green
+LIGHT_ONLY = {"fig01-splash"}   # the splash is a green gradient by design
 
 # ppt asset name -> processed figure
 PPT_MAP = {
@@ -70,6 +74,7 @@ PPT_MAP = {
     "rewards": "fig09-rewards",
     "knowledge": "fig12-knowledge",
     "family": "fig11-family",
+    "report": "fig14-report",    # slide 10 shows the carbon report sheet
 }
 
 
@@ -83,7 +88,9 @@ def find(src_dir, stem):
 
 
 def theme_of(im):
-    probe = im.convert("L").crop((0, 400, im.width, min(2000, im.height)))
+    """Brightness of the page body (skips whatever top/bottom chrome the crop kept)."""
+    h = im.height
+    probe = im.convert("L").crop((0, h // 6, im.width, h - h // 6))
     return "LIGHT" if ImageStat.Stat(probe).mean[0] > 110 else "DARK"
 
 
@@ -97,16 +104,23 @@ def main():
     os.makedirs(SHOTS, exist_ok=True)
     made, missing, mismatched = {}, [], []
 
-    for fig, (stem, bottom_crop) in FIGURES.items():
+    for fig, (stem, bottom_crop, box) in FIGURES.items():
         src = find(args.src, stem)
         if not src:
             missing.append(f"{fig} (looked for {stem}.png/.jpg in {args.src})")
             continue
         im = Image.open(src).convert("RGB")
-        if stem != "splash":
+
+        if box:
+            # explicit card crop, e.g. the sapling card out of the home page
+            left, top, right, bottom = box
+            im = im.crop((left, top, min(right, im.width), min(bottom, im.height)))
+        elif stem == "splash":
+            # the splash has no status bar to drop
+            if bottom_crop:
+                im = im.crop((0, 0, im.width, im.height - bottom_crop))
+        else:
             im = im.crop((0, STATUS_BAR_PX, im.width, im.height - (bottom_crop or 0)))
-        elif bottom_crop:
-            im = im.crop((0, 0, im.width, im.height - bottom_crop))
 
         theme = theme_of(im)
         if fig not in LIGHT_ONLY and theme != "LIGHT":
