@@ -9,7 +9,8 @@ import { DateUtil } from '../common/DateUtil';
  * - 成长值**完全由记录与任务奖励派生**，没有独立的可写状态 → 无法靠点按钮刷；
  * - 每日成长上限 80，约 6~8 条有效记录封顶，避免极小事重复刷；
  * - 连续记录有加成（每天 +5%，封顶 +50%），但**断签不掉级**，只影响当天加成；
- * - 连续天数只在"相邻自然日"累加，中间断档从 1 重新开始。
+ * - 连续天数只在"相邻自然日"累加，中间断档从 1 重新开始；
+ * - **断签（最后一条记录早于昨天）时连续天数展示归零**，最长连续与成长值保留。
  *
  * 阶段（阈值 = 累计成长值）：
  *   0 种子 0 / 1 幼苗 60 / 2 小树 180 / 3 开花 420 / 4 结果 900 / 5 常青 2400
@@ -138,6 +139,7 @@ export class Sapling {
     let todayGrowth: number = 0;
     let todayRaw: number = 0;
     let prevTs: number = 0;
+    let lastActiveTs: number = 0;
 
     sorted.forEach((d: DayStat) => {
       const ts: number = DateUtil.dayKeyToTimestamp(d.dateKey);
@@ -163,7 +165,17 @@ export class Sapling {
         todayRaw = raw;
       }
       prevTs = ts;
+      lastActiveTs = ts;
     });
+
+    // 断签判定：最后一次有效记录早于「昨天」，连续天数归零（bestStreak 保留）。
+    // 只影响展示与「今天」的语义，不影响已获得的成长值 —— 断签不掉级。
+    if (lastActiveTs > 0) {
+      const todayTs: number = DateUtil.dayKeyToTimestamp(todayKey);
+      if (Math.round((todayTs - lastActiveTs) / 86400000) > 1) {
+        streak = 0;
+      }
+    }
 
     const stage: number = Sapling.stageOf(growth);
     const stageStart: number = Sapling.STAGE_GROWTH[stage];

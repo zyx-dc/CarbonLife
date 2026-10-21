@@ -204,11 +204,20 @@ export struct HomeTab {
   }
 
   shareText(): string {
-    return resolveStr($r('app.string.report_share_text',
+    const stage: string = resolveStr(Sapling.stageNameRes(this.sapling.stage));
+    if (this.sapling.streak > 0) {
+      return resolveStr($r('app.string.report_share_text',
+        this.totalSaved,
+        this.treeCount,
+        stage,
+        this.sapling.streak.toString()));
+    }
+    // 断签后不宣称「连续」：改说累计活跃天数，避免分享文案自相矛盾
+    return resolveStr($r('app.string.report_share_text_broken',
       this.totalSaved,
       this.treeCount,
-      resolveStr(Sapling.stageNameRes(this.sapling.stage)),
-      this.sapling.streak.toString()));
+      stage,
+      this.sapling.activeDays.toString()));
   }
 
   private progressWidth(): string {
@@ -413,6 +422,9 @@ export struct HomeTab {
       .width('100%')
       .padding({ left: AppSpacing.LG, right: AppSpacing.LG, top: AppSpacing.LG, bottom: AppSpacing.SM })
       .alignItems(HorizontalAlign.Start)
+      // 截图导出需要自包含背景：否则 componentSnapshot 只抓到透明底，
+      // 浅色下看不出问题，深色模式下浅色文字贴到白底会几乎不可读
+      .backgroundColor(AppColor.CARD)
       .id('reportCard');
       }
       .layoutWeight(1)
@@ -568,7 +580,9 @@ export struct HomeTab {
                 Row() {
                   Text(this.sapling.activeDays === 0
                     ? $r('app.string.home_sapling_empty')
-                    : $r('app.string.home_sapling_streak', this.sapling.streak))
+                    : (this.sapling.streak > 0
+                      ? $r('app.string.home_sapling_streak', this.sapling.streak)
+                      : $r('app.string.home_sapling_streak_broken', this.sapling.bestStreak)))
                     .fontSize(AppTypography.SMALL.size)
                     .fontColor(AppColor.ACCENT);
                   Blank();

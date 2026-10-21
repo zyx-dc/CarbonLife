@@ -126,6 +126,31 @@ export default function localUnitTest() {
       expect(s.todayGrowth).assertEqual(40);
     });
 
+    it('compute_keeps_streak_when_last_record_is_yesterday', 0, () => {
+      // 昨天还有记录：连续仍有效（今天还没记录，但还没断）
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-18', 4, 0),
+        day('2026-10-19', 4, 0)
+      ], '2026-10-20');
+      expect(s.streak).assertEqual(2);
+      expect(s.todayGrowth).assertEqual(0);
+    });
+
+    it('compute_zeroes_streak_after_a_multi_day_gap', 0, () => {
+      // 最后一次记录在 4 天前：展示的「连续」必须归零，但成长值与最长连续保留
+      const s: SaplingState = Sapling.compute([
+        day('2026-10-12', 4, 0),
+        day('2026-10-13', 4, 0),
+        day('2026-10-14', 4, 0),
+        day('2026-10-15', 4, 0),
+        day('2026-10-16', 4, 0)
+      ], '2026-10-20');
+      expect(s.streak).assertEqual(0);
+      expect(s.bestStreak).assertEqual(5);
+      expect(s.activeDays).assertEqual(5);
+      expect(s.growth).assertEqual(220);
+    });
+
     it('compute_reaches_max_stage', 0, () => {
       const days: DayStat[] = [];
       for (let i: number = 1; i <= 30; i++) {

@@ -16,7 +16,7 @@
 | 6 | 记录 ≥ 5 条且主导类别 ≥ 40% | 卡片显示「偏向绿色出行」，树冠出现**新叶装饰** |
 | 7 | 点「生成成果卡片」 | 打开**碳账单**：树 + 阶段/偏向 + 累计减排 + 积分/种树/活跃天数/最长连续 + 减排构成 |
 | 8 | 「复制文案」 | 弹出「已复制」并关闭，粘贴可见完整文案（含树阶段与连续天数） |
-| 9 | 「保存图片」 | 系统文件选择器，文件名 `carbonlife-report-<时间戳>.png`；确认后 Toast「碳账单图片已保存」 |
+| 9 | 「保存图片」 | 系统文件选择器，文件名 `carbonlife-report-<时间戳>.png`；确认后 Toast「碳账单图片已保存」；**打开图片应为不透明底**（深色模式下导出的暗色卡片同样可读） |
 | 10 | 切「看板」 | 折线/柱状/饼图随周期切换；导出 CSV/JSON 正常 |
 | 11 | 切「积分」「科普」 | 列表正常渲染，无空白 |
 | 12 | 系统切深色模式 | 全站跟随（首页/看板/碳账单/树形均可读） |
@@ -27,7 +27,7 @@
 |---|---|---|
 | 构建 | `devecocli build` | `BUILD SUCCESSFUL` |
 | 静态检查 | `devecocli check lint` | **0 error**（1 条既有 `AppCard` 性能建议） |
-| 单测 | `hvigorw test --mode module -p module=entry@default -p product=default` | **17/17 PASS** |
+| 单测 | `hvigorw test --mode module -p module=entry@default -p product=default` | **19/19 PASS** |
 | UI 冒烟 | `scripts/ui-smoke.ps1 -Device "<设备>"` | **20/20 PASS** |
 | 升级取证 | `devecocli log --keyword "sapling level"` | `sapling level up 0 -> 1` |
 | 图片取证 | `devecocli log --keyword "report image saved"` | `report image saved, size=144658` |
