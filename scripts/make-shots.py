@@ -58,7 +58,8 @@ FIGURES = {
     "fig13-sapling":    ("home", 0, (30, 1150, 1250, 1600)),
     # the report sheet only: drop the dimmed home page around the modal
     "fig14-report":     ("report", 0, (60, 392, 1220, 2320)),
-    "fig15-local-data": ("data-manager", 0, None),
+    # the 本地数据管理 panel only (must be captured with the panel on screen)
+    "fig15-data-manage": ("data-manager-panel", 0, (0, 1450, 1280, 2700)),
 }
 
 # Pages that must come from a light-theme capture. The dark theme follows the system
@@ -134,6 +135,14 @@ def main():
         print(f"  {fig:<20} <- {os.path.basename(src):<24} {im.size[0]}x{im.size[1]:<5} "
               f"{os.path.getsize(out)//1024:>4} KB  theme={theme}")
 
+    # de-bordered variant of the report sheet (the design doc uses this one)
+    if "fig14-report" in made:
+        rep = Image.open(made["fig14-report"]).convert("RGB")
+        clean = os.path.join(SHOTS, "fig14-report-clean.jpg")
+        rep.crop((14, 0, rep.width - 14, rep.height - 8)).save(
+            clean, "JPEG", quality=JPEG_QUALITY, optimize=True)
+        print(f"  {'fig14-report-clean':<20} <- fig14-report (trimmed 14px sides / 8px bottom)")
+
     if missing:
         print("\nMISSING source screenshots:")
         for m in missing:
@@ -155,7 +164,6 @@ def main():
         shutil.copyfile(made[fig], dst)
         print(f"     {asset + '.jpg':<16} <- {fig}.jpg")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -71,6 +71,11 @@ LIGHT = {
 }
 
 
+AMBER_DECOR = "#E8A317"   # 装饰：色条 / 箭头 / 圆底
+AMBER_TEXT = "#8A5A00"    # 琥珀系文字专用（#E8A317 on #F5F7F5 仅 2.01:1，不达标）
+ON_AMBER = "#14201A"      # 琥珀圆上的数字（#FFFFFF on #E8A317 仅 2.17:1）
+
+
 def make_theme(spec, style, seed, name):
     t = ThemeComposer().compose(style=style, seed=seed)
     t["name"] = name
@@ -151,7 +156,8 @@ def point_rows(s, x, y, w, rows, gap=1.5, size=18):
     for i, (t, d) in enumerate(rows):
         yy = y + i * gap
         oval(s, x, yy + 0.02, 0.5, 0.5, "primary" if i % 2 == 0 else "accent")
-        text(s, x, yy + 0.08, 0.5, 0.4, f"{i + 1:02d}", font_size=14, color="on_primary", bold=True, align="center")
+        text(s, x, yy + 0.08, 0.5, 0.4, f"{i + 1:02d}", font_size=14,
+             color="on_primary" if i % 2 == 0 else ON_AMBER, bold=True, align="center")
         text(s, x + 0.7, yy - 0.02, w - 0.7, 0.4, t, font_size=size, color="primary", bold=True)
         text(s, x + 0.7, yy + 0.42, w - 0.7, 0.4, d, font_size=14, color="text_muted")
 
@@ -169,7 +175,7 @@ prs = Presentation(theme=THEME_LIGHT, strict_theme=True)
 # ── P1 封面 (dark) ──────────────────────────────────────────────────
 s = new_slide(prs)
 rect(s, 0, 0, 0.16, H, "primary")
-text(s, 0.95, 1.15, 7.0, 0.3, "CARBONLIFE · 碳足迹", font_size=12, color="accent", bold=True)
+text(s, 0.95, 1.15, 7.0, 0.3, "CARBONLIFE · 碳足迹", font_size=12, color=AMBER_TEXT, bold=True)
 gradient_text(s, 0.9, 1.55, 6.6, 1.15, "CarbonLife",
               stops=[("#0F3D2E", 0), ("#2F6B4F", 55), ("#0E8F79", 100)], font_size=58, bold=True)
 text(s, 0.95, 2.72, 6.4, 0.5, "碳足迹 · 全民绿色生活", font_size=22, color="primary", bold=True)
@@ -178,7 +184,7 @@ cx = 0.95
 for label in ["双碳目标", "HarmonyOS 原生", "端侧 AI", "隐私优先", "家庭共享"]:
     cx += chip(s, cx, 4.15, label) + 0.18
 rect(s, 0.95, 5.05, 4.2, 0.02, "border")
-text(s, 0.95, 5.25, 6.4, 0.35, "参赛作品 · 答辩演示", font_size=13, color="accent", bold=True)
+text(s, 0.95, 5.25, 6.4, 0.35, "参赛作品 · 答辩演示", font_size=13, color=AMBER_TEXT, bold=True)
 text(s, 0.95, 5.62, 6.4, 0.35, "记录每一次低碳行动，积少成多守护地球", font_size=12, color="text_muted")
 phone(s, 7.3, 1.5, 5.4, 5.4, IMG["home"], ring="border")
 footer(s, 1)
@@ -212,7 +218,8 @@ for i, (n, t, d) in enumerate(steps):
     x = M + i * (cw + 0.85)
     card(s, x, 2.15, cw, 3.0, accent="primary" if i == 0 else "accent")
     oval(s, x + 0.32, 2.55, 0.95, 0.95, "primary" if i == 0 else "accent")
-    text(s, x + 0.32, 2.72, 0.95, 0.6, n, font_size=26, color="on_primary", bold=True, align="center")
+    text(s, x + 0.32, 2.72, 0.95, 0.6, n, font_size=26,
+         color="on_primary" if i == 0 else ON_AMBER, bold=True, align="center")
     text(s, x + 0.32, 3.75, cw - 0.64, 0.5, t, font_size=22, color="primary", bold=True)
     multiline(s, x + 0.32, 4.35, cw - 0.64, 0.9, [d], font_size=14, color="text_muted")
     if i < 2:
@@ -259,11 +266,11 @@ for i, (n, t, d) in enumerate(feats):
         x = M + (CW - row2_width) / 2 + col * (cw + 0.28)
     y = 1.86 + row * (ch + gap_y)
     card(s, x, y, cw, ch, accent="primary" if i % 2 == 0 else "accent")
-    text(s, x + 0.25, y + 0.20, cw - 0.5, 0.3, n, font_size=12, color="accent", bold=True)
+    text(s, x + 0.25, y + 0.20, cw - 0.5, 0.3, n, font_size=12, color=AMBER_TEXT, bold=True)
     text(s, x + 0.25, y + 0.50, cw - 0.5, 0.4, t, font_size=16, color="primary", bold=True)
     text(s, x + 0.25, y + 0.92, cw - 0.5, 0.32, d, font_size=12, color="text_muted")
-text(s, M, 6.30, CW, 0.4, "记录 → 计算 → 激励 → 回馈；数据可导入导出，账单可一键分享。",
-     font_size=14, color="text_muted", align="center")
+text(s, M, 6.30, CW, 0.4, "记录 → 计算 → 激励 → 回馈；数据可导入导出，账单可一键分享，另含本地 / 云备份。",
+     font_size=13, color="text_muted", align="center")
 footer(s, 5)
 NOTES[5] = ("项目共 10 大功能：低碳行为记录、端侧 AI 识图、数据看板与导入导出、积分与荣誉、家庭碳积分、"
             "每日提醒、双碳科普、深浅主题，以及本轮新增的碳小树与碳账单；数据还支持本地整包备份与可选的云备份。")
@@ -271,8 +278,8 @@ NOTES[5] = ("项目共 10 大功能：低碳行为记录、端侧 AI 识图、�
 # ── P6 亮点1 ────────────────────────────────────────────────────────
 s = new_slide(prs)
 header(s, "HIGHLIGHT 01", "13 种低碳行为，四大类自动折算")
-cats = [("出行", "步行 / 骑行 / 公交 …"), ("节能", "节电 / 节水 …"),
-        ("回收", "纸张 / 塑料 / 旧物 …"), ("餐饮", "光盘行动 …")]
+cats = [("出行", "步行 / 骑行 / 公交 / 地铁"), ("节能", "节电 / 节水"),
+        ("回收", "纸张 / 塑料 / 金属 / 旧衣"), ("餐饮", "光盘 / 少用一次性 / 素食")]
 cw = (7.0 - 0.28) / 2
 for i, (t, d) in enumerate(cats):
     x = M + (i % 2) * (cw + 0.28)
@@ -318,10 +325,10 @@ highlight_page(9, "HIGHLIGHT 04", "一个家庭码，把家人的减排聚在一
     IMG["family"],
     "生成或加入家庭码后，可在同一华为账号的多设备间同步，并按成员展示家庭减排与积分。")
 
-highlight_page(10, "HIGHLIGHT 05", "减排有回馈：积分 · 荣誉 · 树苗",
+highlight_page(10, "HIGHLIGHT 05", "减排有回馈：积分 · 荣誉 · 碳小树",
     [("积分", "累计并兑换碳普惠权益"),
      ("荣誉", "解锁低碳徽章与植树证书"),
-     ("树苗", "按真实记录养成，断签不掉级")],
+     ("碳小树", "按真实记录养成，断签不掉级")],
     IMG["report"],
     "碳积分可兑换权益、解锁徽章与植树证书；本轮新增的碳小树按真实记录长成，连续记录有加成、断签不掉级，"
     "下方这张碳账单把所有数字汇成一页可分享的报告。")
@@ -331,7 +338,7 @@ s = new_slide(prs)
 header(s, "DESIGN", "让低碳数据「好看、好读」")
 card(s, M, 1.95, 7.0, 4.6, accent="primary")
 point_rows(s, M + 0.4, 2.35, 6.2,
-           [("视觉基调", "暖白纸感底，深林绿为品牌、琥珀金为强调"),
+           [("视觉基调", "浅色演示稿；App 默认深色，电青为强调"),
             ("统一的系统", "玻璃质感卡片 + 单一信号色，层次靠字号与留白"),
             ("跟随系统", "主题随系统深浅色切换，运行中实时生效"),
             ("有目的的动效", "读数滚动 / 图表入场，支持「减弱动效」开关")], gap=1.15)
@@ -340,7 +347,8 @@ phone(s, 10.35, 1.95, 2.35, 4.6, IMG["knowledge"])
 text(s, 7.75, 6.62, 2.35, 0.3, "首页", font_size=11, color="text_muted", align="center")
 text(s, 10.35, 6.62, 2.35, 0.3, "双碳科普", font_size=11, color="text_muted", align="center")
 footer(s, 11)
-NOTES[11] = "整体采用可跟随系统的浅 / 深双主题，颜色与控件统一走设计规范，关键动效尊重「减弱动效」开关。"
+NOTES[11] = ("整体采用可跟随系统的浅 / 深双主题，颜色与控件统一走设计规范，关键动效尊重「减弱动效」开关。"
+             "整套材料用浅色便于投影；App 本体默认深色「夜行荧光」，强调色是电青 #3DE0C8，琥珀只用于演示材料。")
 
 # ── P12 技术底座 ────────────────────────────────────────────────────
 s = new_slide(prs)
@@ -394,19 +402,27 @@ multiline(s, M + 0.3, 2.8, 4.8, 3.4,
           font_size=14, color="text_dark", line_spacing=9)
 card(s, 6.35, 1.95, 6.28, 4.6, accent="accent")
 text(s, 6.65, 2.2, 5.7, 0.4, "复测结果", font_size=17, color="primary", bold=True)
-rrect(s, 6.65, 2.75, 5.65, 1.5, TINT, line="border")
-text(s, 6.85, 2.9, 5.3, 0.35, "✓ 已通过", font_size=14, color="success", bold=True)
-multiline(s, 6.85, 3.3, 5.3, 0.9, ["记录增删实时刷新 · 图表刷新 · 家庭聚合（本地侧） · UI 冒烟 20/20（手机 + 平板）"], font_size=13, color="text_dark")
-rrect(s, 6.65, 4.5, 5.65, 1.5, TINT, line="border")
-text(s, 6.85, 4.65, 5.3, 0.35, "! 待真机复测", font_size=14, color="accent", bold=True)
-multiline(s, 6.85, 5.05, 5.3, 0.9, ["分布式权限弹窗 · 跨设备家庭聚合"], font_size=13, color="text_dark")
+rrect(s, 6.65, 2.75, 5.65, 1.55, TINT, line="border")
+text(s, 6.85, 2.9, 5.3, 0.35, "✓ 已复测通过", font_size=14, color="success", bold=True)
+multiline(s, 6.85, 3.3, 5.3, 1.0,
+          ["记录增删实时刷新 · 图表刷新 · 家庭聚合（本地侧）",
+           "碳小树 / 碳账单 · 外壳冒烟 20/20（仅导航 / 布局）"],
+          font_size=12, color="text_dark", line_spacing=5)
+rrect(s, 6.65, 4.45, 5.65, 1.7, TINT, line="border")
+text(s, 6.85, 4.55, 5.3, 0.35, "! 待真机 / 待复测", font_size=14, color=AMBER_TEXT, bold=True)
+multiline(s, 6.85, 4.95, 5.3, 1.1,
+          ["分布式权限弹窗 · 跨设备家庭聚合",
+           "云备份端到端（BLOCKED）· 导入运行时"],
+          font_size=12, color="text_dark", line_spacing=5)
 footer(s, 14)
-NOTES[14] = "项目采用「写审分离 + 设备验证」，在模拟器上逐条核对验收清单；记录刷新、图表刷新、家庭聚合（本地侧）与设备端 UI 冒烟 20/20 已通过，分布式权限弹窗与跨设备家庭聚合仍需真机复测。"
+NOTES[14] = ("项目采用「写审分离 + 设备验证」，在模拟器上逐条核对验收清单；记录刷新、图表刷新、家庭聚合（本地侧）"
+             "与碳小树 / 碳账单已复测通过，外壳冒烟 20/20 只覆盖导航与布局；分布式权限弹窗与跨设备家庭聚合仍需真机复测，"
+             "云备份端到端仍为 BLOCKED，导入运行时待复测。")
 
 # ── P15 展望与致谢 (dark) ───────────────────────────────────────────
 s = new_slide(prs)
 rect(s, 0, 0, 0.16, H, "primary")
-text(s, M, 0.7, 6, 0.4, "ROADMAP", font_size=12, color="accent", bold=True)
+text(s, M, 0.7, 6, 0.4, "ROADMAP", font_size=12, color=AMBER_TEXT, bold=True)
 text(s, M, 1.05, 7, 0.7, "接下来", font_size=30, color="primary", bold=True)
 road = ["· 对接真实城市碳普惠平台 API，替代本地模拟兑换码",
         "· 云备份冲突合并策略与签名构建端到端验证",

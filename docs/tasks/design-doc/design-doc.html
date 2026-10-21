@@ -61,7 +61,7 @@
   <li>测试与验证</li>
   <li>总结与展望</li>
 </ol>
-<p class="note"><b>图表索引：</b>正文含 7 张表格（表 1 – 表 7）与 15 张实机界面截图（图 1 – 图 15）。</p>
+<p class="note"><b>图表索引：</b>正文含 7 张表格（表 1 – 表 7）与 15 张应用界面截图（模拟器 Mate 90 Pro / MatePad Pro 13，图 1 – 图 15）。</p>
 
 <!-- ================= 1 ================= -->
 <div class="page-break"></div>
@@ -69,7 +69,7 @@
 
 <h3>1.1 项目简介</h3>
 <p>
-CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活记录与激励应用。用户完成步行、骑行、公交出行、节约用电用水、回收纸张 / 塑料 / 金属 / 旧衣、光盘行动等日常低碳行为后，应用按「活动量 × 排放因子」自动估算碳减排量，并折算为碳积分；积分可用于碳普惠权益兑换、解锁低碳徽章与植树证书，还可在同一账号的多设备间共享「家庭碳积分」。
+CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机与平板上的低碳生活记录与激励应用。用户完成步行、骑行、公交出行、节约用电用水、回收纸张 / 塑料 / 金属 / 旧衣、光盘行动等日常低碳行为后，应用按「活动量 × 排放因子」自动估算碳减排量，并折算为碳积分；积分可用于碳普惠权益兑换、解锁低碳徽章与植树证书，还可在同一账号的多设备间共享「家庭碳积分」。
 </p>
 
 <h3>1.2 选题背景</h3>
@@ -109,6 +109,7 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
 
 <h3>2.2 功能需求列表</h3>
 <p class="tabcap">表 2　功能需求列表</p>
+<p class="note">F1–F10 为功能需求；D1 为数据能力，不计入「10 大功能」。各行为的排放因子集中在 <code>CarbonFactors.ets</code>（例如步行替代驾车 0.17 kg CO₂e/km、节约用电 0.581 kg CO₂e/kWh），取自公开的行为级减排系数；积分换算为 1 kg CO₂e = 100 积分（单条不低于 5 分，每日记录积分上限 300 分）。</p>
 <table>
   <tr><th>编号</th><th>功能</th><th>说明</th></tr>
   <tr><td>F1</td><td>低碳行为记录</td><td>出行 / 节能 / 回收 / 餐饮 4 大类共 13 种行为，按排放因子自动计算减排量与积分（单条不低于 5 分，每日记录积分上限 300 分）。</td></tr>
@@ -119,9 +120,9 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
   <tr><td>F6</td><td>每日提醒</td><td>默认每天 20:00 提醒记录低碳行为，时间可调。</td></tr>
   <tr><td>F7</td><td>双碳科普专栏</td><td>碳达峰 / 碳中和、绿色出行、家庭节能等科普内容与低碳指数自测。</td></tr>
   <tr><td>F8</td><td>浅色 / 深色主题</td><td>跟随系统 colorMode 自动切换。</td></tr>
-  <tr><td>F9</td><td>数据备份与恢复</td><td>本地整包快照（记录 + 兑换 + 任务奖励）备份 / 恢复与去重合并；可选 AGC 云存储备份开关，默认关闭。</td></tr>
-  <tr><td>F10</td><td>碳小树养成</td><td>成长值由真实记录派生（记录 10 点 / 任务 15 点），每日上限 80 点，连续记录 +5%/天（最多 +50%）、断签不掉级；六阶段成长，按行为结构长出不同树冠装饰。</td></tr>
-  <tr><td>F11</td><td>碳账单</td><td>汇成树与阶段、偏向、累计减排、积分 / 种树 / 活跃天数 / 最长连续与减排构成；支持复制分享文案与保存 PNG 图片。</td></tr>
+  <tr><td>F9</td><td>碳小树养成</td><td>成长值由真实记录派生（记录 10 点 / 任务 15 点），每日上限 80 点，连续记录 +5%/天（最多 +50%）、断签不掉级；六阶段成长，按行为结构长出不同树冠装饰。</td></tr>
+  <tr><td>F10</td><td>碳账单</td><td>汇成树与阶段、偏向、累计减排、积分 / 种树 / 活跃天数 / 最长连续与减排构成；支持复制分享文案与保存 PNG 图片。</td></tr>
+  <tr><td>D1</td><td>数据备份与恢复（数据能力）</td><td>本地整包快照（记录 + 兑换 + 任务奖励）备份 / 恢复与去重合并；可选 AGC 云存储备份开关，默认关闭。</td></tr>
 </table>
 
 <h3>2.3 非功能需求</h3>
@@ -180,50 +181,58 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
 
 <h3>4.1 启动页与首页</h3>
 <p>启动页展示品牌标识与光晕动效；首页汇聚今日减排 / 积分、累计减排 / 种树、家庭碳积分、今日任务与智能建议，并提供「去记录低碳行为」与「生成成果卡片」两个主入口。</p>
-<div class="fig"><img style="width:180px" src="shot:fig01-splash.jpg"><div class="cap">图 1　启动页</div></div>
-<div class="fig"><img style="width:180px" src="shot:fig02-home.jpg"><div class="cap">图 2　首页（浅色）</div></div>
+<table border="0"><tr>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig01-splash.jpg"><div class="cap">图 1　启动页</div></td>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig02-home.jpg"><div class="cap">图 2　首页（浅色）</div></td>
+</tr></table>
 
 <h3>4.2 低碳行为记录（F1）</h3>
 <p>提供出行、节能、回收、餐饮 4 大类共 13 种行为。选择类别与行为、填写数量后，应用按排放因子实时估算减排量与可获积分，支持数量步进与备注；保存后写入本机并更新今日记录与首页统计。</p>
-<div class="fig"><img style="width:180px" src="shot:fig03-record.jpg"><div class="cap">图 3　记录页</div></div>
-<div class="fig"><img style="width:180px" src="shot:fig04-recycle.jpg"><div class="cap">图 4　回收类行为</div></div>
+<table border="0"><tr>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig03-record.jpg"><div class="cap">图 3　记录页</div></td>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig04-recycle.jpg"><div class="cap">图 4　回收类行为</div></td>
+</tr></table>
 
 <h3>4.3 端侧 AI 识图（F2）</h3>
 <p>基于 CoreVisionKit 端侧物体检测：用户选择一张照片，模型在本机识别物体（如食物、车辆、植物、纸张等），据此推荐对应的低碳行为并自动定位到该行为，识别过程不上传图片。图 5 为记录页的 AI 识图入口（实际识别需在具备图库 / 相机的设备上操作）。</p>
-<div class="fig"><img style="width:180px" src="shot:fig05-ai-entry.jpg"><div class="cap">图 5　AI 识图入口（记录页）</div></div>
+<div class="fig"><img style="width:240px" src="shot:fig05-ai-entry.jpg"><div class="cap">图 5　AI 识图入口（记录页）</div></div>
 
 <h3>4.4 数据看板与数据管理（F3）</h3>
-<p>按日 / 周 / 月 / 年聚合减排量与积分，折线图展示趋势（数据点稀疏时改用柱状，避免误导），饼图展示类别占比；汇总卡片、趋势图与类别占比<b>统一跟随所选周期</b>。下方为最近记录与本地数据管理区，可导出 / 导入 CSV 与 JSON、清空数据；导出含 UTF-8 BOM 与 RFC 4180 转义，导入逐字段校验归一化。</p>
-<div class="fig"><img style="width:180px" src="shot:fig06-dash-day.jpg"><div class="cap">图 6　看板 · 日</div></div>
-<div class="fig"><img style="width:180px" src="shot:fig07-dash-week.jpg"><div class="cap">图 7　看板 · 周</div></div>
-<div class="fig"><img style="width:180px" src="shot:fig08-dash-month.jpg"><div class="cap">图 8　看板 · 月</div></div>
+<p>按日 / 周 / 月 / 年聚合减排量与积分，折线图展示趋势（数据点稀疏时改用柱状，避免误导），饼图展示类别占比；汇总卡片、趋势图与类别占比<b>统一跟随所选周期</b>（图表按一位小数展示）。下方为最近记录与本地数据管理区，可导出 / 导入 CSV 与 JSON、清空数据；导出含 UTF-8 BOM 与 RFC 4180 转义，导入逐字段校验归一化。</p>
+<table border="0"><tr>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:190px" src="shot:fig06-dash-day.jpg"><div class="cap">图 6　看板 · 日</div></td>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:190px" src="shot:fig07-dash-week.jpg"><div class="cap">图 7　看板 · 周</div></td>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:190px" src="shot:fig08-dash-month.jpg"><div class="cap">图 8　看板 · 月</div></td>
+</tr></table>
 
 <h3>4.5 积分与荣誉（F4）</h3>
 <p>汇总可用碳积分、累计获得与已兑换；提供碳普惠权益商城（模拟兑换码）、植树证书（每减排 10 kg 折算 1 棵树）、低碳徽章（按减排 / 行为达成解锁）与今日任务（完成即发放积分，幂等）。</p>
-<div class="fig"><img style="width:180px" src="shot:fig09-rewards.jpg"><div class="cap">图 9　积分与荣誉</div></div>
-<div class="fig"><img style="width:180px" src="shot:fig10-redeem.jpg"><div class="cap">图 10　碳普惠权益与兑换记录</div></div>
+<table border="0"><tr>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig09-rewards.jpg"><div class="cap">图 9　积分与荣誉</div></td>
+<td border="0" style="text-align:center;vertical-align:top"><img style="width:240px" src="shot:fig10-redeem.jpg"><div class="cap">图 10　碳普惠权益与兑换记录</div></td>
+</tr></table>
 
 <h3>4.6 家庭碳积分（F5）</h3>
 <p>生成或加入家庭码后，可在同一华为账号的多设备间同步各自的减排量与积分，并以「家庭成员」列表按设备展示，实现家庭碳积分的合并统计。</p>
-<div class="fig"><img style="width:180px" src="shot:fig11-family.jpg"><div class="cap">图 11　家庭碳积分（首页卡片）</div></div>
+<div class="fig"><img style="width:240px" src="shot:fig11-family.jpg"><div class="cap">图 11　家庭碳积分（首页卡片）</div></div>
 
 <h3>4.7 每日提醒与科普专栏（F6 / F7）</h3>
 <p>每日提醒默认 20:00，可在首页开启 / 关闭并调整时间，基于后台代理提醒发布；科普专栏提供碳达峰 / 碳中和、绿色出行、家庭节能等图文内容与低碳指数自测。</p>
-<div class="fig"><img style="width:180px" src="shot:fig12-knowledge.jpg"><div class="cap">图 12　双碳科普专栏</div></div>
+<div class="fig"><img style="width:240px" src="shot:fig12-knowledge.jpg"><div class="cap">图 12　双碳科普专栏</div></div>
 
 <h3>4.8 浅色 / 深色主题（F8）</h3>
 <p>所有色彩走动态设计 token，冷启动读取系统 colorMode，运行中实时跟随系统切换；深浅两套主题共用同一套语义角色（primary / signal / accent / chart-*），切换时全部读数与图表重新求值。</p>
 
-<h3>4.9 数据备份与恢复（F9）</h3>
+<h3>4.9 数据备份与恢复（D1）</h3>
 <p>应用支持整包快照的备份与恢复：快照包含记录、兑换与任务奖励三类数据，本地以 JSON 文件形式由用户导出保存（入口与数据管理同处看板，见图 6 – 图 8）；恢复时与现有数据<b>去重合并</b>，不覆盖本机既有记录。此外可选择性开启 AGC 云存储备份，该开关<b>默认关闭</b>，未开启时应用行为与纯本地应用完全一致。</p>
 
-<h3>4.10 碳小树养成（F10）</h3>
-<p>碳小树把记录变成<b>可生长的可视化</b>：成长值由真实记录派生（每条记录 10 点、每完成一个今日任务 15 点），<b>每日上限 80 点</b>——连续记录带来的加成也不会突破这个上限，以抑制刷分；连续记录每天额外 +5%（最多 +50%），<b>断签不掉级</b>。成长值把树推进「种子 → 幼苗 → 小树 → 开花 → 结果 → 常青」六个阶段，并按行为结构（出行 / 餐饮 / 节能 / 回收）长出不同的树冠装饰，让抽象的减排量变成一眼能看懂的成长。</p>
-<div class="fig"><img style="width:180px" src="shot:fig13-sapling.jpg"><div class="cap">图 13　碳小树卡片（阶段 / 成长值 / 连续天数）</div></div>
+<h3>4.10 碳小树养成（F9）</h3>
+<p>碳小树把记录变成<b>可生长的可视化</b>：成长值由真实记录派生（每条记录 10 点、每完成一个今日任务 15 点），<b>每日上限 80 点</b>——连续记录带来的加成也不会突破这个上限，以抑制刷分；连续记录每天额外 +5%（最多 +50%），<b>断签不掉级</b>。成长值把树推进「种子 → 幼苗 → 小树 → 开花 → 结果 → 常青」六个阶段（阈值 0 / 60 / 180 / 420 / 900 / 2400），并按行为结构（出行 / 餐饮 / 节能 / 回收）长出不同的树冠装饰（新叶 / 果实 / 花朵 / 青环），<b>装饰从阶段 2（180 成长值）起显示</b>——所以干净设备当天（最多 80）看不到装饰，演示需先导入种子数据。</p>
+<div class="fig"><img style="width:420px" src="shot:fig13-sapling.jpg"><div class="cap">图 13　碳小树卡片（阶段 / 成长值 / 连续天数）</div></div>
 
-<h3>4.11 碳账单（F11）</h3>
-<p>碳账单把散落在各页的数据汇成一页可分享的报告：树与当前阶段、行为偏向、累计减排量，以及积分 / 种树 / 活跃天数 / 最长连续四项指标，并用条形图展示出行 / 节能 / 回收 / 餐饮的减排构成。支持<b>一键复制分享文案</b>与<b>保存为 PNG 图片</b>，便于在社交场景展示与传播（文案在断签时会改用「累计活跃天数」而非「连续」，避免自相矛盾）。</p>
-<div class="fig"><img style="width:180px" src="shot:fig14-report.jpg"><div class="cap">图 14　碳账单（可复制文案 / 保存图片）</div></div>
+<h3>4.11 碳账单（F10）</h3>
+<p>碳账单把散落在各页的数据汇成一页可分享的报告：树与当前阶段、行为偏向、累计减排量，以及积分 / 种树 / 活跃天数 / 最长连续四项指标，并用条形图展示出行 / 节能 / 回收 / 餐饮的减排构成。支持<b>一键复制分享文案</b>与<b>保存为 PNG 图片</b>，便于在社交场景展示与传播（本次以浮层截图核对；文案在断签时会改用「累计活跃天数」而非「连续」，避免自相矛盾）。</p>
+<div class="fig"><img style="width:240px" src="shot:fig14-report-clean.jpg"><div class="cap">图 14　碳账单（可复制文案 / 保存图片）</div></div>
 
 <!-- ================= 5 ================= -->
 <div class="page-break"></div>
@@ -261,7 +270,7 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
   <li>云备份为<b>可选开关且默认关闭</b>；未开启时应用行为与纯本地应用完全一致。</li>
 </ul>
 <p>数据的导出 / 导入 / 备份全部在设备本地完成，入口见下图。</p>
-<div class="fig"><img style="width:180px" src="shot:fig15-local-data.jpg"><div class="cap">图 15　本机数据管理（导出 / 导入 / 备份）</div></div>
+<div class="fig"><img style="width:240px" src="shot:fig15-data-manage.jpg"><div class="cap">图 15　本机数据管理（导出 / 导入 / 备份）</div></div>
 
 <!-- ================= 7 ================= -->
 <div class="page-break"></div>
@@ -285,13 +294,14 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
 <!-- ================= 8 ================= -->
 <div class="page-break"></div>
 <h2>8. 测试与验证</h2>
-<p>项目采用「写审分离」的协作方式：写代码与设备验证由不同 Agent 承担，验证 Agent 只读、不改源码，在模拟器上构建、安装、驱动 UI 并逐条核对验收清单，产出带证据（截图 / dump / 日志）的结论。本节结果为 <code>master</code> 分支上截至 2026 年 10 月 18 日的验证口径。</p>
-<p class="tabcap">表 7　验收与测试结果（截至 2026-10-18）</p>
+<p>项目采用「写审分离」的协作方式：写代码与设备验证由不同 Agent 承担，验证 Agent 只读、不改源码，在模拟器上构建、安装、驱动 UI 并逐条核对验收清单，产出带证据（截图 / dump / 日志）的结论。本节结果为 <code>master</code> 分支上截至 2026 年 10 月 21 日的验证口径。</p>
+<p class="tabcap">表 7　验收与测试结果（截至 2026-10-21）</p>
 <table>
   <tr><th>验证项</th><th>方法</th><th>结果</th></tr>
   <tr><td>构建</td><td>devecocli build / scripts/run.ps1 -BuildOnly</td><td>BUILD SUCCESSFUL</td></tr>
   <tr><td>静态检查</td><td>devecocli check lint</td><td>0 error（仅 1 条既有组件性能建议，属有意设计）</td></tr>
-  <tr><td>设备端 UI 冒烟</td><td>scripts/ui-smoke.ps1（devecocli ui 驱动，逐页断言）</td><td>手机 Mate 90 Pro 与平板 MatePad Pro 13 各 20/20 通过</td></tr>
+  <tr><td>单元测试</td><td>hvigorw test（先按 scripts/run.ps1 设置 DEVECO_SDK_HOME / JAVA_HOME）</td><td>21/21 PASS</td></tr>
+  <tr><td>设备端外壳冒烟</td><td>scripts/ui-smoke.ps1（devecocli ui 驱动，仅断言导航可点 / 布局非空）</td><td>手机 Mate 90 Pro 与平板 MatePad Pro 13 各 20/20 通过（<b>不覆盖功能</b>）</td></tr>
   <tr><td>宽屏布局</td><td>平板 ui layout 核对导航与多列断点</td><td>通过（数据看板多列 + 断点响应式，旋转 / 折叠 / 分屏可用）</td></tr>
   <tr><td>深浅主题</td><td>切换系统主题，观察 App 冷启动与运行中跟随</td><td>通过</td></tr>
   <tr><td>记录增删刷新</td><td>保存 / 删除后核对首页与列表实时更新</td><td>通过（AppStorage 变更驱动刷新，无需重启）</td></tr>
@@ -302,8 +312,8 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
   <tr><td>分布式权限弹窗</td><td>全新安装冷启动观察授权弹窗</td><td>环境受限：模拟器不弹动态授权框，需真机复测</td></tr>
   <tr><td>云备份端到端</td><td>AGC 云存储上传 / 下载</td><td>环境受限：模拟器为 unsigned 构建，云侧鉴权未通过，需签名构建 + 真机</td></tr>
   <tr><td>导入运行时</td><td>经系统文件选择器导入 JSON / CSV / 整包快照</td><td>校验逻辑已配单元测试用例；运行时待复测</td></tr>
-  <tr><td>碳小树成长</td><td>导入演示种子 + 当日记录后核对成长值 / 阶段 / 连续天数</td><td>通过（成长值 270 · 阶段「小树」· 连续 6 天）</td></tr>
-  <tr><td>碳账单与分享</td><td>打开碳账单核对指标，并导出分享图</td><td>通过（指标与记录一致；已生成 PNG 分享图）</td></tr>
+  <tr><td>碳小树成长</td><td>导入演示种子 + 当日记录后核对成长值 / 阶段 / 连续天数</td><td>通过（成长值 270 = 种子 5 天 220 + 当日 (10 + 30) × 1.25；阶段「小树」· 连续 6 天）</td></tr>
+  <tr><td>碳账单与分享</td><td>打开碳账单核对指标；导出分享图</td><td>通过（指标与记录一致；以页面浮层截图核对，导出 PNG 已单独验证为不透明底）</td></tr>
 </table>
 <p>此外，界面文案已抽取为资源并完成中 / 英双语；英文环境下遍历各页面确认无中文残留。</p>
 <p><b>已知边界（不计入已完成能力）</b>：平板多列布局目前仅数据看板完成，其余 4 个 Tab 待补齐；「减弱动效」目前为 App 内开关，尚未接入系统无障碍设置；端侧 AI 识图的识别过程需在具备图库 / 相机的设备上操作（模拟器环境选图受限）。上述各项均已列入第 9.2 节展望或经真机复测确认。</p>
@@ -314,11 +324,11 @@ CarbonLife（碳足迹）是一款运行在 HarmonyOS 手机上的低碳生活�
 <h3>9.1 已完成</h3>
 <ul>
   <li>完成低碳行为记录、端侧 AI 识图、数据看板与数据管理、积分与荣誉、家庭碳积分、每日提醒、科普专栏、深浅主题等核心功能。</li>
-  <li>完成数据备份与恢复能力：本地整包快照（记录 + 兑换 + 任务奖励）备份 / 去重合并恢复，以及可选的 AGC 云备份开关（默认关闭）。</li>
+  <li>完成本地整包快照（记录 + 兑换 + 任务奖励）备份 / 去重合并恢复；AGC 云备份开关已接入且默认关闭，<b>端到端上传 / 下载待签名构建 + 真机验证</b>。</li>
   <li>完成碳小树养成（六阶段、每日上限 80 点、连续加成、断签不掉级）与碳账单（复制分享文案 / 保存 PNG 分享图）。</li>
-  <li>完成 CSV / JSON 数据导入与导出（RFC 4180 转义 + UTF-8 BOM），导入带逐字段校验归一化。</li>
+  <li>完成 CSV / JSON 导出与导入解析、逐字段校验归一化；<b>系统文件选择器下的运行时导入待复测</b>。</li>
   <li>建立设计 token 体系与浅 / 深双主题，统一颜色、字号、间距、圆角，并完成一轮完整的 UI 设计评审与动效升级。</li>
-  <li>建立「AI 设备验证 Agent + 验收清单」的测试方法：设备端 UI 冒烟测试在手机与平板<b>各 20/20 通过</b>，静态检查 0 error，产出带证据的验证报告。</li>
+  <li>建立「AI 设备验证 Agent + 验收清单」的测试方法：设备端<b>外壳冒烟</b>在手机与平板各 20/20 通过（仅覆盖导航与布局），另有单元测试 21/21、静态检查 0 error，产出带证据的验证报告。</li>
   <li>完成界面文案国际化（中 / 英）、正式应用图标与启动图。</li>
 </ul>
 <h3>9.2 展望</h3>

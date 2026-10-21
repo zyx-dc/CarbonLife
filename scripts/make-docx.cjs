@@ -53,6 +53,12 @@ if (missing > 0) {
 const options = {
   footer: true,
   pageNumber: true,
+  // A4 (twip): html-to-docx defaults to Letter + Times New Roman and ignores the
+  // CSS font-family, which is why the PDF came out 21.59x27.94 cm with 等线/Times.
+  pageSize: { width: 11906, height: 16838 },
+  margins: { top: 1417, bottom: 1417, left: 1417, right: 1417 }, // 2.5 cm
+  font: "Microsoft YaHei",
+  fontSize: 22,                                                // 11 pt (half-points)
   table: { row: { cantSplit: true } },
 }
 

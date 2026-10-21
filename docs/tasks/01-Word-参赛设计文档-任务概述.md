@@ -91,13 +91,18 @@
 # 1) HTML 源：docs/tasks/design-doc/design-doc.html
 # 2) 生成 .docx（需先装依赖：npm i html-to-docx）
 node scripts\make-docx.cjs
-
-# 3) 用 LibreOffice 导出 PDF（输出到同目录）
+# 3) 后处理：并排图的表格去边框、内容表列宽 / 续页表头、权限名缩放、分页符归位（消空白页）
+python scripts\postprocess-docx.py
+# 4) 导出 PDF（A4）
 powershell -ExecutionPolicy Bypass -File scripts\make-design-doc-pdf.ps1
+
+# 5) 交付前自检（15 页 / 10 卡 / F1–F10+D1 / A4 / 15 图 / 0 空白页）
+python scripts\check-deliverables.py
 ```
 
-- 截图以 `src="qa:<文件名>"` 引用 `docs/qa/` 下的图片，`make-docx.cjs` 会把它们转成 base64 内嵌，因此 docx 可独立分发。
-- 图片尺寸必须写在 `<img>` 的**内联** `style="width:180px"` 上：html-to-docx 不解析 CSS class 规则，否则图片会按原始像素被放大到整页宽（历史上曾导致每张截图独占一页、全文 40+ 页）。
+- 截图以 `src="shot:<文件名>"` 引用 **`docs/shots/`**（入库，可复现；`docs/qa/` 是未入库的历史取证归档，只有 `qa:` 前缀才走它）。`make-docx.cjs` 会把图片转成 base64 内嵌，因此 docx 可独立分发。
+- 图片尺寸必须写在 `<img>` 的**内联** `style="width:..."` 上：html-to-docx 不解析 CSS class 规则，否则图片会按原始像素被放大到整页宽（历史上曾导致每张截图独占一页、全文 40+ 页）。当前约定：单图 240px、碳小树卡 420px、双图并排各 240px、三图并排各 190px。
+- 并排图用 `<table border="0">` 实现（td 上**不要**写百分比宽度，会触发 html-to-docx 的 `Invalid XML name: @w` 崩溃）；边框由 `postprocess-docx.py` 统一清掉。
 - 表格题注写在表格前一行（`<p class="tabcap">表 N　…</p>`），图片题注用 `<div class="cap">图 N　…</div>`，编号需与正文引用一致。
 
 ## 7. 硬性要求与红线

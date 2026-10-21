@@ -6,13 +6,13 @@
 - PDF:  `output/rendered/CarbonLife-答辩PPT.pdf`
 - PNG:  `output/rendered/slide01.png … slide15.png` (1280×720)
 - Renderer: LibreOffice + Poppler（PowerPoint COM 未安装，自动回退）
-- Theme: `carbonlife-day-paper`（浅色统一，日光纸感）。全篇无深色页；实机截图统一浅色版。
+- Theme: `carbonlife-day-paper`（浅色统一，日光纸感）。全篇无深色页；截图统一浅色版（模拟器 Mate 90 Pro）。
 - 版本 2（依用户意见修订）：移除暗色封面/致谢，实机演示全部改为浅色版。
 - Package: pptx-designer 1.0.0b11
 
 ## Gate 1 — 视觉观感
 
-PASS。全篇为一套系统：统一眉标 + 大标题 + 信号条；深色封面/收尾与浅色内容形成节奏；真实 App 截图为视觉锚点；页面结构随叙事变化（卡片 / 流程 / 对照 / 分层栈 / 结果对照），非同一模板重复。
+PASS。全篇为一套系统：统一眉标 + 大标题 + 信号条；封面、内容与收尾均为浅色日光纸感（无深色页），靠版式与留白形成节奏；真实 App 截图为视觉锚点；页面结构随叙事变化（卡片 / 流程 / 对照 / 分层栈 / 结果对照），非同一模板重复。
 
 首次渲染发现问题并已修订：
 
