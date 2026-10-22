@@ -56,8 +56,16 @@ function Assert-Result {
 $target = if ($Device -eq "") { "(default device)" } else { $Device }
 Write-Host ("UI smoke - device: " + $target)
 
-# 1) 应用外壳：底部导航 5 个 Tab 均存在
+# 0) 确保 App 在前台：布局里找不到底部导航就先拉起一次（--skip-build 复用已安装产物）
 $raw = Get-Layout
+if (-not ($raw.Contains("首页") -and $raw.Contains("科普"))) {
+  Write-Host "  app not in foreground; launching..."
+  Invoke-Cli @("run", "--ability", "EntryAbility", "--skip-build") | Out-Null
+  Start-Sleep -Seconds 8
+  $raw = Get-Layout
+}
+
+# 1) 应用外壳：底部导航 5 个 Tab 均存在
 foreach ($t in $NAV) {
   Assert-Result ("nav '" + $t + "' present") ($raw.Contains($t))
 }
