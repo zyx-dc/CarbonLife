@@ -21,10 +21,12 @@ param(
 $ErrorActionPreference = "Stop"
 
 $project = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$stamp = (Get-Date).ToString("yyyyMMdd-HHmm")
 if ([string]::IsNullOrEmpty($Out)) {
     # .hvigor 已在 .gitignore 中，生成物不会污染工作区
-    $Out = Join-Path $project ".hvigor\demo-seed.json"
+    $Out = Join-Path $project (".hvigor\demo-seed-" + $stamp + ".json")
 }
+$seedName = Split-Path -Leaf $Out
 $outDir = Split-Path -Parent $Out
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir -Force | Out-Null }
 
@@ -79,10 +81,10 @@ if ($Push) {
     if (-not $hdcExe) {
         Write-Warning "hdc not found; pass -Hdc <path>. Seed file is still available locally."
     } else {
-        & $hdcExe file send $Out "/storage/media/100/local/files/Docs/demo-seed.json" | Out-Null
-        Write-Host "Pushed to device: 我的手机/demo-seed.json"
+        & $hdcExe file send $Out ("/storage/media/100/local/files/Docs/" + $seedName) | Out-Null
+        Write-Host ("Pushed to device: 我的手机/" + $seedName + "（若选择器里看不到，返回上一级再进入即可刷新）")
     }
 }
 
 Write-Host ""
-Write-Host "下一步：看板 → 本地数据管理 → 导入数据（CSV / JSON）→ 我的手机 → demo-seed.json"
+Write-Host ("下一步：看板 → 本地数据管理 → 导入数据（CSV / JSON）→ 我的手机 → " + $seedName)
