@@ -57,3 +57,8 @@ __pycache__/
 /docs/tasks/video/_deprecated-重绘版/
 # 提交打包暂存目录（本地组装用，不随仓库分发）
 /submission/
+# 演示视频工程（Remotion）：源码与分镜入库，依赖 / 渲染产物 / 截图素材不入库
+/tools/video/remotion/node_modules/
+/tools/video/remotion/out/
+/tools/video/remotion/public/shots/
+/tools/video/remotion/public/fonts/
