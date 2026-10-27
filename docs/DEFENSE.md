@@ -23,6 +23,7 @@
 |---|---|---|---|
 | 1 | 模拟器在跑 | `devecocli device list` | 出现 `Mate 90 Pro 127.0.0.1:5555` |
 | 2 | App 已安装且能启动 | 桌面点图标 | 启动页 → 首页，无白屏 |
+| 2b | 若要重装（改了代码） | `devecocli signature generate --force` → `devecocli build` → `devecocli run --device "Mate 90 Pro" --ability EntryAbility --skip-build`，装完执行 `git checkout -- build-profile.json5` | 装机成功；**签名密钥绝不进提交** |
 | 3 | 构建可复现 | `devecocli build` | `BUILD SUCCESSFUL` |
 | 4 | 静态检查 | `devecocli check lint` | `Errors: 0` |
 | 5 | 单测 | `hvigorw test --mode module -p module=entry@default -p product=default` | `Tests run: 21, Failure: 0` |
