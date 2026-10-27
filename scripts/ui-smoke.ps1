@@ -33,6 +33,19 @@ function Get-Layout {
   return ((Invoke-Cli @("ui", "layout", "--format", "json", "--mode", "simplified")) -join "`n")
 }
 
+# 切换 Tab 后首次 dump 可能落在过场/图表首帧上（导航尚未进入布局树），
+# 轮询到导航出现为止，避免一次空布局导致后续断言连锁失败。
+function Get-LayoutWithNav {
+  param([int]$TimeoutMs = 4000)
+  $deadline = (Get-Date).AddMilliseconds($TimeoutMs)
+  $raw = Get-Layout
+  while (-not ($raw.Contains("首页") -and $raw.Contains("科普")) -and (Get-Date) -lt $deadline) {
+    Start-Sleep -Milliseconds 300
+    $raw = Get-Layout
+  }
+  return $raw
+}
+
 function Find-Center {
   param([string]$Raw, [string]$Text)
   $i = $Raw.IndexOf($Text)
@@ -77,7 +90,7 @@ foreach ($t in $NAV) {
   if ($c -eq $null) { continue }
   Invoke-Cli @("ui", "click", $c.x.ToString(), $c.y.ToString()) | Out-Null
   Start-Sleep -Milliseconds 1200
-  $raw = Get-Layout
+  $raw = Get-LayoutWithNav
   Assert-Result ("'" + $t + "' renders (layout non-empty)") ($raw.Length -gt 1500)
   Assert-Result ("'" + $t + "' keeps bottom nav") ($raw.Contains("首页") -and $raw.Contains("科普"))
 }

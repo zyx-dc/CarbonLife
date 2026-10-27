@@ -147,7 +147,13 @@ export struct RewardsTab {
                   .fillColor(AppColor.TEXT);
                 Column({ space: AppSpacing.XXS }) {
                   Row({ space: AppSpacing.XS }) {
-                    Text(mallNameRes(item.id, item.name)).fontSize(AppTypography.BODY_MEDIUM.size).fontWeight(AppTypography.BODY_MEDIUM.weight).fontColor(AppColor.TEXT);
+                    Text(mallNameRes(item.id, item.name))
+                      .fontSize(AppTypography.BODY_MEDIUM.size)
+                      .fontWeight(AppTypography.BODY_MEDIUM.weight)
+                      .fontColor(AppColor.TEXT)
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis });
                     if (item.id === this.nearestId) {
                       Text($r('app.string.rewards_mall_nearest'))
                         .fontSize(AppTypography.SMALL.size)
@@ -164,8 +170,15 @@ export struct RewardsTab {
                         .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
                         .borderRadius(AppRadius.SM);
                     }
-                  }.alignItems(VerticalAlign.Center);
-                  Text(mallDescRes(item.id, item.desc)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+                  }
+                  .width('100%')
+                  .alignItems(VerticalAlign.Center);
+                  Text(mallDescRes(item.id, item.desc))
+                    .fontSize(AppTypography.CAPTION.size)
+                    .fontColor(AppColor.TEXT_SUB)
+                    .width('100%')
+                    .maxLines(2)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis });
                   if (this.balance < item.cost) {
                     // 已攒进度 + 还差多少：让「目标」可见，而不是只给一个差额
                     Progress({ value: this.balance, total: item.cost, type: ProgressType.Linear })
@@ -177,9 +190,9 @@ export struct RewardsTab {
                   }
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                 Text(this.balance >= item.cost ? $r('app.string.rewards_redeem') : $r('app.string.rewards_redeem_gap', (item.cost - this.balance).toString()))
-                  .height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
+                  .width(104).height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
-                  .padding({ left: AppSpacing.MD, right: AppSpacing.MD })
+                  .maxLines(1)
                   .backgroundColor(this.balance >= item.cost ? AppColor.PRIMARY : AppColor.ELEVATED)
                   .borderWidth(this.balance >= item.cost ? 0 : 1)
                   .borderColor(AppColor.BORDER)

@@ -27,6 +27,7 @@ export struct HomeTab {
   private onChange: () => void = () => { this.refresh(); };
   private onStoreChange: () => void = () => { FamilyService.get().pushLocal(); this.refresh(); };
   @State showShare: boolean = false;
+  @State showScrollHint: boolean = true;
   @State reminderOn: boolean = false;
   @State reminderHour: number = 20;
   @State reminderMinute: number = 0;
@@ -612,12 +613,29 @@ export struct HomeTab {
           .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 })
           .animation({ duration: AppMotion.reduceMotion() ? 0 : 500, curve: AppMotion.EASE, delay: AppMotion.staggerDelay(2) });
 
+          if (this.showScrollHint) {
+            Row({ space: AppSpacing.XS }) {
+              Text($r('app.string.home_scroll_hint'))
+                .fontSize(AppTypography.SMALL.size)
+                .fontColor(AppColor.TEXT_SUB);
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.Center)
+            .opacity(0.75);
+          }
+
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
             Column({ space: AppSpacing.SM }) {
               this.sectionTitle($r('app.string.home_tasks'));
               ForEach(Rewards.TASKS, (task: DailyTask, index: number) => {
                 TaskCard({ task: task, done: this.taskStates[index] ?? false, index: index })
-                  .onClick(() => { if (!this.taskStates[index]) { this.controller.changeIndex(1); } });
+                  .onClick(() => {
+                    if (!this.taskStates[index]) {
+                      // 带上任务对应的类别/行为，记录页据此预选（t3「坚持记录」保持当前选择）
+                      AppStorage.setOrCreate('recordPreset', task.key + '|' + Date.now().toString());
+                      this.controller.changeIndex(1);
+                    }
+                  });
               }, (task: DailyTask) => task.key);
             }
           }
@@ -728,7 +746,12 @@ export struct HomeTab {
         }
         .width('100%').padding({ left: AppSpacing.MD, right: AppSpacing.MD, top: AppSpacing.MD, bottom: AppSpacing.XL })
       }
-      .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off);
+      .width('100%').height('100%').backgroundColor(Color.Transparent).scrollBar(BarState.Off)
+      .onScroll(() => {
+        if (this.showScrollHint) {
+          this.showScrollHint = false;
+        }
+      });
 
       if (this.showShare) {
         Column() {

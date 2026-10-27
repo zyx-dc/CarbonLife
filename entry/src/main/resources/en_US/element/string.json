@@ -12,6 +12,7 @@
     { "name": "home_total_saved", "value": "Total saved (kg)" },
     { "name": "home_total_trees", "value": "Trees planted" },
     { "name": "home_sapling_title", "value": "Carbon sapling" },
+    { "name": "home_scroll_hint", "value": "Scroll for more" },
     { "name": "home_sapling_stage_0", "value": "Seed" },
     { "name": "home_sapling_stage_1", "value": "Sprout" },
     { "name": "home_sapling_stage_2", "value": "Sapling" },

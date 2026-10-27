@@ -26,12 +26,47 @@ export struct RecordTab {
   @State todayRecordPoints: number = 0;
   @State removingId: string = '';
   @State amountPulse: boolean = false;
+  // 首页每日任务点击时写入，格式 "t1|<时间戳>"；时间戳保证重复点击也会触发
+  @StorageLink('recordPreset') @Watch('applyPreset') preset: string = '';
 
   aboutToAppear(): void {
     CarbonStore.get().addChangeListener(this.onChange);
     this.todayList = this.todayRecords();
     this.todayRecordPoints = CarbonStore.get().recordPointsToday();
+    this.applyPreset();
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
+  }
+
+  /** 把「今日任务」的预选落到记录页：t1 出行 / t2 餐饮 / t4 节能；t3 不改变选择 */
+  private applyPreset(): void {
+    if (this.preset === '') {
+      return;
+    }
+    const taskKey: string = this.preset.split('|')[0];
+    let behaviorKey: string = '';
+    switch (taskKey) {
+      case 't1': behaviorKey = 'walk'; break;
+      case 't2': behaviorKey = 'clean_plate'; break;
+      case 't4': behaviorKey = 'save_power'; break;
+      default: return;
+    }
+    const b: BehaviorDef = CarbonFactors.find(behaviorKey);
+    this.category = b.category;
+    this.selectedKey = b.key;
+    this.amountText = b.step.toString();
+  }
+
+  /** #4 数量步进：滑杆之外再给 +/−，让「精确设定」和「能调」都变得明确 */
+  private stepAmount(dir: number): void {
+    const b: BehaviorDef = this.currentBehavior();
+    const st: number = b.step > 0 ? b.step : 1;
+    const next: number = Math.max(b.step, Math.min(this.amountMax(), this.amountValue() + dir * st));
+    const snapped: number = Math.round(next / st) * st;
+    this.amountText = snapped.toString();
+    if (!AppMotion.reduceMotion()) {
+      this.amountPulse = true;
+      setTimeout(() => { this.amountPulse = false; }, 130);
+    }
   }
 
   aboutToDisappear(): void {
@@ -209,13 +244,27 @@ export struct RecordTab {
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 4}) {
           Column({ space: AppSpacing.SM }) {
             Text($r('app.string.record_amount_title', resolveStr(unitRes(this.currentBehavior().unit)))).fontSize(AppTypography.CAPTION_MEDIUM.size).fontColor(AppColor.TEXT_SUB).width('100%');
-            Row() {
-              Blank();
+            Row({ space: AppSpacing.SM }) {
               Text(this.amountText + ' ' + resolveStr(unitRes(this.currentBehavior().unit)))
                 .fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(AppColor.PRIMARY)
                 .scale({ x: this.amountPulse ? 1.08 : 1, y: this.amountPulse ? 1.08 : 1 })
                 .animation({ duration: AppMotion.reduceMotion() ? 0 : 160, curve: Curve.Friction });
-            }.width('100%');
+              Blank();
+              Text('−')
+                .width(44).height(44).textAlign(TextAlign.Center)
+                .fontSize(AppTypography.H3.size).fontColor(AppColor.TEXT)
+                .backgroundColor(AppColor.ELEVATED)
+                .borderWidth(1).borderColor(AppColor.BORDER)
+                .borderRadius(AppRadius.SM)
+                .onClick(() => this.stepAmount(-1));
+              Text('+')
+                .width(44).height(44).textAlign(TextAlign.Center)
+                .fontSize(AppTypography.H3.size).fontColor(AppColor.TEXT)
+                .backgroundColor(AppColor.ELEVATED)
+                .borderWidth(1).borderColor(AppColor.BORDER)
+                .borderRadius(AppRadius.SM)
+                .onClick(() => this.stepAmount(1));
+            }.width('100%').alignItems(VerticalAlign.Center);
             // #4 滑杆吸附：按行为步长（0.5 / 1 / 5）吸附，松手时读数轻微回弹
             // 自绘 RangeSlider：系统 Slider 在本设备上滑块会多出一层「灰方块 + 白圈」底衬
             RangeSlider({

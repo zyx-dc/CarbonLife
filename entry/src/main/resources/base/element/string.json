@@ -12,6 +12,7 @@
     { "name": "home_total_saved", "value": "累计减排 kg" },
     { "name": "home_total_trees", "value": "累计种树" },
     { "name": "home_sapling_title", "value": "碳小树" },
+    { "name": "home_scroll_hint", "value": "下滑查看更多" },
     { "name": "home_sapling_stage_0", "value": "种子" },
     { "name": "home_sapling_stage_1", "value": "幼苗" },
     { "name": "home_sapling_stage_2", "value": "小树" },
