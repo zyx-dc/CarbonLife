@@ -308,7 +308,10 @@ export struct DashboardTab {
     AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {
       Column({ space: AppSpacing.SM }) {
         Text(this.trendTitle(this.period)).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-        if (this.summaryCount === '0') {
+        // 空状态只看「趋势自身覆盖的区间」（近 7 日 / 6 周 / 6 月 / 5 年），
+        // 不能用 summaryCount —— 那是本日/本周汇总的口径。否则今天没记录时，
+        // 近 7 日明明有数据也会显示「该周期暂无记录」。
+        if (this.trendNonZero === 0) {
           this.emptyState($r('app.string.dashboard_empty'));
         } else if (this.trendNonZero < 2) {
           // 稀疏数据用柱状更诚实（折线连接零点会制造「长期无排放」错觉）

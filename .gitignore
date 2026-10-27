@@ -49,3 +49,11 @@ __pycache__/
 
 # 设计文档插图（当前 UI 截图，入库以便 make-docx.cjs 可复现构建；docs/qa 才是历史取证归档）
 !docs/shots/*.jpg
+!docs/shots/defense/*.jpg
+
+# 演示视频：渲染中间产物与逐帧素材不入库，只保留成片与生成器
+/tools/video/out/
+# 旧版演示视频（重绘风格，已弃用）仅本地留档
+/docs/tasks/video/_deprecated-重绘版/
+# 提交打包暂存目录（本地组装用，不随仓库分发）
+/submission/
