@@ -1,4 +1,6 @@
 import { UIContext } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CarbonStore } from '../model/CarbonStore';
 import { behaviorIcon, CarbonFactors } from '../model/CarbonFactors';
 import { AppColor, AppConst } from '../common/Constants';
@@ -143,14 +145,44 @@ export struct RecordTab {
   }
 
   onAiDetect(): void {
-    VisionService.pickAndDetect().then((res: VisionResult) => {
-      if (res.ok) {
-        const b: BehaviorDef = CarbonFactors.find(res.behaviorKey);
-        this.category = b.category;
-        this.selectedKey = b.key;
-      }
-      ToastHelper.show(this.uiContext, res.message);
-    });
+    // 相册入口
+    VisionService.pickAndDetect()
+      .then((res: VisionResult) => this.applyVisionResult(res))
+      .catch((e: Error) => {
+        hilog.error(0x0C05, 'RecordTab', 'album rejected: %{public}s', e.message);
+      });
+  }
+
+  onAiCapture(): void {
+    // 拍照入口：交给系统相机代拍，不需要 CAMERA 权限。
+    // 部分设备/模拟器可能不支持相机选择器，失败时退回相册，避免按钮点不出反应。
+    const ctx = this.getUIContext().getHostContext() as common.Context;
+    VisionService.captureAndDetect(ctx)
+      .then((res: VisionResult) => {
+        if (res.ok || res.detail === '' || res.detail.indexOf('camera:') !== 0) {
+          this.applyVisionResult(res);
+          return;
+        }
+        hilog.warn(0x0C05, 'RecordTab', 'camera unavailable (%{public}s), fallback to album',
+          res.detail);
+        this.onAiDetect();
+      })
+      .catch((e: Error) => {
+        hilog.error(0x0C05, 'RecordTab', 'camera rejected: %{public}s', e.message);
+        this.onAiDetect();
+      });
+  }
+
+  private applyVisionResult(res: VisionResult): void {
+    if (res.ok) {
+      const b: BehaviorDef = CarbonFactors.find(res.behaviorKey);
+      this.category = b.category;
+      this.selectedKey = b.key;
+      this.amountText = b.step.toString();
+    } else if (res.detail !== '') {
+      hilog.info(0x0C05, 'RecordTab', 'vision failed: %{public}s', res.detail);
+    }
+    ToastHelper.show(this.uiContext, res.message);
   }
 
   todayRecords(): CarbonRecord[] {
@@ -182,7 +214,14 @@ export struct RecordTab {
                 Text($r('app.string.record_ai_desc')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB).width('100%').maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis });
               }.layoutWeight(1).alignItems(HorizontalAlign.Start);
             }.width('100%').alignItems(VerticalAlign.Center);
-            AppButton({ text: $r('app.string.record_ai_button'), type: 'secondary', btnHeight: 44, fullWidth: true }).onClick(() => this.onAiDetect());
+            Row({ space: AppSpacing.SM }) {
+              AppButton({ text: $r('app.string.record_ai_button_camera'), type: 'primary', btnHeight: 44 })
+                .layoutWeight(1)
+                .onClick(() => this.onAiCapture());
+              AppButton({ text: $r('app.string.record_ai_button_album'), type: 'secondary', btnHeight: 44 })
+                .layoutWeight(1)
+                .onClick(() => this.onAiDetect());
+            }.width('100%');
           }
         }
 
