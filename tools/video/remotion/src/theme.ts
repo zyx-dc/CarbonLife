@@ -6,7 +6,11 @@ export const FPS = 60;
 /** 120 BPM：一拍 0.5 秒 = 30 帧 */
 export const BEAT = 30;
 
-export const LIGHT = "#F3F3F5";
+/**
+ * 浅底压到 #E9E9EC 而不是近白：白色界面放上去才有边界，
+ * 之前 #F3F3F5 上白卡只有 σ≈11 的对比，整帧发灰。
+ */
+export const LIGHT = "#E9E9EC";
 export const DARK = "#080C07";
 export const INK = "#12180D";
 export const INK_SUB = "rgba(18,24,13,0.62)";

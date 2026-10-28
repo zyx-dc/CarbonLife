@@ -62,3 +62,6 @@ __pycache__/
 /tools/video/remotion/out/
 /tools/video/remotion/public/shots/
 /tools/video/remotion/public/fonts/
+# 配乐与中间成片由脚本生成，不入库
+/tools/video/*.wav
+/tools/video/*.mp4

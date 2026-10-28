@@ -65,7 +65,7 @@ App 内：**看板 → 本地数据管理 → 清空全部数据 → 导入数�
 | PPT 15 页 | `docs/tasks/ppt/CarbonLife-答辩PPT.pptx`（另有 `.pdf` 兜底） | ✅ 已有 |
 | 讲稿要点 | `docs/tasks/ppt/讲稿要点.md` | ✅ 已有 |
 | 设计方案 Word | `docs/tasks/design-doc/CarbonLife-设计文档.docx` | ✅ 已有 |
-| 演示视频 mp4 | ✅ `docs/tasks/video/CarbonLife-演示视频.mp4`（35.6 秒 / 60fps / 9.2 MB） | 已就绪 |
+| 演示视频 mp4 | ✅ `docs/tasks/video/CarbonLife-演示视频.mp4`（49.6 秒 / 60fps / 12.4 MB） | 已就绪 |
 | 源码包 | 需现打（去编译产物） | ⏳ 提交前做 |
 
 ### 1.4 三条降级预案（写在手卡上）
@@ -317,7 +317,7 @@ App 内：**看板 → 本地数据管理 → 清空全部数据 → 导入数�
 | 项 | 要求 | 当前 | 待办 |
 |---|---|---|---|
 | 设计方案 Word | `.docx` | ✅ `docs/tasks/design-doc/CarbonLife-设计文档.docx` | 复核是否含校名/队名/指导老师 |
-| 演示视频 | `.mp4`，**≤5 分钟，≤100MB** | ✅ `docs/tasks/video/CarbonLife-演示视频.mp4`（**35.6 秒 / 1080p60 / 9.2 MB / 无旁白**，真实截图混剪） | 可选：按 `分镜.md` 复现或调整 |
+| 演示视频 | `.mp4`，**≤5 分钟，≤100MB** | ✅ `docs/tasks/video/CarbonLife-演示视频.mp4`（**49.6 秒 / 1080p60 / 12.4 MB / 原创配乐**，真实截图混剪） | 可选：按 `分镜.md` 复现或调整 |
 | 答辩 PPT | ≤7 分钟 | ✅ 15 页 | 复核无身份信息 |
 | 源码包 | 去编译产物、可复现编译 | ⏳ | 见 6.2 |
 
@@ -358,7 +358,7 @@ git archive --format=zip -o ..\CarbonLife-src.zip HEAD
 
 | 项 | 当前 |
 |---|---|
-| 成片 | `docs/tasks/video/CarbonLife-演示视频.mp4` — 35.6 秒 / 1920×1080 / **60fps** / 9.2 MB / 无旁白 |
+| 成片 | `docs/tasks/video/CarbonLife-演示视频.mp4` — 49.6 秒 / 1920×1080 / **60fps** / 12.4 MB / 原创配乐（120 BPM）|
 | 风格 | 产品混剪：浅底/暗场交替、120 BPM 拍点硬切、景别跳变、唯一重音是青柠 `0.51` |
 | 内容 | 记录页 → 0.51 → 首页更新 → 碳账单 → 看板三连 → 积分 → 科普 → 收尾 |
 | 工程 | `tools/video/remotion/`（Remotion；改 `src/shots.ts` 即可重出，`npx remotion studio` 可拖时间轴预览） |
