@@ -40,7 +40,8 @@ const TAG: string = 'VisionService';
  */
 export class VisionService {
   // 低于该置信度的检测结果不参与推荐，避免误判
-  private static readonly MIN_SCORE: number = 0.45;
+  // 0.45 太低：键盘、桌面纹理常被误判成纸张。抬到 0.55 后明显更稳。
+  private static readonly MIN_SCORE: number = 0.55;
 
   // 检测模型标签索引 → 低碳行为映射表（集中维护，便于扩展）。
   // 需要覆盖更多场景时，只需在此追加一条 {labels, name, behaviorKey, message}，
@@ -162,17 +163,40 @@ export class VisionService {
     return { ok: false, label: '', behaviorKey: '', score: 0, message: message, detail: detail };
   }
 
-  // 遍历全部检测结果，返回第一个「置信度达标且命中映射表」的推荐
+  /**
+   * 从全部检测结果里挑「最可信且命中映射表」的那一个。
+   *
+   * 之前是拿到第一个过阈值的就返回，结果一张键盘的照片里有 0.46 的「纸张」候选，
+   * 就盖过了置信度更高的键盘（键盘不在映射表里）——表现为明显误判。
+   * 现在：只看主标签（labels[0]），按置信度取最大者。
+   */
   private static mapObjects(objects: objectDetection.VisionObject[]): VisionResult {
+    let best: VisionResult | null = null;
+    let scanned: number = 0;
     for (let i = 0; i < objects.length; i++) {
       const o = objects[i];
-      if (o.score < VisionService.MIN_SCORE || o.labels.length === 0) {
+      if (o.labels.length === 0) {
         continue;
       }
-      const mapped = VisionService.mapLabels(o.labels, o.score);
-      if (mapped.ok) {
-        return mapped;
+      // 打开前 10 个候选的标签与分数，便于真机排查误判
+      if (scanned < 10) {
+        hilog.info(DOMAIN, TAG, 'obj[%{public}d] label=%{public}d score=%{public}.2f',
+          i, o.labels[0], o.score);
+        scanned++;
       }
+      if (o.score < VisionService.MIN_SCORE) {
+        continue;
+      }
+      const mapped = VisionService.mapLabel(o.labels[0], o.score);
+      if (!mapped.ok) {
+        continue;
+      }
+      if (best === null || mapped.score > best.score) {
+        best = mapped;
+      }
+    }
+    if (best !== null) {
+      return best;
     }
     return VisionService.fail($r('app.string.vision_no_match'), 'map:no-match');
   }
