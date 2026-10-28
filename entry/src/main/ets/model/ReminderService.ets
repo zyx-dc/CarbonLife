@@ -1,6 +1,7 @@
 import { reminderAgentManager } from '@kit.BackgroundTasksKit';
 import { CarbonStore } from './CarbonStore';
 import { AppConst } from '../common/Constants';
+import { DateUtil } from '../common/DateUtil';
 import { resolveStr } from '../common/Localize';
 
 export class ReminderService {
@@ -30,6 +31,21 @@ export class ReminderService {
     return ReminderService.enableAt(h, m);
   }
 
+  /**
+   * 通知正文按「今天有没有记录」生成：
+   * 没记录 → 提示去记一笔；已记录 → 汇报当天条数。
+   * 刻意不写「赢积分」「福利」这类词——代理提醒是工具型能力，
+   * 带营销话术的文案在权限审核里会被判为滥用。
+   */
+  private static contentText(): string {
+    const start = DateUtil.startOfDay(Date.now());
+    const count = CarbonStore.get().recordsInRange(start, Date.now() + 1).length;
+    if (count > 0) {
+      return resolveStr($r('app.string.reminder_notif_content_done', count));
+    }
+    return resolveStr($r('app.string.reminder_notif_content_empty'));
+  }
+
   static async enableAt(hour: number, minute: number): Promise<number> {
     // 先取消已存在的提醒，避免重复发布导致多条告警
     const prev = await CarbonStore.get().getSetting(AppConst.KEY_REMINDER_ID, '');
@@ -45,7 +61,7 @@ export class ReminderService {
       minute: minute,
       daysOfWeek: [1, 2, 3, 4, 5, 6, 7],
       title: resolveStr($r('app.string.reminder_notif_title')),
-      content: resolveStr($r('app.string.reminder_notif_content')),
+      content: ReminderService.contentText(),
       notificationId: 1001,
       wantAgent: {
         pkgName: 'com.example.carbonlife',

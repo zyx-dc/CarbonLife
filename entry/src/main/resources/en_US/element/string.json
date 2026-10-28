@@ -303,6 +303,8 @@
 
     { "name": "reminder_notif_title", "value": "Low-carbon reminder" },
     { "name": "reminder_notif_content", "value": "Log today's low-carbon actions and earn points!" },
+    { "name": "reminder_notif_content_empty", "value": "No low-carbon activity logged today - it takes 10 seconds" },
+    { "name": "reminder_notif_content_done", "value": "%d activities logged today, keep it up" },
 
     { "name": "quiz_q1", "value": "Usual way to commute?" },
     { "name": "quiz_q2", "value": "What AC temperature do you usually set in summer?" },

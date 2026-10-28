@@ -302,6 +302,8 @@
 
     { "name": "reminder_notif_title", "value": "低碳生活提醒" },
     { "name": "reminder_notif_content", "value": "记录今天的低碳行为，坚持减排赢积分！" },
+    { "name": "reminder_notif_content_empty", "value": "今天还没有记录低碳行为，花 10 秒记一笔" },
+    { "name": "reminder_notif_content_done", "value": "今天已记录 %d 条低碳行为，继续保持" },
 
     { "name": "quiz_q1", "value": "日常通勤主要方式？" },
     { "name": "quiz_q2", "value": "夏天家里空调一般设多少度？" },
