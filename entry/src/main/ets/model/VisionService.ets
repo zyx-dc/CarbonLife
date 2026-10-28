@@ -101,22 +101,34 @@ export class VisionService {
     let source: image.ImageSource | null = null;
     let pixelMap: image.PixelMap | null = null;
     let detector: objectDetection.ObjectDetector | null = null;
+    let step: string = 'open';
     try {
+      hilog.info(DOMAIN, TAG, 'detect start, uri=%{public}s', uri);
       file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
+      step = 'decode';
       source = image.createImageSource(file.fd);
       pixelMap = await source.createPixelMap();
+      const info: image.ImageInfo = await source.getImageInfo();
+      hilog.info(DOMAIN, TAG, 'decoded %{public}dx%{public}d fmt=%{public}d',
+        info.size.width, info.size.height, info.pixelFormat);
 
+      step = 'detector-create';
       detector = await objectDetection.ObjectDetector.create();
-      const req = new visionBase.Request();
-      const imgData: visionBase.ImageData = { pixelMap: pixelMap };
-      req.inputData = imgData;
+      step = 'process';
+      // 注意：visionBase.Request 在 d.ts 里声明为 class，但运行时没有构造函数，
+      // 用 new 会抛 TypeError: Constructor is false。官方样例用的是对象字面量。
+      const req: visionBase.Request = {
+        inputData: { pixelMap: pixelMap }
+      };
       const resp = await detector.process(req);
+      hilog.info(DOMAIN, TAG, 'objects=%{public}d', resp.objects.length);
       return VisionService.mapObjects(resp.objects);
     } catch (e) {
       const err = e as BusinessError;
-      hilog.error(DOMAIN, TAG, 'detect failed: code=%{public}d msg=%{public}s',
-        err.code ?? -1, err.message ?? '');
-      return VisionService.fail($r('app.string.vision_failed'), `detect:${err.code ?? -1}`);
+      hilog.error(DOMAIN, TAG, 'detect failed at %{public}s: code=%{public}d msg=%{public}s',
+        step, err.code ?? -1, err.message ?? String(e));
+      return VisionService.fail($r('app.string.vision_failed'),
+        `detect:${step}:${err.code ?? -1}`);
     } finally {
       // 统一释放，失败路径也不泄漏：检测器进程 / 像素图 / 图片源 / 文件句柄
       if (detector !== null) {
