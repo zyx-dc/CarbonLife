@@ -195,6 +195,30 @@
 
 > 「上层只管渲染，下层只管数据和规则。页面不直接算减排，只调 `CarbonStore`；算法不碰 UI，`Sapling` 是纯函数，所以能单测。」
 
+#### 2.1.1 依赖关系（脚本扫出来的，不是画在 PPT 上的）
+
+| 层 | 文件 | 引用了谁 | 结论 |
+|---|---|---|---|
+| `model/*` | 12 | 只引 `common` 与同层 | **一行 UI 都没引** |
+| `components/*` | 11 | `common` + `CarbonTypes`（纯类型） | 不碰 `CarbonStore` |
+| `view/*` | 5 | `common` + `components` + `model` | **五个页面互不引用** |
+| `pages/Index` | 1 | 只引 5 个 view | 纯装配 |
+| `entryability` | 1 | 启动时才碰 model | 生命周期与业务分离 |
+
+> 一个细节要能解释：`Badge` / `TaskCard` 引了 `model/CarbonTypes`——那是**纯类型文件，没有逻辑没有状态**，组件依赖类型是允许的；依赖 `CarbonStore` 才是越界。
+
+#### 2.1.2 三条契约
+
+**契约 1 · 数据只从 `CarbonStore` 进出。** 页面不算减排、不算成长，一条记录只有一个计算点：
+```
+saved  = amount × factor      // factor 来自 CarbonFactors
+points = round(saved × 100)   // 统一折算
+```
+
+**契约 2 · 写操作必须让版本号 +1。** `versionCounter++` → `AppStorage['recordsVersion']`，四个 Tab 全部 `@StorageLink` 监听后重算。
+
+**契约 3 · 算法是纯函数。** `Sapling.compute(stats, todayKey)` 不读 AppStorage、不碰 UI、**连当前时间都不自己取**（`todayKey` 由调用方传）——所以能写单测。
+
 ### 2.2 一条记录的完整链路（最该背熟的一条）
 
 ```
@@ -241,6 +265,13 @@ versionCounter++  →  AppStorage['recordsVersion']
 | 为什么断签不掉级？ | 掉级制造焦虑，断三天就弃用，这是习惯产品的头号流失点。我们只惩罚"今天的加成"，不没收历史。 |
 | 为什么不用状态管理库？ | 数据量小、页面少，一个版本号足够；引入库的收益小于维护成本。 |
 | 为什么因子是硬编码表？ | 它本质是**可替换的字典**。接真实平台时换表，不动业务代码——这是分层的目的。 |
+| 为什么不用状态管理库？ | 数据量小、页面少，页面只需要一个"数据变了"的**信号**，不需要共享对象。代价是全量重算（几千条完全够），收益是不存在"多处持有副本"。**这是主动的减法。** |
+
+**三个证据（被问"分层有用吗"时用）**
+
+1. **识图 bug 只改了一层**：`new visionBase.Request()` → 对象字面量，改的是 `model/VisionService.ets`，UI 一行没动，四个页面照常工作。
+2. **成长算法 11 个单测**：因为 `Sapling` 是纯函数，不用起 UI、不用连设备，毫秒级跑完。
+3. **换因子表不动业务代码**：接真实碳普惠平台只改 `CarbonFactors` 那张表，`CarbonStore` 与所有页面都不受影响。
 
 ### 2.5 必背数字
 
