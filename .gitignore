@@ -65,3 +65,8 @@ __pycache__/
 # 配乐与中间成片由脚本生成，不入库
 /tools/video/*.wav
 /tools/video/*.mp4
+
+# 演示视频成片不入库（体积大，可由工程重新生成；只在本地与提交包留档）
+/docs/tasks/video/*.mp4
+# 另一条产出线（本地留档，不入库）
+/docs/tasks/video/_alt/
