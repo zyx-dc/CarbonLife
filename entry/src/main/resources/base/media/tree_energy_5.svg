@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="energy tree, evergreen stage">
-  <ellipse cx="100" cy="178" rx="54" ry="8.5" fill="#D9A63C" opacity="0.15"/>
-  <path d="M 89 178 C 91 160 91.5 148 92.5 130 L 107.5 130 C 108.5 148 109 160 111 178 Z" fill="#6B4B33"/>
-  <path d="M 100 12 C 106 34 118 48 126 64 C 134 80 136 96 132 110 C 127 128 114 140 100 140 C 86 140 73 128 68 110 C 64 96 66 80 74 64 C 82 48 94 34 100 12 Z" fill="#A87C26"/>
-  <path d="M 100 10 C 106 32 118 46 126 62 C 134 78 136 94 132 108 C 127 126 114 138 100 138 C 86 138 73 126 68 108 C 64 94 66 78 74 62 C 82 46 94 32 100 10 Z" fill="#D9A63C"/>
-  <path d="M 100 46 C 104 60 112 70 116 82 C 120 94 118 106 112 114 C 106 121 94 121 88 114 C 82 106 80 94 84 82 C 88 70 96 60 100 46 Z" fill="#E8C46A"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <ellipse cx="100" cy="178" rx="44" ry="7" fill="#977022" opacity="0.15"/>
+  <g transform="translate(15.00 8.00) scale(11.333)">
+    <path d="M9.5 10H12L9 7h2L8.5 4H10L7.5.5L5 4h1.5L4 7h2l-3 3h2.5L2 13h4.5v1.5c0 .5 2 .5 2 0V13H13z" fill="#977022" transform="translate(0.20 0.26)"/>
+    <path d="M9.5 10H12L9 7h2L8.5 4H10L7.5.5L5 4h1.5L4 7h2l-3 3h2.5L2 13h4.5v1.5c0 .5 2 .5 2 0V13H13z" fill="#C89937"/>
+  </g>
 </svg>

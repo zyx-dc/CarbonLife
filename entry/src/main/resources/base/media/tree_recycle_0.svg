@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="recycle tree, seed stage">
-  <ellipse cx="100" cy="178" rx="46" ry="8.5" fill="#4C8FA8" opacity="0.15"/>
-  <path d="M 52 176 C 52 156 72 146 100 146 C 128 146 148 156 148 176 Z" fill="#6B4B33"/>
-  <ellipse cx="100" cy="134" rx="13" ry="18" fill="#A97C50"/>
-  <path d="M 100 120 L 100 106" stroke="#6B4B33" stroke-width="5" stroke-linecap="round"/>
-  <path d="M 100 118 Q 96.8 99.2 78 96 Q 81.2 114.8 100 118 Z" fill="#7FB0C6"/>
-  <path d="M 100 112 Q 118.4 110.1 122 92 Q 103.6 93.9 100 112 Z" fill="#4C8FA8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <ellipse cx="100" cy="178" rx="38" ry="7" fill="#376E84" opacity="0.15"/>
+  <path d="M64 177 C64 160 80 150 100 150 C120 150 136 160 136 177 Z" fill="#4A3A2A" opacity="0.55"/>
+  <ellipse cx="100" cy="150" rx="12" ry="16" fill="#A97C50" transform="rotate(-8 100 150)"/>
+  <path d="M94 146 Q100 141 106 147" stroke="#7E5A36" stroke-width="1.6" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M100 138 Q97 130 101 124" stroke="#4C8FA8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M101 128 Q108 122 116 122 Q112 131 103 132 Z" fill="#376E84"/>
+  <path d="M99 132 Q91 126 83 128 Q88 136 97 136 Z" fill="#4C8FA8"/>
 </svg>

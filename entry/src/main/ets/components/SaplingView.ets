@@ -22,12 +22,21 @@ export struct SaplingView {
   @State prevVariant: string = 'mixed';
   @State fade: number = 1;
   @State zoom: number = 1;
+  // 生长的"破土"感：首次出现和阶段提升时从略小、略低长到本位
+  @State grow: number = 0.84;
 
   aboutToAppear(): void {
     this.curStage = this.stage;
     this.curVariant = this.variant;
     this.prevStage = this.stage;
     this.prevVariant = this.variant;
+    if (AppMotion.reduceMotion()) {
+      this.grow = 1;
+      return;
+    }
+    this.getUIContext().animateTo({ duration: 520, curve: Curve.EaseOut }, () => {
+      this.grow = 1;
+    });
   }
 
   private onTreeChanged(): void {
@@ -54,6 +63,10 @@ export struct SaplingView {
       this.zoom = 0.88;
       this.getUIContext().animateTo({ duration: 520, curve: Curve.EaseOut }, () => {
         this.zoom = 1;
+      });
+      this.grow = 0.90;
+      this.getUIContext().animateTo({ duration: 460, curve: Curve.EaseOut }, () => {
+        this.grow = 1;
       });
     }
   }
@@ -125,6 +138,7 @@ export struct SaplingView {
     .width(this.treeSize)
     .height(this.treeSize)
     .alignContent(Alignment.Center)
-    .scale({ x: this.zoom, y: this.zoom });
+    .scale({ x: this.zoom * this.grow, y: this.zoom * this.grow })
+    .translate({ y: (1 - this.grow) * 12 });
   }
 }
