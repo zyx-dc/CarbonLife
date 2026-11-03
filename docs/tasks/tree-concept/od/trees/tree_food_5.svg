@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="food tree, evergreen stage">
-  <ellipse cx="100" cy="178" rx="54" ry="8.5" fill="#C97A5E" opacity="0.15"/>
-  <path d="M 89 178 C 91 160 91.5 148 92.5 130 L 107.5 130 C 108.5 148 109 160 111 178 Z" fill="#6B4B33"/>
-  <path d="M 38 80 A 62 62 0 1 0 162 80 A 62 62 0 1 0 38 80 Z M 46 122 A 54 22 0 1 0 154 122 A 54 22 0 1 0 46 122 Z" fill="#A05B43"/>
-  <path d="M 38 72 A 62 62 0 1 0 162 72 A 62 62 0 1 0 38 72 Z M 46 114 A 54 22 0 1 0 154 114 A 54 22 0 1 0 46 114 Z" fill="#C97A5E"/>
-  <ellipse cx="82" cy="54" rx="30" ry="20" fill="#E39A7E"/>
-</svg>

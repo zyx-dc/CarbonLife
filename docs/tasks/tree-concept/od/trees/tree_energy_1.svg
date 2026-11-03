@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="energy tree, sprout stage">
-  <ellipse cx="100" cy="178" rx="40" ry="8.5" fill="#D9A63C" opacity="0.15"/>
-  <path d="M 96 178 L 96 128 Q 96 120 100 120 Q 104 120 104 128 L 104 178 Z" fill="#6B4B33"/>
-  <path d="M 100 150 Q 88.1 117.8 54 114 Q 65.9 146.2 100 150 Z" fill="#D9A63C"/>
-  <path d="M 100 138 Q 130.5 143.7 148 118 Q 117.5 112.3 100 138 Z" fill="#E8C46A"/>
-  <path d="M 100 128 Q 111.8 102.3 92 82 Q 80.2 107.7 100 128 Z" fill="#A87C26"/>
-</svg>

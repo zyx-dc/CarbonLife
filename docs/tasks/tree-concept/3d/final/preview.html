@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>软陶树 · 108px 预览</title>
+<style>
+  body{margin:0;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:#111}
+  section{padding:32px 36px}
+  .dark{background:#080C07;color:#F6F6F8}
+  .light{background:#E9E9EC;color:#12180D}
+  h2{font-size:13px;letter-spacing:2px;font-weight:600;margin:0 0 18px;opacity:.55}
+  .row{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end}
+  .item{width:132px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .box{width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+  .box img{width:108px;height:108px;object-fit:contain}
+  .name{font-size:11px;opacity:.7}
+  .stages{display:flex;gap:12px;align-items:flex-end}
+  .stages .box{width:110px;height:110px}
+  .stages img{width:100px;height:100px}
+  .cards{display:flex;gap:32px;flex-wrap:wrap}
+  .card{width:360px;border-radius:22px;padding:18px;display:flex;gap:14px;align-items:center;background:rgba(22,28,20,.75);border:1px solid rgba(246,246,248,.10)}
+  .light .card{background:#F6F6F8;border-color:rgba(18,24,13,.08)}
+  .card img{width:120px;height:120px;object-fit:contain;flex:none}
+  .card .col{display:flex;flex-direction:column;gap:6px}
+  .card b{font-size:17px}
+  .card span{font-size:12px;opacity:.6}
+  .bar{height:6px;border-radius:3px;background:rgba(182,255,46,.16);overflow:hidden}
+  .bar i{display:block;height:100%;width:72%;background:#B6FF2E}
+  .note{font-size:12px;line-height:1.8;opacity:.55;margin-top:16px}
+</style>
+</head>
+<body>
+<section class="dark">
+  <h2>DARK · 108PX · 结果期</h2>
+  <div class="row" id="darkRow"></div>
+</section>
+<section class="light">
+  <h2>LIGHT · 同一批</h2>
+  <div class="row" id="lightRow"></div>
+</section>
+<section class="dark">
+  <h2>六个阶段 · 均衡</h2>
+  <div class="stages" id="stagesMixed"></div>
+</section>
+<section class="dark">
+  <h2>六个阶段 · 回收</h2>
+  <div class="stages" id="stagesRecycle"></div>
+</section>
+<section class="dark">
+  <h2>卡片尺寸 · 深色 / 浅色</h2>
+  <div class="cards">
+    <div class="card"><img src="tree_mixed_5.png" alt="">
+      <div class="col"><b>碳小树 · 常青</b><span>均衡成长 · 出行 38%</span><div class="bar"><i></i></div><span>成长值 2624</span></div>
+    </div>
+    <div class="card" style="background:#F6F6F8;color:#12180D;border-color:rgba(18,24,13,.08)"><img src="tree_travel_4.png" alt="">
+      <div class="col"><b>碳小树 · 结果</b><span>偏向绿色出行 · 出行 62%</span><div class="bar" style="background:rgba(46,139,87,.15)"><i style="background:#2E8B57"></i></div><span>成长值 980</span></div>
+    </div>
+  </div>
+  <div class="note">底图：Kenney Nature Kit（CC0） · 软陶材质与光照由 Blender 统一渲染 · 接触阴影在合成时加入</div>
+</section>
+<script>
+const V = [["mixed","均衡"],["travel","出行"],["recycle","回收"],["energy","节能"],["food","餐饮"]];
+function row(id){document.getElementById(id).innerHTML=V.map(([v,n])=>`<div class="item"><div class="box"><img src="tree_${v}_4.png"></div><div class="name">${n}</div></div>`).join("");}
+row("darkRow"); row("lightRow");
+function stages(id,v){document.getElementById(id).innerHTML=[0,1,2,3,4,5].map(s=>`<div class="item"><div class="box"><img src="tree_${v}_${s}.png"></div><div class="name">stage ${s}</div></div>`).join("");}
+stages("stagesMixed","mixed"); stages("stagesRecycle","recycle");
+</script>
+</body>
+</html>
