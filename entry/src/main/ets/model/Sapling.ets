@@ -33,6 +33,12 @@ export interface SaplingState {
   variant: string;
 }
 
+/** 行为结构的一行：类别名 + 记录条数占比（与 variantOf 同一口径） */
+export interface VariantShare {
+  category: string;
+  pct: number;
+}
+
 /** 单日原始行为数：增长算法的纯输入，便于单测。 */
 export interface DayStat {
   dateKey: string;
@@ -115,6 +121,27 @@ export class Sapling {
       case '餐饮': return 'food';
       default: return 'mixed';
     }
+  }
+
+  /**
+   * 行为结构占比：和 variantOf 同一口径（按记录条数），用于在树下面解释"为什么长这样"。
+   * 只返回占比最高的前 3 类，避免小屏拥挤。
+   */
+  static sharesOf(store: CarbonStore): VariantShare[] {
+    const records: CarbonRecord[] = store.getRecords();
+    if (records.length === 0) {
+      return [];
+    }
+    const counts: Map<string, number> = new Map<string, number>();
+    records.forEach((r: CarbonRecord) => {
+      counts.set(r.category, (counts.get(r.category) ?? 0) + 1);
+    });
+    const out: VariantShare[] = [];
+    counts.forEach((v: number, k: string) => {
+      out.push({ category: k, pct: Math.round(v * 100 / records.length) });
+    });
+    out.sort((a: VariantShare, b: VariantShare) => b.pct - a.pct);
+    return out.slice(0, 3);
   }
 
   static variantNameRes(variant: string): ResourceStr {

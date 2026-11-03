@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>会变的树 · 真实素材演示</title>
+<style>
+  :root{
+    --bg:#080C07; --card:#10150E; --line:rgba(246,246,248,.10);
+    --ink:#F6F6F8; --sub:rgba(246,246,248,.55); --lime:#B6FF2E;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1280px;margin:0 auto;padding:56px 40px 80px}
+  .eyebrow{font-size:12px;letter-spacing:3px;color:var(--sub)}
+  h1{font-size:40px;line-height:1.2;margin:12px 0 8px;font-weight:800}
+  .lede{color:var(--sub);font-size:16px;line-height:1.8;max-width:780px;margin:0}
+  .rule{height:1px;background:var(--line);margin:44px 0}
+  h2{font-size:13px;letter-spacing:2px;color:var(--sub);font-weight:600;margin:0 0 24px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 20px 20px;
+        display:flex;flex-direction:column;align-items:center;gap:14px}
+  .tree{width:190px;height:190px;display:flex;align-items:center;justify-content:center}
+  .tree img{width:170px;height:170px}
+  .name{font-size:18px;font-weight:700;color:var(--lime)}
+  .tag{font-size:12px;color:var(--sub)}
+  .bar{width:100%;height:8px;border-radius:6px;background:rgba(246,246,248,.08);display:flex;overflow:hidden}
+  .bar i{display:block;height:100%}
+  .legend{width:100%;display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:6px}
+  .stages{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;align-items:end}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .stage .tree{width:120px;height:120px}
+  .stage .tree img{width:108px;height:108px}
+  .stage span{font-size:12px;color:var(--sub)}
+  .note{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px}
+  .note div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .note b{display:block;font-size:15px;margin-bottom:6px}
+  .note p{margin:0;font-size:13px;line-height:1.7;color:var(--sub)}
+  .family{display:flex;align-items:center;gap:36px;background:var(--card);border:1px solid var(--line);
+          border-radius:24px;padding:32px}
+  .family .trees{display:flex;gap:4px;align-items:flex-end}
+  .family .box{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .family .box img{width:104px;height:104px}
+  .family .box span{font-size:11px;color:var(--sub)}
+  .fam-meta{flex:1}
+  .big{font-size:34px;font-weight:800;color:var(--lime)}
+  .small{font-size:13px;color:var(--sub);margin-top:8px;line-height:1.8}
+  .badge{display:inline-block;font-size:11px;color:var(--lime);border:1px solid rgba(182,255,46,.35);
+         border-radius:999px;padding:4px 10px;margin-bottom:12px}
+  footer{margin-top:52px;font-size:12px;color:var(--sub);line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">CARBONLIFE · REAL ASSETS</div>
+  <h1>会变的树</h1>
+  <p class="lede">
+    下面全部是 App 里实际打包的 SVG，不是示意图。同一阶段，四种生活：
+    出行把树压扁、回收把树叠高、饮食让树结果、节能让树变细。
+    阶段只认“有行动的天数”，形态只认“行为结构”。
+  </p>
+
+  <div class="rule"></div>
+  <h2>同一阶段 · 四种生活（结果期）</h2>
+  <div class="grid" id="variants"></div>
+
+  <div class="rule"></div>
+  <h2>一棵树的一生 · 从种子到常青</h2>
+  <div class="stages" id="stages"></div>
+
+  <div class="note">
+    <div><b>成长只认天</b><p>每天有记录就长，日上限固定；断签不掉级。刷不出来，也逼不出来。</p></div>
+    <div><b>形状认结构</b><p>某类行为占比 ≥ 40% 且至少 5 条记录，才会形成偏向；一次记录不会让树变形。</p></div>
+    <div><b>变化是渐进的</b><p>阶段或形态切换时做 360ms 交叉淡入，阶段提升再叠一次“抽长”，不会啪地换图。</p></div>
+  </div>
+
+  <div class="rule"></div>
+  <h2>家庭 · 一片小树林（分布式同步）</h2>
+  <div class="family">
+    <div class="trees" id="familyTrees"></div>
+    <div class="fam-meta">
+      <span class="badge">分布式 · 3 台设备 · 不上云</span>
+      <div class="big">本月一起减 42.6 kg</div>
+      <div class="small">
+        每人一棵，形态各不同；家庭总量由各设备本地记录汇总，不经过服务器。
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    素材路径：entry/src/main/resources/base/media/tree_{variant}_{stage}.svg（20 张，由 tools/tree/gen_trees.py 生成）。
+    种子与幼苗沿用原 sapling_0/1；阶段阈值仍为 0 / 60 / 180 / 420 / 900 / 2400。
+  </footer>
+</div>
+
+<script>
+const BASE = "../../../entry/src/main/resources/base/media/";
+const V = [
+  ["mixed","均衡型","mixed",[[28,"#7ED0A4"],[24,"#6FBF73"],[26,"#FF8A65"],[22,"#FFC857"]]],
+  ["travel","出行型","travel",[[62,"#7ED0A4"],[14,"#6FBF73"],[16,"#FF8A65"],[8,"#FFC857"]]],
+  ["recycle","回收型","recycle",[[12,"#7ED0A4"],[58,"#6FBF73"],[20,"#FF8A65"],[10,"#FFC857"]]],
+  ["food","饮食型","food",[[14,"#7ED0A4"],[16,"#6FBF73"],[58,"#FF8A65"],[12,"#FFC857"]]],
+  ["energy","节能型","energy",[[12,"#7ED0A4"],[16,"#6FBF73"],[14,"#FF8A65"],[58,"#FFC857"]]]
+];
+
+function bar(comp){
+  return `<div class="bar">${comp.map(([p,c])=>`<i style="width:${p}%;background:${c}"></i>`).join("")}</div>
+    <div class="legend"><span>出行 ${comp[0][0]}%</span><span>回收 ${comp[1][0]}%</span><span>饮食 ${comp[2][0]}%</span><span>节能 ${comp[3][0]}%</span></div>`;
+}
+
+document.getElementById("variants").innerHTML = V.map(([key,label,v,comp])=>`
+  <div class="card">
+    <div class="tree"><img src="${BASE}tree_${v}_4.svg" alt="${label}"></div>
+    <div class="name">${label}</div>
+    <div class="tag">同一阶段 · 结果期</div>
+    ${bar(comp)}
+  </div>`).join("");
+
+const stages = [
+  ["sapling_0","种子 · 0"],["sapling_1","幼苗 · 60"],
+  ["tree_recycle_2","小树 · 180"],["tree_recycle_3","开花 · 420"],
+  ["tree_recycle_4","结果 · 900"],["tree_recycle_5","常青 · 2400"]
+];
+document.getElementById("stages").innerHTML = stages.map(([f,label])=>`
+  <div class="stage"><div class="tree"><img src="${BASE}${f}.svg" alt=""></div><span>${label}</span></div>`).join("");
+
+const fam = [["travel","爸爸"],["food","妈妈"],["recycle","你"]];
+document.getElementById("familyTrees").innerHTML = fam.map(([v,n])=>`
+  <div class="box"><img src="${BASE}tree_${v}_4.svg" alt=""><span>${n}</span></div>`).join("");
+</script>
+</body>
+</html>

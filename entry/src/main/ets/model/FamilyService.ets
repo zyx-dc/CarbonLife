@@ -2,6 +2,7 @@ import { distributedDataObject } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 import { CarbonStore } from './CarbonStore';
+import { Sapling, SaplingState } from './Sapling';
 import { AppConst } from '../common/Constants';
 
 export class MemberData {
@@ -10,6 +11,10 @@ export class MemberData {
   saved: number = 0;
   points: number = 0;
   updatedAt: number = 0;
+  /** 成员自己的碳小树：阶段与形态随分布式会话同步，家庭页据此画"小树林" */
+  stage: number = 0;
+  variant: string = 'mixed';
+  growth: number = 0;
 }
 
 class FamilyData {
@@ -125,6 +130,7 @@ export class FamilyService {
       return;
     }
     const store = CarbonStore.get();
+    const tree: SaplingState = Sapling.of(store);
     const data = this.data();
     const next: MemberData[] = [];
     let found = false;
@@ -134,6 +140,9 @@ export class FamilyService {
         m.saved = store.totalSaved();
         m.points = store.pointsBalance();
         m.updatedAt = Date.now();
+        m.stage = tree.stage;
+        m.variant = tree.variant;
+        m.growth = tree.growth;
         found = true;
       }
       next.push(m);
@@ -145,6 +154,9 @@ export class FamilyService {
       me.saved = store.totalSaved();
       me.points = store.pointsBalance();
       me.updatedAt = Date.now();
+      me.stage = tree.stage;
+      me.variant = tree.variant;
+      me.growth = tree.growth;
       next.push(me);
     }
     // 整体赋值：确保分布式数据对象感知到变更并同步到组内其他设备

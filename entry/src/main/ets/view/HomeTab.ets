@@ -1,4 +1,4 @@
-import { UIContext, componentSnapshot } from '@kit.ArkUI';
+﻿import { UIContext, componentSnapshot } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { image } from '@kit.ImageKit';
 import { picker, fileIo as fs } from '@kit.CoreFileKit';
@@ -14,7 +14,7 @@ import { AppCard } from '../components/AppCard';
 import { AnimatedNumber } from '../components/AnimatedNumber';
 import { TaskCard } from '../components/TaskCard';
 import { SaplingView } from '../components/SaplingView';
-import { Sapling, SaplingState } from '../model/Sapling';
+import { Sapling, SaplingState, VariantShare } from '../model/Sapling';
 import { AppMotion, AppRadius, AppShadow, AppSpacing, AppTypography, ToastHelper } from '../common/Theme';
 import { categoryRes, resolveStr } from '../common/Localize';
 
@@ -53,6 +53,8 @@ export struct HomeTab {
   @State live: boolean = false;
   // 碳小树：成长值由记录派生，见 model/Sapling.ets
   @State sapling: SaplingState = Sapling.of(CarbonStore.get());
+  // 行为结构占比（解释树形），与 variantOf 同口径
+  @State shares: VariantShare[] = [];
   @State categories: CategoryStat[] = [];
   private lastStage: number = -1;
 
@@ -97,6 +99,7 @@ export struct HomeTab {
     this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
     const s: SaplingState = Sapling.of(store);
     this.sapling = s;
+    this.shares = Sapling.sharesOf(store);
     this.categories = store.savedByCategory();
     if (this.lastStage >= 0 && s.stage > this.lastStage) {
       hilog.info(0x0000, 'CarbonLife', 'sapling level up %{public}d -> %{public}d', this.lastStage, s.stage);
@@ -225,6 +228,15 @@ export struct HomeTab {
     return Math.round(this.sapling.progress * 100) + '%';
   }
 
+  /** 树下的行为结构说明：出行 62% · 回收 14% · 饮食 16% */
+  private compositionText(): string {
+    const parts: string[] = [];
+    this.shares.forEach((s: VariantShare) => {
+      parts.push(resolveStr(categoryRes(s.category)) + ' ' + s.pct + '%');
+    });
+    return parts.join(' · ');
+  }
+
   /** 把碳账单卡片截成 PNG，交给系统文件选择器保存（无需额外权限）。 */
   private async saveReportImage(): Promise<void> {
     try {
@@ -275,21 +287,6 @@ export struct HomeTab {
         }
       }.alignItems(HorizontalAlign.Start);
     }.alignItems(VerticalAlign.Center);
-  }
-
-  @Builder memberRow(m: MemberData) {
-    Row({ space: AppSpacing.SM }) {
-      Text(m.nickname === '' || m.nickname === '我' ? $r('app.string.common_me') : m.nickname).fontSize(AppTypography.BODY.size).fontColor(AppColor.TEXT).layoutWeight(1);
-      if (FamilyService.get().isLocal(m.deviceId)) {
-        Text($r('app.string.common_me')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.PRIMARY)
-          .backgroundColor(AppColor.PRIMARY_SOFT)
-          .padding({ left: AppSpacing.XS + 2, right: AppSpacing.XS + 2, top: 1, bottom: 1 })
-          .borderRadius(AppRadius.SM);
-      }
-      Text(m.saved.toFixed(2) + ' kg').fontSize(AppTypography.CAPTION.size).fontColor(AppColor.PRIMARY);
-      Text($r('app.string.home_family_points_suffix', m.points.toString())).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.ACCENT).margin({ left: AppSpacing.SM });
-    }
-    .width('100%').padding({ top: AppSpacing.XS, bottom: AppSpacing.XS });
   }
 
   @Builder reportStat(label: ResourceStr, value: string, color: string) {
@@ -377,6 +374,11 @@ export struct HomeTab {
           Text(Sapling.variantNameRes(this.sapling.variant))
             .fontSize(AppTypography.CAPTION.size)
             .fontColor(AppColor.TEXT_SUB);
+          if (this.shares.length > 0) {
+            Text(this.compositionText())
+              .fontSize(AppTypography.CAPTION.size)
+              .fontColor(AppColor.TEXT_SUB);
+          }
         }
         .width('100%');
 
@@ -548,6 +550,15 @@ export struct HomeTab {
                   .fontSize(AppTypography.SMALL.size)
                   .fontColor(AppColor.TEXT_SUB);
 
+                if (this.shares.length > 0) {
+                  Text(this.compositionText())
+                    .fontSize(AppTypography.CAPTION.size)
+                    .fontColor(AppColor.TEXT_SUB)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .width('100%');
+                }
+
                 Stack({ alignContent: Alignment.Start }) {
                   Column()
                     .width('100%')
@@ -664,9 +675,29 @@ export struct HomeTab {
                 if (this.members.length >= 2) {
                   Column({ space: AppSpacing.XS }) {
                     this.sectionTitle($r('app.string.home_family_members'), $r('app.string.home_family_people', this.members.length.toString()));
-                    ForEach(this.members, (m: MemberData) => {
-                      this.memberRow(m);
-                    }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
+                    Scroll() {
+                      Row({ space: AppSpacing.LG }) {
+                        ForEach(this.members, (m: MemberData) => {
+                          Column({ space: AppSpacing.XXS }) {
+                            SaplingView({ stage: m.stage, variant: m.variant, treeSize: 64 });
+                            Text(m.nickname === '' || m.nickname === '我' ? $r('app.string.common_me') : m.nickname)
+                              .fontSize(AppTypography.CAPTION.size)
+                              .fontColor(FamilyService.get().isLocal(m.deviceId) ? AppColor.PRIMARY : AppColor.TEXT)
+                              .maxLines(1)
+                              .textOverflow({ overflow: TextOverflow.Ellipsis });
+                            Text(m.saved.toFixed(1) + ' kg')
+                              .fontSize(AppTypography.SMALL.size)
+                              .fontColor(AppColor.TEXT_SUB);
+                          }
+                          .width(84)
+                          .alignItems(HorizontalAlign.Center);
+                        }, (m: MemberData) => m.deviceId + '-' + m.updatedAt.toString());
+                      }
+                      .padding({ top: AppSpacing.XXS, bottom: AppSpacing.XXS });
+                    }
+                    .scrollable(ScrollDirection.Horizontal)
+                    .scrollBar(BarState.Off)
+                    .width('100%');
                   }.width('100%').margin({ top: AppSpacing.SM });
                 }
               }

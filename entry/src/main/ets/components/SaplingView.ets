@@ -1,68 +1,124 @@
 import { AppMotion } from '../common/Theme';
 
 /**
- * 碳小树可视化：按阶段切换 SVG，阶段变化时做一次轻微"生长"缩放。
- * 仅用 ArkUI 基础能力 + 本地 SVG，无外部依赖。
+ * 碳小树可视化：阶段（长多大）× 形态（长成什么样）。
  *
- * 注意：属性不能叫 size / scale —— 与 CustomComponent 基类同名会编译失败。
+ * - 阶段：0 种子 / 1 幼苗 / 2 小树 / 3 开花 / 4 结果 / 5 常青
+ * - 形态：mixed / travel / recycle / food / energy，由行为结构决定（见 Sapling.variantOf）
+ * - 形态或阶段变化时做一次交叉淡入，避免"啪"地换图
+ * - 素材：sapling_0/1 + tree_<variant>_<stage>.svg（tools/tree/gen_trees.py 生成）
  */
 @Component
 export struct SaplingView {
-  @Prop @Watch('onStageChanged') stage: number;
+  @Prop @Watch('onTreeChanged') stage: number;
+  @Prop @Watch('onTreeChanged') variant: string;
   @Prop treeSize: number = 92;
-  @Prop variant: string = 'mixed';
+
+  @State curStage: number = 0;
+  @State curVariant: string = 'mixed';
+  @State prevStage: number = 0;
+  @State prevVariant: string = 'mixed';
+  @State fade: number = 1;
   @State zoom: number = 1;
 
-  private onStageChanged(): void {
-    if (AppMotion.reduceMotion()) {
+  aboutToAppear(): void {
+    this.curStage = this.stage;
+    this.curVariant = this.variant;
+    this.prevStage = this.stage;
+    this.prevVariant = this.variant;
+  }
+
+  private onTreeChanged(): void {
+    if (this.stage === this.curStage && this.variant === this.curVariant) {
       return;
     }
-    this.zoom = 0.86;
-    this.getUIContext().animateTo({ duration: 460, curve: Curve.EaseOut }, () => {
-      this.zoom = 1;
-    });
-  }
+    const stageChanged: boolean = this.stage !== this.curStage;
+    this.prevStage = this.curStage;
+    this.prevVariant = this.curVariant;
+    this.curStage = this.stage;
+    this.curVariant = this.variant;
 
-  private mediaForStage(stage: number): Resource {
-    switch (stage) {
-      case 1: return $r('app.media.sapling_1');
-      case 2: return $r('app.media.sapling_2');
-      case 3: return $r('app.media.sapling_3');
-      case 4: return $r('app.media.sapling_4');
-      case 5: return $r('app.media.sapling_5');
-      default: return $r('app.media.sapling_0');
+    if (AppMotion.reduceMotion()) {
+      this.fade = 1;
+      return;
+    }
+
+    // 形态切换：交叉淡入；阶段提升：额外做一次轻微"抽长"
+    this.fade = 0;
+    this.getUIContext().animateTo({ duration: 360, curve: Curve.EaseOut }, () => {
+      this.fade = 1;
+    });
+    if (stageChanged) {
+      this.zoom = 0.88;
+      this.getUIContext().animateTo({ duration: 520, curve: Curve.EaseOut }, () => {
+        this.zoom = 1;
+      });
     }
   }
 
-  private mediaForVariant(): Resource {
-    switch (this.variant) {
-      case 'travel': return $r('app.media.accent_travel');
-      case 'energy': return $r('app.media.accent_energy');
-      case 'recycle': return $r('app.media.accent_recycle');
-      case 'food': return $r('app.media.accent_food');
-      default: return $r('app.media.accent_travel');
+  private mediaFor(stage: number, variant: string): Resource {
+    if (stage <= 0) {
+      return $r('app.media.sapling_0');
+    }
+    if (stage === 1) {
+      return $r('app.media.sapling_1');
+    }
+    if (variant === 'travel') {
+      switch (stage) {
+        case 2: return $r('app.media.tree_travel_2');
+        case 3: return $r('app.media.tree_travel_3');
+        case 4: return $r('app.media.tree_travel_4');
+        default: return $r('app.media.tree_travel_5');
+      }
+    }
+    if (variant === 'recycle') {
+      switch (stage) {
+        case 2: return $r('app.media.tree_recycle_2');
+        case 3: return $r('app.media.tree_recycle_3');
+        case 4: return $r('app.media.tree_recycle_4');
+        default: return $r('app.media.tree_recycle_5');
+      }
+    }
+    if (variant === 'food') {
+      switch (stage) {
+        case 2: return $r('app.media.tree_food_2');
+        case 3: return $r('app.media.tree_food_3');
+        case 4: return $r('app.media.tree_food_4');
+        default: return $r('app.media.tree_food_5');
+      }
+    }
+    if (variant === 'energy') {
+      switch (stage) {
+        case 2: return $r('app.media.tree_energy_2');
+        case 3: return $r('app.media.tree_energy_3');
+        case 4: return $r('app.media.tree_energy_4');
+        default: return $r('app.media.tree_energy_5');
+      }
+    }
+    switch (stage) {
+      case 2: return $r('app.media.tree_mixed_2');
+      case 3: return $r('app.media.tree_mixed_3');
+      case 4: return $r('app.media.tree_mixed_4');
+      default: return $r('app.media.tree_mixed_5');
     }
   }
 
   build() {
     Stack() {
-      Image(this.mediaForStage(this.stage))
+      Image(this.mediaFor(this.prevStage, this.prevVariant))
         .width(this.treeSize)
         .height(this.treeSize)
-        .objectFit(ImageFit.Contain);
-      if (this.stage >= 2 && this.variant !== 'mixed') {
-        Image(this.mediaForVariant())
-          .width(this.treeSize)
-          .height(this.treeSize)
-          .objectFit(ImageFit.Contain)
-          .opacity(0.96)
-          .transition(TransitionEffect.OPACITY.animation({ duration: 320, curve: Curve.EaseOut }));
-      }
+        .objectFit(ImageFit.Contain)
+        .opacity(1 - this.fade);
+      Image(this.mediaFor(this.curStage, this.curVariant))
+        .width(this.treeSize)
+        .height(this.treeSize)
+        .objectFit(ImageFit.Contain)
+        .opacity(this.fade);
     }
     .width(this.treeSize)
     .height(this.treeSize)
     .alignContent(Alignment.Center)
-    .scale({ x: this.zoom, y: this.zoom })
-    .animation({ duration: 460, curve: Curve.EaseOut });
+    .scale({ x: this.zoom, y: this.zoom });
   }
 }
