@@ -1,17 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <ellipse cx="100" cy="172" rx="59" ry="11" fill="#8C7B5E" opacity="0.18"/>
-  <circle cx="100" cy="100" r="66" fill="none" stroke="#3FA36A" stroke-width="1.2" opacity="0.22"/>
-  <path d="M100 168 Q100 130 100 104" stroke="#6B4F35" stroke-width="9.5" fill="none" stroke-linecap="round"/>
-  <path d="M100 116 q-18 -8 -26 -18" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <path d="M100 122 q18 -8 26 -14" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <ellipse cx="100.0" cy="121.2" rx="30.7" ry="11.8" fill="#3FA36A"/>
-  <ellipse cx="100.0" cy="102.4" rx="27.1" ry="13.0" fill="#2E8B57"/>
-  <ellipse cx="100.0" cy="85.8" rx="21.2" ry="11.8" fill="#3FA36A"/>
-  <ellipse cx="100.0" cy="71.7" rx="15.3" ry="9.4" fill="#4CB877"/>
-  <circle cx="88" cy="120" r="4.2" fill="#E8603C"/>
-  <circle cx="112" cy="118" r="4.2" fill="#E8603C"/>
-  <circle cx="100" cy="102" r="4.2" fill="#E8603C"/>
-  <circle cx="86" cy="90" r="4.2" fill="#E8603C"/>
-  <circle cx="114" cy="90" r="3.2" fill="#E8603C" opacity="0.9"/>
-  <path d="M70 126 q30 10 60 0" stroke="#2E8B57" stroke-width="2" opacity="0.35" fill="none" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="recycle tree, evergreen stage">
+  <ellipse cx="100" cy="178" rx="54" ry="8.5" fill="#4C8FA8" opacity="0.15"/>
+  <path d="M 89 178 C 91 160 91.5 148 92.5 130 L 107.5 130 C 108.5 148 109 160 111 178 Z" fill="#6B4B33"/>
+  <path d="M 40 107 H 160 Q 170 107 170 117 V 131 Q 170 141 160 141 H 40 Q 30 141 30 131 V 117 Q 30 107 40 107 Z M 58 75 H 142 Q 152 75 152 85 V 101 Q 152 111 142 111 H 58 Q 48 111 48 101 V 85 Q 48 75 58 75 Z M 76 45 H 124 Q 134 45 134 55 V 71 Q 134 81 124 81 H 76 Q 66 81 66 71 V 55 Q 66 45 76 45 Z" fill="#376E84"/>
+  <path d="M 40 100 H 160 Q 170 100 170 110 V 124 Q 170 134 160 134 H 40 Q 30 134 30 124 V 110 Q 30 100 40 100 Z M 58 68 H 142 Q 152 68 152 78 V 94 Q 152 104 142 104 H 58 Q 48 104 48 94 V 78 Q 48 68 58 68 Z M 76 38 H 124 Q 134 38 134 48 V 64 Q 134 74 124 74 H 76 Q 66 74 66 64 V 48 Q 66 38 76 38 Z" fill="#4C8FA8"/>
+  <ellipse cx="86" cy="63" rx="16" ry="8" fill="#7FB0C6"/>
 </svg>

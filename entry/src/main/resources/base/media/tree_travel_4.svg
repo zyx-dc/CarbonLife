@@ -1,15 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <ellipse cx="100" cy="172" rx="53" ry="11" fill="#8C7B5E" opacity="0.18"/>
-  <path d="M100 168 Q109 134 109 108" stroke="#6B4F35" stroke-width="8.5" fill="none" stroke-linecap="round"/>
-  <path d="M109 120 q-18 -8 -26 -18" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <path d="M109 126 q18 -8 26 -14" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <ellipse cx="112.7" cy="95.8" rx="38.2" ry="17.0" fill="#3FA36A"/>
-  <ellipse cx="74.6" cy="100.0" rx="25.4" ry="14.8" fill="#2E8B57"/>
-  <ellipse cx="138.2" cy="93.6" rx="21.2" ry="12.7" fill="#4CB877"/>
-  <circle cx="96" cy="88" r="4.2" fill="#E8603C"/>
-  <circle cx="126" cy="92" r="4.2" fill="#E8603C"/>
-  <circle cx="76" cy="94" r="4.2" fill="#E8603C"/>
-  <circle cx="116" cy="104" r="4.2" fill="#E8603C"/>
-  <path d="M148 86 q18 2 30 -3" stroke="#3FA36A" stroke-width="1.8" opacity="0.5" fill="none" stroke-linecap="round"/>
-  <path d="M150 99 q20 3 32 -2" stroke="#3FA36A" stroke-width="1.8" opacity="0.35" fill="none" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="travel tree, fruit stage">
+  <ellipse cx="100" cy="178" rx="52" ry="8.5" fill="#2FA894" opacity="0.15"/>
+  <path d="M 89.3 178 C 91.3 160 107.7 134 108.7 116 L 123.3 116 C 124.3 134 108.7 160 110.7 178 Z" fill="#6B4B33"/>
+  <path d="M 40.6 105.2 A 45 21.6 0 1 0 130.6 105.2 A 45 21.6 0 1 0 40.6 105.2 Z M 105.4 101.6 A 28.8 13.5 0 1 0 163 101.6 A 28.8 13.5 0 1 0 105.4 101.6 Z" fill="#227F70"/>
+  <path d="M 37 98 A 45 21.6 0 1 0 127 98 A 45 21.6 0 1 0 37 98 Z M 103.6 94.4 A 28.8 13.5 0 1 0 161.2 94.4 A 28.8 13.5 0 1 0 103.6 94.4 Z" fill="#2FA894"/>
+  <ellipse cx="65.8" cy="90.8" rx="23.4" ry="12.6" fill="#5CC4AE"/>
+  <circle cx="64" cy="92.6" r="7.2" fill="#8F3B2A"/>
+  <circle cx="100" cy="98" r="7.2" fill="#8F3B2A"/>
+  <circle cx="132.4" cy="87.2" r="7.2" fill="#8F3B2A"/>
+  <path d="M 172 96 L 184 96" stroke="#5CC4AE" stroke-width="5" stroke-linecap="round" opacity="0.26"/>
+  <path d="M 180 120 L 192 120" stroke="#5CC4AE" stroke-width="5" stroke-linecap="round" opacity="0.26"/>
 </svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="travel tree, sapling stage">
+  <ellipse cx="100" cy="178" rx="46.4" ry="8.5" fill="#2FA894" opacity="0.15"/>
+  <path d="M 90.1 178 C 92.1 160 108.3 145.2 109.3 127.2 L 122.7 127.2 C 123.7 145.2 107.9 160 109.9 178 Z" fill="#6B4B33"/>
+  <path d="M 59.1 119.8 A 31 14.9 0 1 0 121.1 119.8 A 31 14.9 0 1 0 59.1 119.8 Z M 103.7 117.3 A 19.8 9.3 0 1 0 143.4 117.3 A 19.8 9.3 0 1 0 103.7 117.3 Z" fill="#227F70"/>
+  <path d="M 56.6 114.8 A 31 14.9 0 1 0 118.6 114.8 A 31 14.9 0 1 0 56.6 114.8 Z M 102.5 112.3 A 19.8 9.3 0 1 0 142.2 112.3 A 19.8 9.3 0 1 0 102.5 112.3 Z" fill="#2FA894"/>
+  <ellipse cx="76.4" cy="109.8" rx="16.1" ry="8.7" fill="#5CC4AE"/>
+  <path d="M 172 96 L 184 96" stroke="#5CC4AE" stroke-width="5" stroke-linecap="round" opacity="0.26"/>
+  <path d="M 180 120 L 192 120" stroke="#5CC4AE" stroke-width="5" stroke-linecap="round" opacity="0.26"/>
+</svg>

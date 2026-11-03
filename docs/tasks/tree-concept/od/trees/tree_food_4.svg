@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="food tree, fruit stage">
+  <ellipse cx="100" cy="178" rx="52" ry="8.5" fill="#C97A5E" opacity="0.15"/>
+  <path d="M 89.3 178 C 91.3 160 91.7 150.2 92.7 132.2 L 107.3 132.2 C 108.3 150.2 108.7 160 110.7 178 Z" fill="#6B4B33"/>
+  <path d="M 44.2 87.2 A 55.8 55.8 0 1 0 155.8 87.2 A 55.8 55.8 0 1 0 44.2 87.2 Z M 51.4 125 A 48.6 19.8 0 1 0 148.6 125 A 48.6 19.8 0 1 0 51.4 125 Z" fill="#A05B43"/>
+  <path d="M 44.2 80 A 55.8 55.8 0 1 0 155.8 80 A 55.8 55.8 0 1 0 44.2 80 Z M 51.4 117.8 A 48.6 19.8 0 1 0 148.6 117.8 A 48.6 19.8 0 1 0 51.4 117.8 Z" fill="#C97A5E"/>
+  <ellipse cx="83.8" cy="63.8" rx="27" ry="18" fill="#E39A7E"/>
+  <circle cx="73" cy="103.4" r="13.5" fill="#8F3B2A"/>
+  <circle cx="100" cy="114.2" r="13.5" fill="#8F3B2A"/>
+  <circle cx="127" cy="103.4" r="13.5" fill="#8F3B2A"/>
+</svg>

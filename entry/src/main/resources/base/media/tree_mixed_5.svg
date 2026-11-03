@@ -1,15 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <ellipse cx="100" cy="172" rx="59" ry="11" fill="#8C7B5E" opacity="0.18"/>
-  <circle cx="100" cy="100" r="66" fill="none" stroke="#3FA36A" stroke-width="1.2" opacity="0.22"/>
-  <path d="M100 168 Q100 130 100 104" stroke="#6B4F35" stroke-width="9.5" fill="none" stroke-linecap="round"/>
-  <path d="M100 116 q-18 -8 -26 -18" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <path d="M100 122 q18 -8 26 -14" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <ellipse cx="100.0" cy="100.0" rx="35.4" ry="31.9" fill="#2E8B57"/>
-  <ellipse cx="76.4" cy="114.2" rx="22.4" ry="20.1" fill="#3FA36A"/>
-  <ellipse cx="123.6" cy="114.2" rx="22.4" ry="20.1" fill="#4CB877"/>
-  <circle cx="84" cy="92" r="4.2" fill="#E8603C"/>
-  <circle cx="116" cy="94" r="4.2" fill="#E8603C"/>
-  <circle cx="100" cy="112" r="4.2" fill="#E8603C"/>
-  <circle cx="74" cy="106" r="4.2" fill="#E8603C"/>
-  <circle cx="126" cy="106" r="3.2" fill="#E8603C" opacity="0.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="mixed tree, evergreen stage">
+  <ellipse cx="100" cy="178" rx="54" ry="8.5" fill="#4E9F63" opacity="0.15"/>
+  <path d="M 89 178 C 91 160 91.5 148 92.5 130 L 107.5 130 C 108.5 148 109 160 111 178 Z" fill="#6B4B33"/>
+  <path d="M 46 82 A 54 54 0 1 0 154 82 A 54 54 0 1 0 46 82 Z M 18 124 A 36 36 0 1 0 90 124 A 36 36 0 1 0 18 124 Z M 110 124 A 36 36 0 1 0 182 124 A 36 36 0 1 0 110 124 Z" fill="#3A7F4D"/>
+  <path d="M 46 74 A 54 54 0 1 0 154 74 A 54 54 0 1 0 46 74 Z M 18 116 A 36 36 0 1 0 90 116 A 36 36 0 1 0 18 116 Z M 110 116 A 36 36 0 1 0 182 116 A 36 36 0 1 0 110 116 Z" fill="#4E9F63"/>
+  <ellipse cx="96" cy="50" rx="38" ry="18" fill="#63B878"/>
 </svg>

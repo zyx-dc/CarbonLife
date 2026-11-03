@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarbonLife · 碳小树素材验收</title>
+<style>
+  :root{
+    --bg:#0B0E09;
+    --panel:#0E120C;
+    --line:rgba(255,255,255,.09);
+    --line-soft:rgba(255,255,255,.05);
+    --ink:#EDF0E8;
+    --ink-2:#A7B0A1;
+    --ink-3:#6E786A;
+    --test-dark:#080C07;
+    --test-light:#E9E9EC;
+    --mixed:#4E9F63;
+    --travel:#2FA894;
+    --recycle:#4C8FA8;
+    --energy:#D9A63C;
+    --food:#C97A5E;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);font-size:14px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  main{max-width:1264px;margin:0 auto;padding:0 32px 96px}
+
+  /* ---------- header ---------- */
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{
+    margin:0 0 18px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-3);
+  }
+  h1{
+    margin:0;font-size:clamp(30px,4vw,46px);line-height:1.08;
+    letter-spacing:-.02em;font-weight:600;
+  }
+  .lede{margin:16px 0 0;max-width:560px;color:var(--ink-2);font-size:15px}
+  .lede b{color:var(--ink);font-weight:500}
+
+  /* ---------- section chrome ---------- */
+  section{padding:44px 0;border-bottom:1px solid var(--line-soft)}
+  .blockhead{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap}
+  .blockhead h2{
+    margin:0;font-family:var(--mono);font-size:11px;font-weight:500;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+  }
+  .blockhead p{margin:0;font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+
+  /* ---------- palette ---------- */
+  .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .chip{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
+  .chip .sw{height:56px;border-radius:8px;margin-bottom:12px}
+  .chip .nm{font-size:13px;font-weight:600;letter-spacing:-.01em}
+  .chip .en{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+  .chip .hx{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.7}
+
+  /* ---------- rules ---------- */
+  .rules{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+  .rule{border:1px solid var(--line-soft);border-radius:12px;padding:16px 16px 14px}
+  .rule .n{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
+  .rule p{margin:8px 0 0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+  .rule p b{color:var(--ink);font-weight:500}
+
+  /* ---------- test panels ---------- */
+  .panel{border-radius:18px;padding:30px 28px 24px;border:1px solid var(--line-soft)}
+  .panel--dark{background:var(--test-dark)}
+  .panel--light{background:var(--test-light);border-color:rgba(0,0,0,.08)}
+  .row{display:flex;gap:34px;flex-wrap:wrap}
+  .cell{width:108px}
+  .cell .art{width:108px;height:108px;display:block}
+  .cap{margin:10px 0 0;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3)}
+  .panel--light .cap{color:#8A8A93}
+  .cap b{display:block;font-weight:500;font-family:var(--sans);font-size:11.5px;letter-spacing:0;color:var(--ink-2)}
+  .panel--light .cap b{color:#4A4A52}
+  .stagerow .cell{width:108px}
+
+  /* ---------- cards ---------- */
+  .cards{display:flex;gap:24px;flex-wrap:wrap}
+  .card{
+    width:360px;border-radius:22px;padding:20px;display:flex;align-items:center;gap:16px;
+    border:1px solid transparent;
+  }
+  .card--dark{background:#101610;border-color:rgba(255,255,255,.07)}
+  .card--light{background:#FFFFFF;border-color:rgba(0,0,0,.06);color:#14170F}
+  .card__tree{width:120px;height:120px;display:block;flex:none}
+  .card__body{min-width:0;flex:1}
+  .card__title{margin:0 0 12px;font-size:15px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .metric{margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12px;color:var(--ink-2);padding:5px 0;border-top:1px solid rgba(255,255,255,.07)}
+  .card--light .metric{border-top-color:rgba(0,0,0,.07);color:#6B6B73}
+  .metric b{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink)}
+  .card--light .metric b{color:#14170F}
+
+  /* ---------- overview ---------- */
+  .overview{display:grid;grid-template-columns:repeat(6,190px);gap:12px;overflow-x:auto;padding-bottom:8px}
+  .ov{background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;padding:8px 8px 10px}
+  .ov img{width:190px;height:190px;display:block}
+  .ov span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:var(--ink-3);padding-left:4px}
+
+  /* ---------- footer note ---------- */
+  .accept{
+    margin-top:34px;border:1px solid rgba(182,255,46,.22);border-radius:14px;
+    padding:18px 20px;background:rgba(182,255,46,.04);
+  }
+  .accept p{margin:0;font-size:13px;color:var(--ink-2)}
+  .accept p+p{margin-top:6px}
+  .accept b{color:#D8F5A4;font-weight:600}
+  .accept code{font-family:var(--mono);font-size:11.5px;color:#CFE9A6}
+
+  @media (max-width:1100px){
+    .palette,.rules{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:720px){
+    main{padding:0 18px 64px}
+    .palette,.rules{grid-template-columns:1fr}
+    .row{gap:18px}
+    .card{width:100%}
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <p class="kicker">CarbonLife · 首页卡片素材 · v3</p>
+    <h1>碳小树</h1>
+    <p class="lede">为 <b>108px</b> 设计。第一版太薄，第二版太碎。这一版只保留能活到 108px 的东西：<b>色相先行，轮廓其次，明暗只做整块</b>。</p>
+  </header>
+
+  <section>
+    <div class="blockhead">
+      <h2>配色 / Palette</h2>
+      <p>5 形态 = 5 个主色相</p>
+    </div>
+    <div class="palette">
+      <div class="chip">
+        <div class="sw" style="background:#4E9F63"></div>
+        <div class="en">mixed</div>
+        <div class="nm">均衡</div>
+        <div class="hx">#4E9F63 · 深 #3A7F4D<br>浅 #63B878</div>
+      </div>
+      <div class="chip">
+        <div class="sw" style="background:#2FA894"></div>
+        <div class="en">travel</div>
+        <div class="nm">出行</div>
+        <div class="hx">#2FA894 · 深 #227F70<br>浅 #5CC4AE</div>
+      </div>
+      <div class="chip">
+        <div class="sw" style="background:#4C8FA8"></div>
+        <div class="en">recycle</div>
+        <div class="nm">回收</div>
+        <div class="hx">#4C8FA8 · 深 #376E84<br>浅 #7FB0C6</div>
+      </div>
+      <div class="chip">
+        <div class="sw" style="background:#D9A63C"></div>
+        <div class="en">energy</div>
+        <div class="nm">节能</div>
+        <div class="hx">#D9A63C · 深 #A87C26<br>浅 #E8C46A</div>
+      </div>
+      <div class="chip">
+        <div class="sw" style="background:#C97A5E"></div>
+        <div class="en">food</div>
+        <div class="nm">餐饮</div>
+        <div class="hx">#C97A5E · 深 #A05B43<br>浅 #E39A7E</div>
+      </div>
+    </div>
+
+    <div class="rules">
+      <div class="rule"><div class="n">01</div><p><b>3 个色阶。</b>主 / 深 / 浅，深在下、浅在上，只做整块，不做渐变。</p></div>
+      <div class="rule"><div class="n">02</div><p><b>无细节。</b>无叶簇、叶脉、描边、高光点。108px 下全部是噪点。</p></div>
+      <div class="rule"><div class="n">03</div><p><b>树干固定。</b>#6B4B33；地面阴影用主色 15%。</p></div>
+      <div class="rule"><div class="n">04</div><p><b>#B6FF2E 只做光环。</b>仅常青阶段，透明度 ≤ 0.18。</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="blockhead">
+      <h2>01 · 108px 深色底</h2>
+      <p>stage 4 · 结果期 · #080C07</p>
+    </div>
+    <div class="panel panel--dark">
+      <div class="row">
+        <div class="cell"><img class="art" src="trees/tree_mixed_4.svg" alt="均衡 结果期"><p class="cap"><b>均衡</b>mixed · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_travel_4.svg" alt="出行 结果期"><p class="cap"><b>出行</b>travel · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_recycle_4.svg" alt="回收 结果期"><p class="cap"><b>回收</b>recycle · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_energy_4.svg" alt="节能 结果期"><p class="cap"><b>节能</b>energy · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_food_4.svg" alt="餐饮 结果期"><p class="cap"><b>餐饮</b>food · s4</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="blockhead">
+      <h2>02 · 108px 浅色底</h2>
+      <p>stage 4 · 同一批 · #E9E9EC</p>
+    </div>
+    <div class="panel panel--light">
+      <div class="row">
+        <div class="cell"><img class="art" src="trees/tree_mixed_4.svg" alt="均衡 结果期"><p class="cap"><b>均衡</b>mixed · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_travel_4.svg" alt="出行 结果期"><p class="cap"><b>出行</b>travel · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_recycle_4.svg" alt="回收 结果期"><p class="cap"><b>回收</b>recycle · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_energy_4.svg" alt="节能 结果期"><p class="cap"><b>节能</b>energy · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_food_4.svg" alt="餐饮 结果期"><p class="cap"><b>餐饮</b>food · s4</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="blockhead">
+      <h2>03 · 6 个阶段</h2>
+      <p>mixed · 108px · 深色底</p>
+    </div>
+    <div class="panel panel--dark">
+      <div class="row stagerow">
+        <div class="cell"><img class="art" src="trees/tree_mixed_0.svg" alt="均衡 种子"><p class="cap"><b>种子</b>seed · s0</p></div>
+        <div class="cell"><img class="art" src="trees/tree_mixed_1.svg" alt="均衡 幼苗"><p class="cap"><b>幼苗</b>sprout · s1</p></div>
+        <div class="cell"><img class="art" src="trees/tree_mixed_2.svg" alt="均衡 小树"><p class="cap"><b>小树</b>sapling · s2</p></div>
+        <div class="cell"><img class="art" src="trees/tree_mixed_3.svg" alt="均衡 开花"><p class="cap"><b>开花</b>bloom · s3</p></div>
+        <div class="cell"><img class="art" src="trees/tree_mixed_4.svg" alt="均衡 结果"><p class="cap"><b>结果</b>fruit · s4</p></div>
+        <div class="cell"><img class="art" src="trees/tree_mixed_5.svg" alt="均衡 常青"><p class="cap"><b>常青</b>evergreen · s5</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="blockhead">
+      <h2>04 · 360px 卡片模拟</h2>
+      <p>树 120px · 右侧 3 行</p>
+    </div>
+    <div class="cards">
+      <article class="card card--dark">
+        <img class="card__tree" src="trees/tree_mixed_5.svg" alt="">
+        <div class="card__body">
+          <p class="card__title"><span class="dot" style="background:#4E9F63"></span>均衡 · 常青</p>
+          <p class="metric"><span>最高占比</span><b>42%</b></p>
+          <p class="metric"><span>成长值</span><b>+128</b></p>
+        </div>
+      </article>
+      <article class="card card--light">
+        <img class="card__tree" src="trees/tree_energy_5.svg" alt="">
+        <div class="card__body">
+          <p class="card__title"><span class="dot" style="background:#D9A63C"></span>节能 · 常青</p>
+          <p class="metric"><span>最高占比</span><b>31%</b></p>
+          <p class="metric"><span>成长值</span><b>+96</b></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section style="border-bottom:none">
+    <div class="blockhead">
+      <h2>05 · 总览</h2>
+      <p>30 / 30 · 190px · 行=形态 列=阶段</p>
+    </div>
+    <div class="overview">
+      <div class="ov"><img src="trees/tree_mixed_0.svg" alt=""><span>mixed · 0</span></div>
+      <div class="ov"><img src="trees/tree_mixed_1.svg" alt=""><span>mixed · 1</span></div>
+      <div class="ov"><img src="trees/tree_mixed_2.svg" alt=""><span>mixed · 2</span></div>
+      <div class="ov"><img src="trees/tree_mixed_3.svg" alt=""><span>mixed · 3</span></div>
+      <div class="ov"><img src="trees/tree_mixed_4.svg" alt=""><span>mixed · 4</span></div>
+      <div class="ov"><img src="trees/tree_mixed_5.svg" alt=""><span>mixed · 5</span></div>
+
+      <div class="ov"><img src="trees/tree_travel_0.svg" alt=""><span>travel · 0</span></div>
+      <div class="ov"><img src="trees/tree_travel_1.svg" alt=""><span>travel · 1</span></div>
+      <div class="ov"><img src="trees/tree_travel_2.svg" alt=""><span>travel · 2</span></div>
+      <div class="ov"><img src="trees/tree_travel_3.svg" alt=""><span>travel · 3</span></div>
+      <div class="ov"><img src="trees/tree_travel_4.svg" alt=""><span>travel · 4</span></div>
+      <div class="ov"><img src="trees/tree_travel_5.svg" alt=""><span>travel · 5</span></div>
+
+      <div class="ov"><img src="trees/tree_recycle_0.svg" alt=""><span>recycle · 0</span></div>
+      <div class="ov"><img src="trees/tree_recycle_1.svg" alt=""><span>recycle · 1</span></div>
+      <div class="ov"><img src="trees/tree_recycle_2.svg" alt=""><span>recycle · 2</span></div>
+      <div class="ov"><img src="trees/tree_recycle_3.svg" alt=""><span>recycle · 3</span></div>
+      <div class="ov"><img src="trees/tree_recycle_4.svg" alt=""><span>recycle · 4</span></div>
+      <div class="ov"><img src="trees/tree_recycle_5.svg" alt=""><span>recycle · 5</span></div>
+
+      <div class="ov"><img src="trees/tree_energy_0.svg" alt=""><span>energy · 0</span></div>
+      <div class="ov"><img src="trees/tree_energy_1.svg" alt=""><span>energy · 1</span></div>
+      <div class="ov"><img src="trees/tree_energy_2.svg" alt=""><span>energy · 2</span></div>
+      <div class="ov"><img src="trees/tree_energy_3.svg" alt=""><span>energy · 3</span></div>
+      <div class="ov"><img src="trees/tree_energy_4.svg" alt=""><span>energy · 4</span></div>
+      <div class="ov"><img src="trees/tree_energy_5.svg" alt=""><span>energy · 5</span></div>
+
+      <div class="ov"><img src="trees/tree_food_0.svg" alt=""><span>food · 0</span></div>
+      <div class="ov"><img src="trees/tree_food_1.svg" alt=""><span>food · 1</span></div>
+      <div class="ov"><img src="trees/tree_food_2.svg" alt=""><span>food · 2</span></div>
+      <div class="ov"><img src="trees/tree_food_3.svg" alt=""><span>food · 3</span></div>
+      <div class="ov"><img src="trees/tree_food_4.svg" alt=""><span>food · 4</span></div>
+      <div class="ov"><img src="trees/tree_food_5.svg" alt=""><span>food · 5</span></div>
+    </div>
+
+    <div class="accept">
+      <p><b>验收标准 ·</b> 108px 下不靠文字，能区分 5 个形态。</p>
+      <p>深底 <code>#080C07</code> 与浅底 <code>#E9E9EC</code> 均不脏、不糊、不刺眼。全部 30 个文件为纯 <code>path / circle / ellipse</code>，无渐变、无 filter、无文字、无外部字体。</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

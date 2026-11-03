@@ -1,13 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <ellipse cx="100" cy="172" rx="53" ry="11" fill="#8C7B5E" opacity="0.18"/>
-  <path d="M100 168 Q100 134 100 108" stroke="#6B4F35" stroke-width="8.5" fill="none" stroke-linecap="round"/>
-  <path d="M100 120 q-18 -8 -26 -18" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <path d="M100 126 q18 -8 26 -14" stroke="#6B4F35" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <ellipse cx="100.0" cy="102.1" rx="32.9" ry="29.7" fill="#2E8B57"/>
-  <ellipse cx="77.7" cy="113.8" rx="19.1" ry="18.0" fill="#3FA36A"/>
-  <ellipse cx="122.3" cy="113.8" rx="19.1" ry="18.0" fill="#4CB877"/>
-  <circle cx="84" cy="94" r="6.2" fill="#E8603C"/>
-  <circle cx="116" cy="92" r="6.2" fill="#E8603C"/>
-  <circle cx="100" cy="110" r="6.2" fill="#E8603C"/>
-  <circle cx="78" cy="112" r="6.2" fill="#E8603C"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="food tree, fruit stage">
+  <ellipse cx="100" cy="178" rx="52" ry="8.5" fill="#C97A5E" opacity="0.15"/>
+  <path d="M 89.3 178 C 91.3 160 91.7 150.2 92.7 132.2 L 107.3 132.2 C 108.3 150.2 108.7 160 110.7 178 Z" fill="#6B4B33"/>
+  <path d="M 44.2 87.2 A 55.8 55.8 0 1 0 155.8 87.2 A 55.8 55.8 0 1 0 44.2 87.2 Z M 51.4 125 A 48.6 19.8 0 1 0 148.6 125 A 48.6 19.8 0 1 0 51.4 125 Z" fill="#A05B43"/>
+  <path d="M 44.2 80 A 55.8 55.8 0 1 0 155.8 80 A 55.8 55.8 0 1 0 44.2 80 Z M 51.4 117.8 A 48.6 19.8 0 1 0 148.6 117.8 A 48.6 19.8 0 1 0 51.4 117.8 Z" fill="#C97A5E"/>
+  <ellipse cx="83.8" cy="63.8" rx="27" ry="18" fill="#E39A7E"/>
+  <circle cx="73" cy="103.4" r="13.5" fill="#8F3B2A"/>
+  <circle cx="100" cy="114.2" r="13.5" fill="#8F3B2A"/>
+  <circle cx="127" cy="103.4" r="13.5" fill="#8F3B2A"/>
 </svg>

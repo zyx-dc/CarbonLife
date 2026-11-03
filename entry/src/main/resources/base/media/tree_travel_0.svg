@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="travel tree, seed stage">
+  <ellipse cx="100" cy="178" rx="46" ry="8.5" fill="#2FA894" opacity="0.15"/>
+  <path d="M 52 176 C 52 156 72 146 100 146 C 128 146 148 156 148 176 Z" fill="#6B4B33"/>
+  <ellipse cx="100" cy="134" rx="13" ry="18" fill="#A97C50"/>
+  <path d="M 100 120 L 100 106" stroke="#6B4B33" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 100 118 Q 96.8 99.2 78 96 Q 81.2 114.8 100 118 Z" fill="#5CC4AE"/>
+  <path d="M 100 112 Q 118.4 110.1 122 92 Q 103.6 93.9 100 112 Z" fill="#2FA894"/>
+</svg>

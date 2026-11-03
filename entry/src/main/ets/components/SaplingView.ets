@@ -6,7 +6,9 @@ import { AppMotion } from '../common/Theme';
  * - 阶段：0 种子 / 1 幼苗 / 2 小树 / 3 开花 / 4 结果 / 5 常青
  * - 形态：mixed / travel / recycle / food / energy，由行为结构决定（见 Sapling.variantOf）
  * - 形态或阶段变化时做一次交叉淡入，避免"啪"地换图
- * - 素材：sapling_0/1 + tree_<variant>_<stage>.svg（tools/tree/gen_trees.py 生成）
+ * - 素材：tree_<variant>_<stage>.svg，由 OpenDesign 生成（见 docs/tasks/tree-concept/）
+ *
+ * 设计约束：108px 下靠"主色 + 大轮廓"识别，细节不参与识别。
  */
 @Component
 export struct SaplingView {
@@ -57,14 +59,10 @@ export struct SaplingView {
   }
 
   private mediaFor(stage: number, variant: string): Resource {
-    if (stage <= 0) {
-      return $r('app.media.sapling_0');
-    }
-    if (stage === 1) {
-      return $r('app.media.sapling_1');
-    }
     if (variant === 'travel') {
       switch (stage) {
+        case 0: return $r('app.media.tree_travel_0');
+        case 1: return $r('app.media.tree_travel_1');
         case 2: return $r('app.media.tree_travel_2');
         case 3: return $r('app.media.tree_travel_3');
         case 4: return $r('app.media.tree_travel_4');
@@ -73,6 +71,8 @@ export struct SaplingView {
     }
     if (variant === 'recycle') {
       switch (stage) {
+        case 0: return $r('app.media.tree_recycle_0');
+        case 1: return $r('app.media.tree_recycle_1');
         case 2: return $r('app.media.tree_recycle_2');
         case 3: return $r('app.media.tree_recycle_3');
         case 4: return $r('app.media.tree_recycle_4');
@@ -81,6 +81,8 @@ export struct SaplingView {
     }
     if (variant === 'food') {
       switch (stage) {
+        case 0: return $r('app.media.tree_food_0');
+        case 1: return $r('app.media.tree_food_1');
         case 2: return $r('app.media.tree_food_2');
         case 3: return $r('app.media.tree_food_3');
         case 4: return $r('app.media.tree_food_4');
@@ -89,6 +91,8 @@ export struct SaplingView {
     }
     if (variant === 'energy') {
       switch (stage) {
+        case 0: return $r('app.media.tree_energy_0');
+        case 1: return $r('app.media.tree_energy_1');
         case 2: return $r('app.media.tree_energy_2');
         case 3: return $r('app.media.tree_energy_3');
         case 4: return $r('app.media.tree_energy_4');
@@ -96,6 +100,8 @@ export struct SaplingView {
       }
     }
     switch (stage) {
+      case 0: return $r('app.media.tree_mixed_0');
+      case 1: return $r('app.media.tree_mixed_1');
       case 2: return $r('app.media.tree_mixed_2');
       case 3: return $r('app.media.tree_mixed_3');
       case 4: return $r('app.media.tree_mixed_4');
