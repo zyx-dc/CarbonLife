@@ -2,6 +2,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { image } from '@kit.ImageKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { objectDetection, visionBase } from '@kit.CoreVisionKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 export interface VisionResult {
   ok: boolean;
@@ -19,8 +20,9 @@ interface LabelMapping {
 }
 
 export class VisionService {
-  // 低于该置信度的检测结果不参与推荐，避免误判
-  private static readonly MIN_SCORE: number = 0.45;
+  // 低于该置信度的检测结果不参与推荐，避免误判；0.35–0.45 之间提示“低置信度，可修改”
+  private static readonly MIN_SCORE: number = 0.35;
+  private static readonly HIGH_SCORE: number = 0.45;
 
   // 检测模型标签索引 → 低碳行为映射表（集中维护，便于扩展）。
   // 需要覆盖更多场景时，只需在此追加一条 {labels, name, behaviorKey, message}，
@@ -53,12 +55,19 @@ export class VisionService {
       pixelMap = await source.createPixelMap();
 
       detector = await objectDetection.ObjectDetector.create();
-      const req = new visionBase.Request();
+      console.info('VisionService detector created');
       const imgData: visionBase.ImageData = { pixelMap: pixelMap };
-      req.inputData = imgData;
+      const req: visionBase.Request = { inputData: imgData };
       const resp = await detector.process(req);
+      console.info('VisionService detect done objects=' + resp.objects.length);
+      resp.objects.forEach((o: objectDetection.VisionObject, index: number) => {
+        console.info('VisionService object ' + index + ' score=' + o.score +
+          ' labels=' + o.labels.join(','));
+      });
       return VisionService.mapObjects(resp.objects);
     } catch (e) {
+      const err = e as BusinessError;
+      console.error('VisionService detect failed code=' + err.code + ' message=' + err.message);
       return { ok: false, label: '', behaviorKey: '', score: 0, message: $r('app.string.vision_failed') };
     } finally {
       // 统一释放，失败路径也不泄漏：检测器进程 / 像素图 / 图片源 / 文件句柄
@@ -107,7 +116,15 @@ export class VisionService {
     for (let i = 0; i < VisionService.LABEL_MAP.length; i++) {
       const m = VisionService.LABEL_MAP[i];
       if (m.labels.indexOf(label) >= 0) {
-        return { ok: true, label: m.name, behaviorKey: m.behaviorKey, score: score, message: m.message };
+        return {
+          ok: true,
+          label: m.name,
+          behaviorKey: m.behaviorKey,
+          score: score,
+          message: score < VisionService.HIGH_SCORE
+            ? $r('app.string.vision_low_confidence')
+            : m.message
+        };
       }
     }
     return { ok: false, label: '', behaviorKey: '', score: score, message: $r('app.string.vision_no_match') };

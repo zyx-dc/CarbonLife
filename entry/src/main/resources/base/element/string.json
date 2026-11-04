@@ -293,6 +293,7 @@
     { "name": "vision_person", "value": "识别到人物，建议记录「步行替代驾车」" },
     { "name": "vision_plant", "value": "识别到植物，建议记录「素食一餐」" },
     { "name": "vision_paper", "value": "识别到纸张类，建议记录「回收纸张」" },
+    { "name": "vision_low_confidence", "value": "识别结果置信度较低，已为你选中，可手动修改" },
     { "name": "vision_no_image", "value": "未选择图片" },
     { "name": "vision_failed", "value": "识别失败，请手动选择行为" },
     { "name": "vision_no_match", "value": "未识别到匹配场景，请手动选择行为" },
