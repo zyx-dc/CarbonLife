@@ -325,16 +325,32 @@ export struct DashboardTab {
     AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
       Column({ space: AppSpacing.SM }) {
         Text($r('app.string.dashboard_category_pie')).fontSize(AppTypography.H4.size).fontWeight(AppTypography.H4.weight).fontColor(AppColor.TEXT).width('100%');
-        PieChartView({ data: this.categoryValues, colors: this.categoryColors }).margin({ top: AppSpacing.SM });
-        Row({ space: AppSpacing.MD }) {
-          ForEach(this.legendData, (c: CategoryStat) => {
-            Row({ space: AppSpacing.XS }) {
-              Circle({ width: 8, height: 8 }).fill(c.color);
-              Text(categoryRes(c.category)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
-            }
-          }, (c: CategoryStat) => c.category);
+        if (this.legendData.length === 0) {
+          Row({ space: AppSpacing.SM }) {
+            Image($r('app.media.ic_nav_dashboard'))
+              .width(28)
+              .height(28)
+              .fillColor(AppColor.BORDER);
+            Text($r('app.string.dashboard_pie_empty'))
+              .fontSize(AppTypography.CAPTION.size)
+              .fontColor(AppColor.TEXT_SUB)
+              .layoutWeight(1);
+          }
+          .width('100%')
+          .padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
+          .alignItems(VerticalAlign.Center);
+        } else {
+          PieChartView({ data: this.categoryValues, colors: this.categoryColors }).margin({ top: AppSpacing.SM });
+          Row({ space: AppSpacing.MD }) {
+            ForEach(this.legendData, (c: CategoryStat) => {
+              Row({ space: AppSpacing.XS }) {
+                Circle({ width: 8, height: 8 }).fill(c.color);
+                Text(categoryRes(c.category)).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
+              }
+            }, (c: CategoryStat) => c.category);
+          }
+          .width('100%').justifyContent(FlexAlign.Center).margin({ top: AppSpacing.SM });
         }
-        .width('100%').justifyContent(FlexAlign.Center).margin({ top: AppSpacing.SM });
       }
     }
   }

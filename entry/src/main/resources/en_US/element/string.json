@@ -394,6 +394,7 @@
 
     { "name": "home_share_text", "value": "On CarbonLife I've saved %s kg CO₂e, earned %s points and planted %s tree(s). Join the low-carbon life!" },
     { "name": "home_family_points_suffix", "value": "%s pts" },
-    { "name": "home_family_people", "value": "%s people" }
+    { "name": "home_family_people", "value": "%s people" },
+    { "name": "dashboard_pie_empty", "value": "Log one action to see where your reductions come from" }
   ]
 }

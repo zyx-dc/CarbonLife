@@ -190,14 +190,14 @@ export struct RewardsTab {
                   }
                 }.layoutWeight(1).alignItems(HorizontalAlign.Start);
                 Text(this.balance >= item.cost ? $r('app.string.rewards_redeem') : $r('app.string.rewards_redeem_gap', (item.cost - this.balance).toString()))
-                  .width(104).height(44).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
+                  .width(92).height(36).fontSize(AppTypography.CAPTION.size).fontWeight(FontWeight.Medium)
                   .textAlign(TextAlign.Center)
                   .maxLines(1)
                   .backgroundColor(this.balance >= item.cost ? AppColor.PRIMARY : AppColor.ELEVATED)
                   .borderWidth(this.balance >= item.cost ? 0 : 1)
                   .borderColor(AppColor.BORDER)
                   .fontColor(this.balance >= item.cost ? AppColor.TEXT_INVERSE : AppColor.TEXT_SUB)
-                  .borderRadius(AppRadius.SM)
+                  .borderRadius(AppRadius.FULL)
                   .onClick(() => this.onRedeem(item));
               }
               .width('100%').padding({ top: AppSpacing.SM, bottom: AppSpacing.SM })
