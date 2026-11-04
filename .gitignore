@@ -49,3 +49,6 @@ __pycache__/
 
 # 设计文档插图（当前 UI 截图，入库以便 make-docx.cjs 可复现构建；docs/qa 才是历史取证归档）
 !docs/shots/*.jpg
+
+# 临时工作目录
+/.tmp-docdiff

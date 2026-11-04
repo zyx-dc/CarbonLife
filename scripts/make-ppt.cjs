@@ -164,7 +164,7 @@ function pic(slide, file, x, y, w, h) {
   const s = pptx.addSlide(); bg(s); header(s, "技术底座")
   bullets(s, [
     "HarmonyOS / OpenHarmony 原生：ArkTS + ArkUI 声明式 UI（Stage 模型，SDK 26.0.0）",
-    "本机存储：Preferences；家庭：分布式数据对象",
+    "本机存储：Preferences；家庭：分布式 KV 存储",
     "端侧 AI：CoreVisionKit 物体检测；提醒：后台代理提醒",
   ])
 }
