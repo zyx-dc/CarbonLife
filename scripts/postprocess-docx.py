@@ -12,11 +12,18 @@ docx itself (run this right after `node scripts/make-docx.cjs`):
 3. Content tables repeat their header row when they cross a page.
 4. The permission-name column in table 6 is set to 9.5 pt so
    `ohos.permission.DISTRIBUTED_DATASYNC` no longer breaks mid-word.
+5. Normalize the OOXML so Microsoft Word accepts the file (LibreOffice and
+   python-docx are lenient, Word is not):
+   - `<w:sectPr>` must be the LAST child of `<w:body>` (html-to-docx puts it first);
+   - `<w:pgMar w:header="undefined">` is not a number and is replaced;
+   - children of pPr / rPr / tblPr / trPr / tcPr / tblBorders / tcBorders / sectPr
+     are reordered to the schema sequence.
 
 Usage:
   python scripts/postprocess-docx.py [--docx PATH]
 """
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
@@ -43,6 +50,78 @@ COLUMN_WIDTHS = {
 }
 
 EDGES = ("top", "left", "bottom", "right", "insideH", "insideV")
+
+# OOXML child sequences (subset we actually emit). Word rejects out-of-order children.
+ORDERS = {
+    "pPr": ["pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl",
+            "numPr", "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens",
+            "kinsoku", "wordWrap", "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN",
+            "bidi", "adjustRightInd", "snapToGrid", "spacing", "ind", "contextualSpacing",
+            "mirrorIndents", "suppressOverlap", "jc", "textDirection", "textAlignment",
+            "textboxTightWrap", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"],
+    "rPr": ["rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike",
+            "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish",
+            "webHidden", "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight",
+            "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang",
+            "eastAsianLayout", "specVanish", "oMath"],
+    "tblPr": ["tblStyle", "tblpPr", "tblOverlap", "bidiVisual", "tblStyleRowBandSize",
+              "tblStyleColBandSize", "tblW", "jc", "tblCellSpacing", "tblInd", "tblBorders",
+              "shd", "tblLayout", "tblCellMar", "tblLook", "tblCaption", "tblDescription"],
+    "trPr": ["cnfStyle", "divId", "gridBefore", "gridAfter", "wBefore", "wAfter", "cantSplit",
+             "trHeight", "tblHeader", "tblCellSpacing", "jc", "hidden", "ins", "del", "trPrChange"],
+    "tcPr": ["cnfStyle", "tcW", "gridSpan", "hMerge", "vMerge", "tcBorders", "shd", "noWrap",
+             "tcMar", "textDirection", "tcFitText", "vAlign", "hideMark", "headers", "cellIns",
+             "cellDel", "cellMerge", "tcPrChange"],
+    "tblBorders": ["top", "left", "bottom", "right", "insideH", "insideV"],
+    "tcBorders": ["top", "left", "bottom", "right", "insideH", "insideV", "tl2br", "tr2bl"],
+    "sectPr": ["footnotePr", "endnotePr", "type", "pgSz", "pgMar", "paperSrc", "pgBorders",
+               "lnNumType", "pgNumType", "cols", "formProt", "vAlign", "noEndnote", "titlePg",
+               "textDirection", "bidi", "rtlGutter", "docGrid", "printerSettings", "sectPrChange"],
+    "tblCellMar": ["top", "left", "bottom", "right"],
+    "tcMar": ["top", "left", "bottom", "right"],
+}
+
+# attributes of w:pgMar that must be integers
+PGMAR_DEFAULTS = {"header": "851", "footer": "992", "gutter": "0"}
+
+
+def _local(tag):
+    return tag.split("}")[-1]
+
+
+def reorder(el, order):
+    index = {tag: i for i, tag in enumerate(order)}
+    children = list(el)
+    ranked = sorted(enumerate(children),
+                    key=lambda pair: (index.get(_local(pair[1].tag), len(order) + 1), pair[0]))
+    for child in children:
+        el.remove(child)
+    for _, child in ranked:
+        el.append(child)
+
+
+def normalize_ooxml(doc):
+    """Make the package acceptable to Microsoft Word."""
+    root = doc.element
+    body = root.body
+    sect = body.find(qn("w:sectPr"))
+    if sect is not None:
+        body.remove(sect)
+        body.append(sect)
+
+    fixed = 0
+    for pgmar in root.iter(qn("w:pgMar")):
+        for attr, default in PGMAR_DEFAULTS.items():
+            value = pgmar.get(qn("w:" + attr))
+            if value is not None and not value.lstrip("-").isdigit():
+                pgmar.set(qn("w:" + attr), default)
+                fixed += 1
+
+    for name, order in ORDERS.items():
+        for el in root.iter(qn("w:" + name)):
+            reorder(el, order)
+    return fixed
+
 
 
 def has_image(table):
@@ -153,7 +232,12 @@ def main():
     if not path.exists():
         sys.exit(f"docx not found: {path}")
 
-    doc = Document(str(path))
+    # Work on a copy: python-docx keeps the source package open on Windows, so saving
+    # straight back onto it can raise PermissionError.
+    work = path.with_name(path.stem + ".work" + path.suffix)
+    shutil.copyfile(path, work)
+
+    doc = Document(str(work))
     figures = [t for t in doc.tables if has_image(t)]
     content = [t for t in doc.tables if not has_image(t)]
 
@@ -179,7 +263,14 @@ def main():
             shrink_first_column(t, 8.5)
     print(f"  content tables (widths + repeat header): {len(content)}")
 
-    doc.save(str(path))
+    fixed = normalize_ooxml(doc)
+    print(f"  OOXML normalized for Word (pgMar attributes fixed: {fixed})")
+
+    doc.save(str(work))
+    # a WeChat-received or otherwise read-only target cannot be replaced on Windows
+    if path.exists():
+        path.chmod(0o666)
+    work.replace(path)
     print(f"  saved {path} ({path.stat().st_size // 1024} KB)")
 
 
