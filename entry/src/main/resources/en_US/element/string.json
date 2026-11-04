@@ -401,6 +401,14 @@
 
     { "name": "home_share_text", "value": "On CarbonLife I've saved %s kg CO₂e, earned %s points and planted %s tree(s). Join the low-carbon life!" },
     { "name": "home_family_points_suffix", "value": "%s pts" },
-    { "name": "home_family_people", "value": "%s people" }
+    { "name": "home_family_people", "value": "%s people" },
+    { "name": "home_start_title", "value": "Start in three steps" },
+    { "name": "home_start_step1", "value": "Pick an action: walking, cycling, clean plate, recycling and 10 more" },
+    { "name": "home_start_step2", "value": "Enter the amount; CO2e and points are worked out for you" },
+    { "name": "home_start_step3", "value": "The more you log, the faster your sapling grows" },
+    { "name": "home_start_footnote", "value": "Works offline; data stays on this device" },
+    { "name": "home_start_cta", "value": "Log your first action" },
+    { "name": "home_start_knowledge", "value": "Read the basics first" },
+    { "name": "record_first_hint", "value": "Step one: pick an action, enter the amount, then save" }
   ]
 }

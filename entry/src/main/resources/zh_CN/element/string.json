@@ -401,6 +401,14 @@
     { "name": "home_share_text", "value": "我在「CarbonLife」App 已累计减排 %s kg CO₂e，获得 %s 积分，种下 %s 棵树。一起加入低碳生活吧！" },
     { "name": "home_family_points_suffix", "value": "%s 分" },
     { "name": "home_family_people", "value": "%s 人" },
-    { "name": "rewards_tree_count_one", "value": "%s 棵" }
+    { "name": "rewards_tree_count_one", "value": "%s 棵" },
+    { "name": "home_start_title", "value": "三步开始你的低碳账本" },
+    { "name": "home_start_step1", "value": "选一个行为：步行、骑行、光盘、回收等 13 种" },
+    { "name": "home_start_step2", "value": "填数量，自动算出减排量和积分" },
+    { "name": "home_start_step3", "value": "记录越多，碳小树长得越快" },
+    { "name": "home_start_footnote", "value": "全程离线，数据只存在这台设备" },
+    { "name": "home_start_cta", "value": "记录第一个行为" },
+    { "name": "home_start_knowledge", "value": "先看看低碳科普" },
+    { "name": "record_first_hint", "value": "第一步：选一个行为 → 填数量 → 保存" }
   ]
 }

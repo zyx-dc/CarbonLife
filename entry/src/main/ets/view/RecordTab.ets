@@ -16,7 +16,7 @@ import { behaviorNameRes, categoryRes, unitRes, resolveStr } from '../common/Loc
 @Component
 export struct RecordTab {
   @StorageLink('recordsVersion') version: number = 0;
-  private onChange: () => void = () => { this.todayList = this.todayRecords(); this.todayRecordPoints = CarbonStore.get().recordPointsToday(); };
+  private onChange: () => void = () => { this.todayList = this.todayRecords(); this.todayRecordPoints = CarbonStore.get().recordPointsToday(); this.hasAnyRecord = CarbonStore.get().totalCount() > 0; };
   private uiContext: UIContext = this.getUIContext();
   controller: TabsController = new TabsController();
   @State category: string = '出行';
@@ -28,6 +28,8 @@ export struct RecordTab {
   @State todayRecordPoints: number = 0;
   @State removingId: string = '';
   @State amountPulse: boolean = false;
+  // 一条记录都没有时，在顶部给一句「第一步做什么」
+  @State hasAnyRecord: boolean = false;
   // 首页每日任务点击时写入，格式 "t1|<时间戳>"；时间戳保证重复点击也会触发
   @StorageLink('recordPreset') @Watch('applyPreset') preset: string = '';
 
@@ -35,6 +37,7 @@ export struct RecordTab {
     CarbonStore.get().addChangeListener(this.onChange);
     this.todayList = this.todayRecords();
     this.todayRecordPoints = CarbonStore.get().recordPointsToday();
+    this.hasAnyRecord = CarbonStore.get().totalCount() > 0;
     this.applyPreset();
     setTimeout(() => this.ready = true, AppMotion.reduceMotion() ? 0 : 60);
   }
@@ -201,6 +204,28 @@ export struct RecordTab {
         }
         .width('100%').alignItems(HorizontalAlign.Start)
         .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 }).animation(AppMotion.enterOptions());
+
+        if (!this.hasAnyRecord) {
+          Row({ space: AppSpacing.SM }) {
+            Text($r('app.string.record_first_hint'))
+              .fontSize(AppTypography.SMALL.size)
+              .fontColor(AppColor.TEXT_SUB)
+              .layoutWeight(1);
+          }
+          .width('100%')
+          .padding({
+            left: AppSpacing.MD,
+            right: AppSpacing.MD,
+            top: AppSpacing.SM,
+            bottom: AppSpacing.SM
+          })
+          .borderRadius(AppRadius.MD)
+          .backgroundColor(AppColor.GLASS)
+          .borderWidth(1)
+          .borderColor(AppColor.GLASS_BORDER)
+          .opacity(this.ready ? 1 : 0)
+          .animation(AppMotion.enterOptions());
+        }
 
                   AppCard({ cardPadding: AppSpacing.MD , enter: this.ready, enterDelayIndex: 1}) {
           Column({ space: AppSpacing.SM }) {

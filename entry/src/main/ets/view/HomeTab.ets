@@ -41,6 +41,8 @@ export struct HomeTab {
   @State totalSaved: string = '0.00';
   @State totalPoints: string = '0';
   @State totalCount: string = '0';
+  // 首次使用（一条记录都没有）时，首屏不摆一排 0，而是告诉他这个 App 怎么用
+  @State hasRecords: boolean = false;
   @State treeCount: string = '0';
   @State familySaved: string = '0.00';
   @State familyPoints: string = '0';
@@ -87,6 +89,7 @@ export struct HomeTab {
     this.totalSaved = store.totalSaved().toFixed(2);
     this.totalPoints = store.totalPoints().toString();
     this.totalCount = store.totalCount().toString();
+    this.hasRecords = store.totalCount() > 0;
     this.treeCount = Rewards.treeCount(store).toString();
     this.familySaved = family.getSaved().toFixed(2);
     this.familyPoints = family.getPoints().toString();
@@ -271,6 +274,26 @@ export struct HomeTab {
       Text(value).fontSize(AppTypography.H4.size).fontWeight(FontWeight.Bold).fontColor(color);
       Text(label).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
     }.layoutWeight(1).alignItems(HorizontalAlign.Center);
+  }
+
+  @Builder startStep(no: string, text: ResourceStr) {
+    Row({ space: AppSpacing.SM }) {
+      Text(no)
+        .fontSize(AppTypography.SMALL.size)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppColor.TEXT_INVERSE)
+        .width(20)
+        .height(20)
+        .textAlign(TextAlign.Center)
+        .borderRadius(10)
+        .backgroundColor(AppColor.PRIMARY);
+      Text(text)
+        .fontSize(AppTypography.BODY.size)
+        .fontColor(AppColor.TEXT)
+        .layoutWeight(1);
+    }
+    .width('100%')
+    .alignItems(VerticalAlign.Center);
   }
 
   @Builder sectionTitle(title: ResourceStr, subtitle?: ResourceStr) {
@@ -491,6 +514,24 @@ export struct HomeTab {
               Image($r('app.media.ic_leaf')).width(38).height(38).fillColor(AppColor.TEXT_SUB);
             }.width('100%');
 
+            if (!this.hasRecords) {
+              Column({ space: AppSpacing.SM }) {
+                Text($r('app.string.home_start_title'))
+                  .fontSize(AppTypography.H3.size)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(AppColor.TEXT)
+                  .width('100%');
+                this.startStep('1', $r('app.string.home_start_step1'));
+                this.startStep('2', $r('app.string.home_start_step2'));
+                this.startStep('3', $r('app.string.home_start_step3'));
+                Text($r('app.string.home_start_footnote'))
+                  .fontSize(AppTypography.CAPTION.size)
+                  .fontColor(AppColor.TEXT_SUB)
+                  .width('100%');
+              }
+              .width('100%')
+              .alignItems(HorizontalAlign.Start);
+            } else {
             Column({ space: AppSpacing.XXS }) {
               AnimatedNumber({ value: parseFloat(this.todaySaved), decimals: 2, textSize: AppTypography.DISPLAY.size, textColor: AppColor.READING });
               Text($r('app.string.home_today_unit')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
@@ -510,6 +551,7 @@ export struct HomeTab {
                 Text($r('app.string.home_total_trees')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
               }.layoutWeight(1).alignItems(HorizontalAlign.Start);
             }.width('100%');
+            }
           }
           .width('100%')
           .padding(AppSpacing.LG)
@@ -617,8 +659,23 @@ export struct HomeTab {
           .onClick(() => { this.showShare = true; })
 
           Row({ space: AppSpacing.SM }) {
-            AppButton({ text: $r('app.string.home_go_record'), type: 'primary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(1));
-            AppButton({ text: $r('app.string.home_share_card'), type: 'secondary' }).layoutWeight(1).onClick(() => this.showShare = true);
+            AppButton({
+              text: this.hasRecords ? $r('app.string.home_go_record') : $r('app.string.home_start_cta'),
+              type: 'primary'
+            })
+              .layoutWeight(1)
+              .onClick(() => {
+                if (!this.hasRecords) {
+                  // 首条记录：直接落到「步行」预选，省掉一次选择
+                  AppStorage.setOrCreate('recordPreset', 't1|' + Date.now().toString());
+                }
+                this.controller.changeIndex(1);
+              });
+            if (this.hasRecords) {
+              AppButton({ text: $r('app.string.home_share_card'), type: 'secondary' }).layoutWeight(1).onClick(() => this.showShare = true);
+            } else {
+              AppButton({ text: $r('app.string.home_start_knowledge'), type: 'secondary' }).layoutWeight(1).onClick(() => this.controller.changeIndex(4));
+            }
           }
           .width('100%')
           .opacity(this.ready ? 1 : 0).translate({ y: this.ready ? 0 : 20 })
