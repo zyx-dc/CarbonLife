@@ -114,6 +114,8 @@ export struct HomeTab {
       this.familyCode = code;
       this.refresh();
       ToastHelper.show(this.uiContext, $r('app.string.family_code_toast', code));
+    }).catch(() => {
+      ToastHelper.show(this.uiContext, $r('app.string.family_gen_failed'));
     });
   }
 
@@ -125,6 +127,8 @@ export struct HomeTab {
     FamilyService.get().joinSession(this.familyCode).then(() => {
       this.refresh();
       ToastHelper.show(this.uiContext, $r('app.string.family_joined'));
+    }).catch(() => {
+      ToastHelper.show(this.uiContext, $r('app.string.family_join_failed'));
     });
   }
 

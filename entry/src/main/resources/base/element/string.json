@@ -74,6 +74,8 @@
     { "name": "family_manage", "value": "加入 / 管理家庭组" },
     { "name": "family_need_code", "value": "请先输入或生成家庭码" },
     { "name": "family_joined", "value": "已加入家庭组" },
+    { "name": "family_gen_failed", "value": "生成失败：请检查分布式权限与网络" },
+    { "name": "family_join_failed", "value": "加入失败：请检查分布式权限与网络" },
     { "name": "family_left", "value": "已退出家庭组" },
     { "name": "family_synced", "value": "已同步我的碳积分" },
     { "name": "family_code_toast", "value": "家庭码：%s" },

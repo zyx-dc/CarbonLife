@@ -1,28 +1,35 @@
-import { distributedDataObject } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 import { CarbonStore } from './CarbonStore';
 import { AppConst } from '../common/Constants';
+import { FamilyKvStore } from './FamilyKvStore';
 
-export class MemberData {
-  deviceId: string = '';
-  nickname: string = '我';
-  saved: number = 0;
-  points: number = 0;
-  updatedAt: number = 0;
+/**
+ * 家庭组：基于分布式 KV 的跨设备成员聚合（docs/ROADMAP.md 方案 A）。
+ *
+ * key   = member:<deviceId>
+ * value = JSON.stringify(MemberData)
+ * store = 家庭码（未加入时用本地 store）
+ */
+export interface MemberData {
+  deviceId: string;
+  nickname: string;
+  saved: number;
+  points: number;
+  updatedAt: number;
 }
 
-class FamilyData {
-  members: MemberData[] = [];
-}
+const LOCAL_STORE = 'carbonlife_family_local_v2';
 
 export class FamilyService {
   private static instance: FamilyService | null = null;
-  private obj: distributedDataObject.DataObject | null = null;
-  private model: FamilyData = new FamilyData();
+  private kv: FamilyKvStore = new FamilyKvStore();
+  private ctx: common.Context | null = null;
+  private members: MemberData[] = [];
   private localDeviceId: string = '';
   private sessionId: string = '';
-  private peerOnline: boolean = false;
+  private nickname: string = '我';
+  private initialized: boolean = false;
   private versionCounter: number = 1;
   private changeListeners: Array<() => void> = [];
 
@@ -34,36 +41,42 @@ export class FamilyService {
   }
 
   async init(ctx: common.Context): Promise<void> {
-    if (this.obj !== null) {
+    if (this.initialized) {
       return;
     }
+    this.ctx = ctx;
     this.localDeviceId = await this.ensureDeviceId();
-    // 清理历史版本可能残留的 deviceId 为空的幽灵成员
-    this.model.members = this.model.members.filter((m: MemberData) => m.deviceId !== '');
+    this.nickname = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_NAME, '我');
+    let saved = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_SESSION, '');
+    if (saved !== '' && !/^[A-Za-z0-9_]{1,64}$/.test(saved)) {
+      console.warn('FamilyService drop invalid/legacy session ' + saved);
+      await CarbonStore.get().setSetting(AppConst.KEY_FAMILY_SESSION, '');
+      saved = '';
+    }
+    this.sessionId = saved;
     try {
-      this.obj = distributedDataObject.create(ctx, this.model);
-      this.obj.on('change', (sessionId: string, fields: Array<string>) => {
-        this.notify();
+      const storeId = saved === '' ? LOCAL_STORE : 'fam_' + saved;
+      await this.kv.open(ctx, storeId);
+      this.kv.onChanged(() => {
+        void this.reload();
       });
-      this.obj.on('status', (sessionId: string, networkId: string, status: string) => {
-        this.peerOnline = status === 'online';
-        this.notify();
-      });
+      await this.reload();
+      this.kv.sync();
+      this.initialized = true;
+      this.pushLocal();
+      console.info('FamilyService init ok store=' + storeId + ' members=' + this.members.length);
     } catch (e) {
       console.error('FamilyService init failed: ' + JSON.stringify(e));
-      return;
-    }
-    const name = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_NAME, '我');
-    this.setNickname(name);
-    // 恢复上次的家庭会话，避免重启后掉出家庭组
-    const savedSession = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_SESSION, '');
-    if (savedSession !== '') {
-      this.sessionId = savedSession;
-      await this.applySession(savedSession);
     }
   }
 
   private async ensureDeviceId(): Promise<string> {
+    // 系统级设备 ID 由 udid-hash + appid 派生，两台设备天然不同；
+    // 旧的随机 UUID 存在 Preferences 里，备份恢复到另一台设备会撞 key。
+    const systemId = this.kv.localDeviceId();
+    if (systemId !== '') {
+      return systemId;
+    }
     let id = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_DEVICE_ID, '');
     if (id === '') {
       id = util.generateRandomUUID(true);
@@ -72,107 +85,103 @@ export class FamilyService {
     return id;
   }
 
-  private data(): FamilyData {
-    return (this.obj ?? this.model) as FamilyData;
-  }
-
-  private localMember(): MemberData {
-    const data = this.data();
-    let member = data.members.find((m: MemberData) => m.deviceId === this.localDeviceId);
-    if (!member) {
-      member = new MemberData();
-      member.deviceId = this.localDeviceId;
-      // 整体赋值而非原地 push：分布式数据对象对嵌套数组的原地修改不会触发同步
-      if (this.localDeviceId !== '') {
-        const next: MemberData[] = data.members.slice();
-        next.push(member);
-        data.members = next;
-      }
+  private async reload(): Promise<void> {
+    try {
+      const raw = await this.kv.readAll();
+      const list: MemberData[] = [];
+      raw.forEach((json: string) => {
+        try {
+          list.push(JSON.parse(json) as MemberData);
+        } catch (e) {
+          console.error('FamilyService bad member json: ' + json);
+        }
+      });
+      this.members = list;
+      console.info('FamilyService reload members=' + list.length + ' ids=' +
+        list.map((m: MemberData) => m.deviceId).join(','));
+      this.notify();
+    } catch (e) {
+      console.error('FamilyService reload failed: ' + JSON.stringify(e));
     }
-    return member;
   }
 
   async genSession(): Promise<string> {
-    this.sessionId = distributedDataObject.genSessionId();
-    await this.applySession(this.sessionId);
-    return this.sessionId;
+    const code = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    await this.applySession(code);
+    console.info('FamilyService genSession code=' + code);
+    return code;
   }
 
   async joinSession(sessionId: string): Promise<void> {
-    this.sessionId = sessionId;
     await this.applySession(sessionId);
+    console.info('FamilyService joinSession code=' + sessionId);
   }
 
   async leaveSession(): Promise<void> {
-    this.sessionId = '';
+    await this.kv.remove(this.localDeviceId);
+    this.kv.sync();
     await this.applySession('');
   }
 
-  private async applySession(sessionId: string): Promise<void> {
-    if (this.obj !== null) {
-      try {
-        await this.obj.setSessionId(sessionId);
-      } catch (e) {
-        console.error('FamilyService setSessionId failed: ' + JSON.stringify(e));
-      }
+  /** 切换 KVStore 组；失败直接抛给 UI，不把无效 session 写进本地。 */
+  private async applySession(code: string): Promise<void> {
+    if (this.ctx === null) {
+      throw new Error('FamilyService not initialized');
     }
-    await CarbonStore.get().setSetting(AppConst.KEY_FAMILY_SESSION, sessionId);
+    const storeId = code === '' ? LOCAL_STORE : 'fam_' + code;
+    await this.kv.open(this.ctx, storeId);
+    this.kv.onChanged(() => {
+      void this.reload();
+    });
+    this.sessionId = code;
+    await CarbonStore.get().setSetting(AppConst.KEY_FAMILY_SESSION, code);
+    await this.reload();
+    this.kv.sync();
+    this.pushLocal();
     this.notify();
   }
 
   pushLocal(): void {
-    if (this.obj === null) {
+    if (this.ctx === null || this.localDeviceId === '') {
       return;
     }
     const store = CarbonStore.get();
-    const data = this.data();
-    const next: MemberData[] = [];
-    let found = false;
-    data.members.forEach((m: MemberData) => {
-      if (m.deviceId === this.localDeviceId) {
-        m.nickname = m.nickname === '' ? '我' : m.nickname;
-        m.saved = store.totalSaved();
-        m.points = store.pointsBalance();
-        m.updatedAt = Date.now();
-        found = true;
-      }
-      next.push(m);
+    const member: MemberData = {
+      deviceId: this.localDeviceId,
+      nickname: this.nickname,
+      saved: store.totalSaved(),
+      points: store.pointsBalance(),
+      updatedAt: Date.now()
+    };
+    void this.kv.put(member.deviceId, JSON.stringify(member)).then(() => {
+      this.kv.sync();
+      return this.reload();
+    }).catch((e: Error) => {
+      console.error('FamilyService pushLocal failed: ' + JSON.stringify(e));
     });
-    if (!found && this.localDeviceId !== '') {
-      const me = new MemberData();
-      me.deviceId = this.localDeviceId;
-      me.nickname = '我';
-      me.saved = store.totalSaved();
-      me.points = store.pointsBalance();
-      me.updatedAt = Date.now();
-      next.push(me);
-    }
-    // 整体赋值：确保分布式数据对象感知到变更并同步到组内其他设备
-    data.members = next;
-    this.notify();
   }
 
   setNickname(name: string): void {
-    const member = this.localMember();
-    member.nickname = name === '' ? '我' : name;
-    CarbonStore.get().setSetting(AppConst.KEY_FAMILY_NAME, member.nickname);
+    this.nickname = name === '' ? '我' : name;
+    CarbonStore.get().setSetting(AppConst.KEY_FAMILY_NAME, this.nickname);
+    this.pushLocal();
     this.notify();
   }
 
   getNickname(): string {
-    return this.localMember().nickname;
+    return this.nickname;
   }
 
   getSaved(): number {
-    return this.data().members.reduce((sum: number, m: MemberData) => sum + m.saved, 0);
+    return this.members.reduce((sum: number, m: MemberData) => sum + m.saved, 0);
   }
 
   getPoints(): number {
-    return this.data().members.reduce((sum: number, m: MemberData) => sum + m.points, 0);
+    return this.members.reduce((sum: number, m: MemberData) => sum + m.points, 0);
   }
 
   getMembers(): MemberData[] {
-    return this.data().members.slice();
+    return this.members.slice();
   }
 
   isLocal(deviceId: string): boolean {
@@ -184,7 +193,7 @@ export class FamilyService {
   }
 
   isPeerOnline(): boolean {
-    return this.peerOnline;
+    return this.members.length > 1;
   }
 
   addChangeListener(cb: () => void): void {
