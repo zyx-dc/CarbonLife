@@ -60,11 +60,19 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground(): void {
-    hilog.info(DOMAIN, TAG, 'Ability onForeground');
+    console.info('EntryAbility onForeground enter');
+    // 回到前台补一次同步：锁屏/切后台期间的本地写入可能还积压着没推给对端。
+    // resync() 内部会判断是否已初始化，未初始化时直接返回。
+    const family = FamilyService.get();
+    family.resync();
+    family.startTicker();
+    console.info('EntryAbility onForeground done');
   }
 
   onBackground(): void {
-    hilog.info(DOMAIN, TAG, 'Ability onBackground');
+    console.info('EntryAbility onBackground');
+    // 停掉前台心跳，避免后台空转耗电；重试交给下次回到前台
+    FamilyService.get().stopTicker();
   }
 
   onConfigurationUpdate(newConfig: Configuration): void {

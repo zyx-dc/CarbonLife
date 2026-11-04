@@ -46,6 +46,7 @@ export struct HomeTab {
   @State familyPoints: string = '0';
   @State familyStatusRes: Resource = $r('app.string.family_status_none');
   @State familyJoined: boolean = false;
+  @State familySyncText: string = '';
   @State members: MemberData[] = [];
   @State taskStates: boolean[] = [];
   @State suggestionsList: ResourceStr[] = [];
@@ -93,6 +94,7 @@ export struct HomeTab {
       ? (family.isPeerOnline() ? $r('app.string.family_status_online') : $r('app.string.family_status_waiting'))
       : $r('app.string.family_status_none');
     this.members = family.getMembers();
+    this.familySyncText = this.syncLabel(family);
     this.suggestionsList = Rewards.suggestions(store);
     this.taskStates = Rewards.TASKS.map((t: DailyTask) => Rewards.taskDone(t.key, store));
     const s: SaplingState = Sapling.of(store);
@@ -107,6 +109,31 @@ export struct HomeTab {
       }, 2000);
     }
     this.lastStage = s.stage;
+  }
+
+  /** 「刚刚同步 / N 分钟前同步 / 尚未同步」；有积压时追加「待同步」。 */
+  private syncLabel(family: FamilyService): string {
+    if (!this.familyJoined) {
+      return '';
+    }
+    const at: number = family.lastSyncAt();
+    let text: string = '';
+    if (at <= 0) {
+      text = resolveStr($r('app.string.family_sync_never'));
+    } else {
+      const diff: number = Date.now() - at;
+      if (diff < 60000) {
+        text = resolveStr($r('app.string.family_sync_just'));
+      } else if (diff < 3600000) {
+        text = resolveStr($r('app.string.family_sync_min', Math.floor(diff / 60000).toString()));
+      } else {
+        text = resolveStr($r('app.string.family_sync_hour', Math.floor(diff / 3600000).toString()));
+      }
+    }
+    if (family.isSyncPending()) {
+      text = text + ' · ' + resolveStr($r('app.string.family_sync_pending'));
+    }
+    return text;
   }
 
   onGenCode(): void {
@@ -669,6 +696,13 @@ export struct HomeTab {
                     Text($r('app.string.home_family_points')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
                   }.layoutWeight(1);
                 }.width('100%').margin({ top: AppSpacing.SM });
+                if (this.familySyncText !== '') {
+                  Text(this.familySyncText)
+                    .fontSize(AppTypography.SMALL.size)
+                    .fontColor(AppColor.TEXT_SUB)
+                    .width('100%')
+                    .margin({ top: AppSpacing.XS });
+                }
                 if (this.members.length >= 2) {
                   Column({ space: AppSpacing.XS }) {
                     this.sectionTitle($r('app.string.home_family_members'), $r('app.string.home_family_people', this.members.length.toString()));

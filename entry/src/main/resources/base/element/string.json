@@ -78,6 +78,11 @@
     { "name": "family_join_failed", "value": "加入失败：请检查分布式权限与网络" },
     { "name": "family_left", "value": "已退出家庭组" },
     { "name": "family_synced", "value": "已同步我的碳积分" },
+    { "name": "family_sync_never", "value": "尚未同步" },
+    { "name": "family_sync_just", "value": "刚刚同步" },
+    { "name": "family_sync_min", "value": "%s 分钟前同步" },
+    { "name": "family_sync_hour", "value": "%s 小时前同步" },
+    { "name": "family_sync_pending", "value": "待同步" },
     { "name": "family_code_toast", "value": "家庭码：%s" },
 
     { "name": "reminder_title", "value": "每日低碳提醒" },

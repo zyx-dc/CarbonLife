@@ -17,9 +17,22 @@ export interface MemberData {
   saved: number;
   points: number;
   updatedAt: number;
+  /**
+   * 已退出家庭的墓碑标记。
+   * 不能直接 delete key：对端离线时没收到删除，等它上线会把缓存里的旧值 PUSH 回来，
+   * 于是「已经退出的人」永远留在对端成员列表里。墓碑是一份带时间戳的正式数据，
+   * 能按 per-key 最新值规则压住旧记录。
+   */
+  deleted?: boolean;
 }
 
 const LOCAL_STORE = 'carbonlife_family_local_v2';
+/**
+ * 对端不在线时的退避重试间隔。
+ * 冷启动那一刻软总线往往还没发现对端，getAvailableDeviceListSync() 返回空，
+ * 若此时不重试，这一轮家庭数据就永远推不出去——这正是「拔掉调试线就不同步」的主因。
+ */
+const RETRY_DELAYS: number[] = [1000, 3000, 10000, 30000];
 
 export class FamilyService {
   private static instance: FamilyService | null = null;
@@ -32,6 +45,10 @@ export class FamilyService {
   private initialized: boolean = false;
   private versionCounter: number = 1;
   private changeListeners: Array<() => void> = [];
+  private retryTimer: number = -1;
+  private retryStep: number = 0;
+  private pendingSync: boolean = false;
+  private tickTimer: number = -1;
 
   static get(): FamilyService {
     if (FamilyService.instance === null) {
@@ -61,12 +78,94 @@ export class FamilyService {
         void this.reload();
       });
       await this.reload();
-      this.kv.sync();
+      // 先挂上线监听再补推，避免「挂监听之前对端刚好上线」这类事件被错过
+      this.kv.watchPeers(() => {
+        console.info('FamilyService peer online -> resync');
+        this.resync();
+      });
       this.initialized = true;
+      this.resync();
       this.pushLocal();
       console.info('FamilyService init ok store=' + storeId + ' members=' + this.members.length);
     } catch (e) {
       console.error('FamilyService init failed: ' + JSON.stringify(e));
+    }
+  }
+
+  /**
+   * 补一次双向同步。对端不在线时按 1s/3s/10s/30s 退避重试。
+   * 三个入口会调它：冷启动 init、对端上线（deviceStateChange）、App 回到前台。
+   */
+  resync(): void {
+    // init() 一开始就会设 ctx，但此时 KV 可能还没打开；用 initialized 挡住，
+    // 否则冷启动的前台回调会先闪一次「待同步」。init 末尾自己会补一次。
+    if (this.ctx === null || !this.initialized) {
+      return;
+    }
+    // 未加入家庭时不存在需要共享的数据。此时若仍 sync，会把各设备「独处时」
+    // 的旧记录互相对拉，表现为退出家庭组后本地又冒出 2 个成员。
+    if (this.sessionId === '') {
+      this.pendingSync = false;
+      this.clearRetry();
+      return;
+    }
+    const targets = this.kv.sync();
+    if (targets > 0) {
+      this.pendingSync = false;
+      this.clearRetry();
+      this.notify();
+      return;
+    }
+    this.pendingSync = true;
+    this.scheduleRetry();
+    this.notify();
+  }
+
+  private scheduleRetry(): void {
+    if (this.retryTimer !== -1 || this.retryStep >= RETRY_DELAYS.length) {
+      return;
+    }
+    const delay: number = RETRY_DELAYS[this.retryStep];
+    this.retryStep = this.retryStep + 1;
+    console.info('FamilyService retry in ' + delay + 'ms step=' + this.retryStep);
+    this.retryTimer = setTimeout(() => {
+      this.retryTimer = -1;
+      this.resync();
+    }, delay);
+  }
+
+  private clearRetry(): void {
+    if (this.retryTimer !== -1) {
+      clearTimeout(this.retryTimer);
+      this.retryTimer = -1;
+    }
+    this.retryStep = 0;
+  }
+
+  /**
+   * 前台保活心跳。退避重试 4 次（共 44 秒）就会停，若对端更晚才上线，
+   * 只靠 deviceStateChange 也可能被系统省电策略吞掉，这里再兜一层。
+   * 只在有积压时动作，没有积压就是空转，开销可忽略。
+   */
+  startTicker(): void {
+    if (this.tickTimer !== -1) {
+      return;
+    }
+    this.tickTimer = setInterval(() => {
+      if (this.pendingSync) {
+        console.info('FamilyService ticker retry');
+        this.resync();
+      }
+    }, 30000);
+    console.info('FamilyService ticker started');
+  }
+
+  /** 进后台停掉，避免在后台空耗电量；回到前台会重新拉起。 */
+  stopTicker(): void {
+    if (this.tickTimer !== -1) {
+      clearInterval(this.tickTimer);
+      this.tickTimer = -1;
+      console.info('FamilyService ticker stopped');
     }
   }
 
@@ -87,7 +186,11 @@ export class FamilyService {
       const list: MemberData[] = [];
       raw.forEach((json: string) => {
         try {
-          list.push(JSON.parse(json) as MemberData);
+          const m = JSON.parse(json) as MemberData;
+          if (m.deleted === true) {
+            return;
+          }
+          list.push(m);
         } catch (e) {
           console.error('FamilyService bad member json: ' + json);
         }
@@ -114,9 +217,35 @@ export class FamilyService {
   }
 
   async leaveSession(): Promise<void> {
-    await this.kv.remove(this.localDeviceId);
-    this.kv.sync();
+    // 不删 key，改写墓碑：对端离线时收不到删除，回来会把旧值 PUSH 回来。
+    // 切换 store 会 close 当前 store，所以先留一个同步窗口，让墓碑推出去再走。
+    const tomb: MemberData = {
+      deviceId: this.localDeviceId,
+      nickname: this.nickname,
+      saved: 0,
+      points: 0,
+      updatedAt: Date.now(),
+      deleted: true
+    };
+    try {
+      await this.kv.put(this.localDeviceId, JSON.stringify(tomb));
+      const targets = this.kv.sync();
+      console.info('FamilyService leave tombstone targets=' + targets);
+      if (targets > 0) {
+        await this.delay(1200);
+      }
+    } catch (e) {
+      console.error('FamilyService leave tombstone failed: ' + JSON.stringify(e));
+    }
     await this.applySession('');
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (e: Error) => void) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
+    });
   }
 
   /** 切换 KVStore 组；失败直接抛给 UI，不把无效 session 写进本地。 */
@@ -132,9 +261,26 @@ export class FamilyService {
     this.sessionId = code;
     await CarbonStore.get().setSetting(AppConst.KEY_FAMILY_SESSION, code);
     await this.reload();
-    this.kv.sync();
     this.pushLocal();
     this.notify();
+  }
+
+  private afterPut(): void {
+    // 同 resync()：未加入家庭时本地 store 只服务本机，不做跨设备同步
+    if (this.sessionId === '') {
+      this.pendingSync = false;
+      this.clearRetry();
+      void this.reload();
+      return;
+    }
+    const targets = this.kv.sync();
+    this.pendingSync = targets === 0;
+    if (this.pendingSync) {
+      this.scheduleRetry();
+    } else {
+      this.clearRetry();
+    }
+    void this.reload();
   }
 
   pushLocal(): void {
@@ -147,11 +293,11 @@ export class FamilyService {
       nickname: this.nickname,
       saved: store.totalSaved(),
       points: store.pointsBalance(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
+      deleted: false
     };
     void this.kv.put(member.deviceId, JSON.stringify(member)).then(() => {
-      this.kv.sync();
-      return this.reload();
+      this.afterPut();
     }).catch((e: Error) => {
       console.error('FamilyService pushLocal failed: ' + JSON.stringify(e));
     });
@@ -190,6 +336,16 @@ export class FamilyService {
 
   isPeerOnline(): boolean {
     return this.members.length > 1;
+  }
+
+  /** 有本地写入还没推出去，正在退避重试。 */
+  isSyncPending(): boolean {
+    return this.pendingSync;
+  }
+
+  /** 上次同步成功的时间戳；0 表示本次进程内还没成功过。 */
+  lastSyncAt(): number {
+    return this.kv.lastSuccessAt();
   }
 
   addChangeListener(cb: () => void): void {
