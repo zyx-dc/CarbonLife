@@ -31,6 +31,7 @@
 - 每台设备 `create(ctx, FamilyData{members: MemberData[]})`，再 `setSessionId(同一家庭码)`。
 - 本机成员写入 `members` 数组（已改为整体赋值），`getSaved()/getPoints()` 对 `members` 求和。
 - **2026-10-01 复测**：单机生成家庭码后状态由「未加入」→「等待对方」，并出现「家庭成员 1 人 · 我」；跨设备并集仍受限（下方根因），故本条保持 open。
+- **2026-11-04 已修复**：按方案 A 改用分布式 KV（`SINGLE_VERSION`，每设备 `member:<deviceId>` 分键），nova 16 + MatePad Air 双真机验证通过：双方均显示「家庭成员 2 人」，家庭减排 / 积分为两台之和。
 
 ### 根因
 DistributedDataObject 的同步粒度是**对象级**（同名对象字段以 last-write-wins 覆盖），
@@ -61,8 +62,8 @@ group = familySessionId             // 以家庭码作为 KVStore 组标识
 4. 保留 `getMembers()/getSaved()/getPoints()/isLocal()` 接口不变，UI 无需改。
 
 ### 验收标准
-- [ ] 两台登录**同一华为账号**的设备输入相同家庭码后，均显示「家庭成员 2 人」。
-- [ ] 家庭减排/积分 = 两台设备之和。
+- [x] 两台登录**同一华为账号**的设备输入相同家庭码后，均显示「家庭成员 2 人」。
+- [x] 家庭减排/积分 = 两台设备之和。
 - [ ] 离线编辑后恢复网络可自动合并（以 `updatedAt` 较新者为准）。
 - [ ] 退出家庭组后不再显示其他成员。
 
