@@ -274,7 +274,7 @@ export struct HomeTab {
           Text(subtitle).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
         }
       }.alignItems(HorizontalAlign.Start);
-    }.alignItems(VerticalAlign.Center);
+    }.width('100%').alignItems(VerticalAlign.Center);
   }
 
   @Builder memberRow(m: MemberData) {
@@ -459,7 +459,7 @@ export struct HomeTab {
     Stack() {
       Scroll() {
         Column({ space: AppSpacing.MD }) {
-          Column({ space: AppSpacing.LG }) {
+          Column({ space: AppSpacing.MD }) {
             Row() {
               Column({ space: AppSpacing.XXS }) {
                 Row({ space: AppSpacing.SM }) {
@@ -490,27 +490,27 @@ export struct HomeTab {
             }.width('100%');
 
             Column({ space: AppSpacing.XXS }) {
-              AnimatedNumber({ value: parseFloat(this.todaySaved), decimals: 2, textSize: AppTypography.DISPLAY.size, textColor: AppColor.READING });
+              AnimatedNumber({ value: parseFloat(this.todaySaved), decimals: 2, textSize: AppTypography.DISPLAY.size, textColor: parseFloat(this.todaySaved) === 0 ? AppColor.TEXT_SUB : AppColor.READING });
               Text($r('app.string.home_today_unit')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
             }.width('100%').alignItems(HorizontalAlign.Start);
 
             Row() {
               Column({ space: AppSpacing.XXS }) {
-                AnimatedNumber({ value: parseFloat(this.todayPoints), textSize: AppTypography.H3.size, textColor: AppColor.ACCENT });
-                Text($r('app.string.home_today_points')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                AnimatedNumber({ value: parseFloat(this.todayPoints), textSize: AppTypography.H3.size, textColor: parseFloat(this.todayPoints) === 0 ? AppColor.TEXT_SUB : AppColor.ACCENT });
+                Text($r('app.string.home_today_points')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
               }.layoutWeight(1).alignItems(HorizontalAlign.Start);
               Column({ space: AppSpacing.XXS }) {
                 AnimatedNumber({ value: parseFloat(this.totalSaved), decimals: 2, textSize: AppTypography.H3.size, textColor: AppColor.TEXT });
-                Text($r('app.string.home_total_saved')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                Text($r('app.string.home_total_saved')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
               }.layoutWeight(1).alignItems(HorizontalAlign.Start);
               Column({ space: AppSpacing.XXS }) {
-                AnimatedNumber({ value: parseFloat(this.treeCount), textSize: AppTypography.H3.size, textColor: AppColor.TEXT });
-                Text($r('app.string.home_total_trees')).fontSize(AppTypography.SMALL.size).fontColor(AppColor.TEXT_SUB);
+                AnimatedNumber({ value: parseFloat(this.treeCount), textSize: AppTypography.H3.size, textColor: parseFloat(this.treeCount) === 0 ? AppColor.TEXT_SUB : AppColor.TEXT });
+                Text($r('app.string.home_total_trees')).fontSize(AppTypography.CAPTION.size).fontColor(AppColor.TEXT_SUB);
               }.layoutWeight(1).alignItems(HorizontalAlign.Start);
             }.width('100%');
           }
           .width('100%')
-          .padding(AppSpacing.LG)
+          .padding(AppSpacing.MD)
           .borderRadius(AppRadius.LG)
           .backgroundColor(AppColor.GLASS_STRONG)
           .backdropBlur(24)
@@ -551,18 +551,18 @@ export struct HomeTab {
                 Stack({ alignContent: Alignment.Start }) {
                   Column()
                     .width('100%')
-                    .height(6)
-                    .borderRadius(3)
+                    .height(4)
+                    .borderRadius(2)
                     .backgroundColor(AppColor.PRIMARY_SOFT);
                   Column()
                     .width(this.progressWidth())
-                    .height(6)
-                    .borderRadius(3)
+                    .height(4)
+                    .borderRadius(2)
                     .backgroundColor(AppColor.PRIMARY)
                     .animation({ duration: AppMotion.reduceMotion() ? 0 : 480, curve: Curve.EaseOut });
                 }
                 .width('100%')
-                .height(6)
+                .height(4)
                 .margin({ top: AppSpacing.XXS, bottom: AppSpacing.XXS });
 
                 Row() {
@@ -616,12 +616,12 @@ export struct HomeTab {
           if (this.showScrollHint) {
             Row({ space: AppSpacing.XS }) {
               Text($r('app.string.home_scroll_hint'))
-                .fontSize(AppTypography.SMALL.size)
+                .fontSize(AppTypography.CAPTION.size)
                 .fontColor(AppColor.TEXT_SUB);
             }
             .width('100%')
             .justifyContent(FlexAlign.Center)
-            .opacity(0.75);
+            .opacity(0.55);
           }
 
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 3 }) {

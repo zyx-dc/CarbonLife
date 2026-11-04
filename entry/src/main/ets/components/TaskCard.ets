@@ -33,9 +33,9 @@ export struct TaskCard {
   build() {
     Row({ space: AppSpacing.SM }) {
       Text(this.done ? '✓' : '')
-        .width(22)
-        .height(22)
-        .fontSize(14)
+        .width(20)
+        .height(20)
+        .fontSize(13)
         .fontColor(AppColor.TEXT_INVERSE)
         .textAlign(TextAlign.Center)
         .backgroundColor(this.done ? AppColor.SUCCESS : 'transparent')

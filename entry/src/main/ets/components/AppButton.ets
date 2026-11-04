@@ -35,7 +35,7 @@ export struct AppButton {
     if (this.type === 'ghost') {
       return 'transparent';
     }
-    return AppColor.GLASS;
+    return AppColor.GLASS_STRONG;
   }
 
   private textColor(): string {
