@@ -55,7 +55,7 @@ export class FamilyService {
     }
     this.sessionId = saved;
     try {
-      const storeId = saved === '' ? LOCAL_STORE : 'fam_' + saved;
+      const storeId = saved === '' ? LOCAL_STORE : 'fam2_' + saved;
       await this.kv.open(ctx, storeId);
       this.kv.onChanged(() => {
         void this.reload();
@@ -71,12 +71,8 @@ export class FamilyService {
   }
 
   private async ensureDeviceId(): Promise<string> {
-    // 系统级设备 ID 由 udid-hash + appid 派生，两台设备天然不同；
-    // 旧的随机 UUID 存在 Preferences 里，备份恢复到另一台设备会撞 key。
-    const systemId = this.kv.localDeviceId();
-    if (systemId !== '') {
-      return systemId;
-    }
+    // 成员键必须跨重装稳定：用 Preferences 里的随机 UUID。
+    // 系统 getLocalDeviceId 会随签名/安装变化，不能当成员身份。
     let id = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_DEVICE_ID, '');
     if (id === '') {
       id = util.generateRandomUUID(true);
@@ -128,7 +124,7 @@ export class FamilyService {
     if (this.ctx === null) {
       throw new Error('FamilyService not initialized');
     }
-    const storeId = code === '' ? LOCAL_STORE : 'fam_' + code;
+    const storeId = code === '' ? LOCAL_STORE : 'fam2_' + code;
     await this.kv.open(this.ctx, storeId);
     this.kv.onChanged(() => {
       void this.reload();
