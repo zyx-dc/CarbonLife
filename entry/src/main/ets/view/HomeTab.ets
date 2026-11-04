@@ -643,11 +643,15 @@ export struct HomeTab {
           AppCard({ cardPadding: AppSpacing.MD, enter: this.ready, enterDelayIndex: 4 }) {
             Column({ space: AppSpacing.SM }) {
               Row() {
-                this.sectionTitle($r('app.string.home_family_title'), $r('app.string.home_family_subtitle'));
-                Blank();
+                Column() {
+                  this.sectionTitle($r('app.string.home_family_title'), $r('app.string.home_family_subtitle'));
+                }
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start);
                 Text(this.familyStatusRes)
                   .fontSize(AppTypography.CAPTION.size)
-                  .fontColor(AppColor.TEXT_SUB);
+                  .fontColor(AppColor.TEXT_SUB)
+                  .margin({ left: AppSpacing.SM });
               }.width('100%');
               // 未加入家庭时不再重复展示本机数据（与「今日/累计」口径避免混淆）
               if (this.familyJoined) {
