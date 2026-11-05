@@ -111,26 +111,31 @@ export struct HomeTab {
     this.lastStage = s.stage;
   }
 
-  /** 「刚刚同步 / N 分钟前同步 / 尚未同步」；有积压时追加「待同步」。 */
+  /**
+   * 同步状态一行。
+   * 从没成功同步过且确有积压时只显示「待同步」——此时再叠一句「尚未同步」，
+   * 会和卡片上已经合并出来的成员数据自相矛盾，看着像故障。
+   */
   private syncLabel(family: FamilyService): string {
     if (!this.familyJoined) {
       return '';
     }
     const at: number = family.lastSyncAt();
+    const pending: boolean = family.isSyncPending();
     let text: string = '';
     if (at <= 0) {
-      text = resolveStr($r('app.string.family_sync_never'));
-    } else {
-      const diff: number = Date.now() - at;
-      if (diff < 60000) {
-        text = resolveStr($r('app.string.family_sync_just'));
-      } else if (diff < 3600000) {
-        text = resolveStr($r('app.string.family_sync_min', Math.floor(diff / 60000).toString()));
-      } else {
-        text = resolveStr($r('app.string.family_sync_hour', Math.floor(diff / 3600000).toString()));
-      }
+      return pending ? resolveStr($r('app.string.family_sync_pending'))
+        : resolveStr($r('app.string.family_sync_never'));
     }
-    if (family.isSyncPending()) {
+    const diff: number = Date.now() - at;
+    if (diff < 60000) {
+      text = resolveStr($r('app.string.family_sync_just'));
+    } else if (diff < 3600000) {
+      text = resolveStr($r('app.string.family_sync_min', Math.floor(diff / 60000).toString()));
+    } else {
+      text = resolveStr($r('app.string.family_sync_hour', Math.floor(diff / 3600000).toString()));
+    }
+    if (pending) {
       text = text + ' · ' + resolveStr($r('app.string.family_sync_pending'));
     }
     return text;

@@ -61,6 +61,8 @@ export class AppConst {
   static readonly KEY_FAMILY_SESSION: string = 'family_session';
   static readonly KEY_FAMILY_NAME: string = 'family_name';
   static readonly KEY_FAMILY_DEVICE_ID: string = 'family_device_id';
+  /** 上次同步成功的时间戳。只放内存的话，冷启动后会误显示「尚未同步」。 */
+  static readonly KEY_FAMILY_LAST_SYNC: string = 'family_last_sync';
   static readonly KEY_TASK_REWARDS: string = 'task_rewards';
   static readonly KEY_REMINDER_ID: string = 'reminder_id';
   static readonly KEY_REMINDER_HOUR: string = 'reminder_hour';

@@ -49,6 +49,8 @@ export class FamilyService {
   private retryStep: number = 0;
   private pendingSync: boolean = false;
   private tickTimer: number = -1;
+  /** 落盘的上次同步成功时间；冷启动后仍能显示「N 分钟前同步」。 */
+  private lastOkPersist: number = 0;
 
   static get(): FamilyService {
     if (FamilyService.instance === null) {
@@ -64,6 +66,11 @@ export class FamilyService {
     this.ctx = ctx;
     this.localDeviceId = await this.ensureDeviceId();
     this.nickname = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_NAME, '我');
+    const savedAt = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_LAST_SYNC, '0');
+    this.lastOkPersist = parseInt(savedAt, 10);
+    if (isNaN(this.lastOkPersist) || this.lastOkPersist < 0) {
+      this.lastOkPersist = 0;
+    }
     let saved = await CarbonStore.get().getSetting(AppConst.KEY_FAMILY_SESSION, '');
     if (saved !== '' && !/^[A-Za-z0-9_]{1,64}$/.test(saved)) {
       console.warn('FamilyService drop invalid/legacy session ' + saved);
@@ -196,6 +203,7 @@ export class FamilyService {
         }
       });
       this.members = list;
+      this.stampSyncTime();
       console.info('FamilyService reload members=' + list.length + ' ids=' +
         list.map((m: MemberData) => m.deviceId).join(','));
       this.notify();
@@ -343,9 +351,18 @@ export class FamilyService {
     return this.pendingSync;
   }
 
-  /** 上次同步成功的时间戳；0 表示本次进程内还没成功过。 */
+  /** 上次同步成功的时间戳；0 表示从未成功过。 */
   lastSyncAt(): number {
-    return this.kv.lastSuccessAt();
+    return Math.max(this.kv.lastSuccessAt(), this.lastOkPersist);
+  }
+
+  /** 把本次同步成功的时间落盘，否则冷启动后卡片会误显示「尚未同步」。 */
+  private stampSyncTime(): void {
+    const at = this.kv.lastSuccessAt();
+    if (at > this.lastOkPersist) {
+      this.lastOkPersist = at;
+      void CarbonStore.get().setSetting(AppConst.KEY_FAMILY_LAST_SYNC, at.toString());
+    }
   }
 
   addChangeListener(cb: () => void): void {
