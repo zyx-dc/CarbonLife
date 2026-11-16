@@ -1,4 +1,6 @@
 # ArkTS 在 github.com 部署的 linguist 中尚未生效：.ets 会被完全忽略，
 # 导致本仓库被统计成 Python 项目（应用代码 270KB ArkTS vs 56KB 辅助脚本）。
-# ArkTS 是 TypeScript 方言，映射到 TypeScript 以获得正确的语言归类。
-*.ets linguist-language=TypeScript
+#
+# 显式关掉所有排除开关，再映射到 TypeScript（ArkTS 是 TypeScript 方言），
+# 避免 .ets 被当作生成物/第三方代码跳过。
+*.ets linguist-language=TypeScript linguist-detectable=true linguist-vendored=false linguist-generated=false linguist-documentation=false
