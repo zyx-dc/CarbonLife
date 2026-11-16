@@ -1,4 +1,4 @@
-# ArkTS 在 github.com 部署的 linguist 中尚未生效，.ets 会被完全忽略，
+# ArkTS 在 github.com 部署的 linguist 中尚未生效：.ets 会被完全忽略，
 # 导致本仓库被统计成 Python 项目（应用代码 270KB ArkTS vs 56KB 辅助脚本）。
-# 显式声明语言，让 GitHub 按 ArkTS 归类。
-*.ets linguist-language=ArkTS
+# ArkTS 是 TypeScript 方言，映射到 TypeScript 以获得正确的语言归类。
+*.ets linguist-language=TypeScript
